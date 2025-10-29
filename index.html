@@ -5,23 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finanças Pro+ v4.1 | Seu Dashboard Financeiro</title>
     
-    <!-- Scripts e Fontes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Libs de Gráficos e Exportação -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
-    <!-- Configuração do Tailwind CSS -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -32,9 +28,9 @@
                     },
                     colors: {
                         sky: {
-                           50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                           400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                           800: '#075985', 900: '#0c4a6e', 950: '#082f49',
+                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
+                            400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
+                            800: '#075985', 900: '#0c4a6e', 950: '#082f49',
                         }
                     }
                 },
@@ -42,7 +38,6 @@
         }
     </script>
 
-    <!-- Estilos Personalizados -->
     <style>
         body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         .transaction.paid { border-left-color: #10b981; } /* Emerald-500 */
@@ -94,7 +89,6 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans">
 
-    <!-- Container Principal do App -->
     <div id="main-app-container" class="flex h-screen overflow-hidden w-full">
         
         <div id="sidebar-backdrop" class="hidden lg:hidden" onclick="toggleSidebar(false)"></div>
@@ -134,17 +128,14 @@
 
             <div class="p-4 md:p-8 max-w-7xl mx-auto w-full">
                 
-                <!-- Loader inicial (oculto quando app estiver pronto) -->
                 <div id="loading-indicator" class="text-center p-8"> 
                     <div class="loader"></div>
                     <p id="loading-message" class="text-slate-500 dark:text-slate-400">Autenticando e carregando dados...</p>
                 </div>
 
-                <!-- Conteúdo principal (começa oculto) -->
                 <div id="app-content" class="hidden"> 
                     
                     <main id="page-dashboard">
-                       <!-- ... (Conteúdo Dashboard Inalterado) ... -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="scale" class="w-4 h-4"></i>Saldo Total (Contas)</h2><p id="total-balance" class="text-3xl font-bold text-sky-600 dark:text-sky-500 mt-2">R$ 0,00</p></div>
                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i>Receitas (Mês)</h2><p id="total-income" class="text-3xl font-bold text-emerald-500 mt-2">R$ 0,00</p></div>
@@ -296,14 +287,11 @@
     <button id="open-transaction-modal-btn" title="Adicionar Transação" class="hidden fixed bottom-6 right-6 z-50 bg-sky-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-sky-700 transition-all duration-300 transform hover:scale-110"><i data-lucide="plus" class="w-7 h-7"></i></button>
     
 
-    <!-- MODAIS -->
-    <!-- (Modal de Transação, Pagamento, Pagar Fatura, Alerta, Confirmação, Input - Conteúdo Inalterado) -->
-     <div id="transaction-modal" class="modal-backdrop hidden" onclick="closeTransactionModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-lg m-4" onclick="event.stopPropagation()"> <div class="flex justify-between items-center mb-4 border-b dark:border-slate-600 pb-3"> <h3 id="transaction-modal-title" class="text-xl font-bold text-slate-800 dark:text-slate-100">Nova Transação</h3> <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"><i data-lucide="x" class="w-6 h-6"></i></button> </div> <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"> <input type="hidden" id="transaction-id"> <div class="md:col-span-2"><p class="block text-slate-600 dark:text-slate-300 font-medium mb-2">Tipo</p><div class="flex gap-6"><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="expense" class="h-4 w-4 text-rose-600 focus:ring-rose-500" checked><span class="text-slate-700 dark:text-slate-300">Despesa</span></label><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="income" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300">Receita</span></label></div></div> <div class="md:col-span-2"><label for="description" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Descrição</label><input type="text" id="description" placeholder="Ex: Salário, Aluguel..." class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div><label for="amount" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Valor (R$)</label><input type="number" id="amount" placeholder="250,50" step="0.01" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div id="due-date-section"><label for="due-date" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Data</label><input type="date" id="due-date" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition dark:[color-scheme:dark]" required></div> <div id="category-section" class="md:col-span-2"><label for="category-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Categoria</label><select id="category-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div id="account-section" class="md:col-span-2"><label for="account-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Conta</label><select id="account-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div class="md:col-span-2"><label for="notes" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Notas</label><textarea id="notes" placeholder="Detalhes adicionais..." rows="2" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></textarea></div> <div class="md:col-span-2 flex items-center justify-between"> <div id="recurring-payment-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-recurring" class="h-4 w-4 text-sky-600 rounded focus:ring-sky-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Despesa Recorrente</span></label></div> <div id="status-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-paid" class="h-4 w-4 text-emerald-600 rounded focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Já foi paga/recebida?</span></label></div> </div> <div class="md:col-span-2 flex justify-end gap-4 mt-4"> <button type="button" onclick="closeTransactionModal()" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">Salvar</button> </div> </form> </div> </div>
+    <div id="transaction-modal" class="modal-backdrop hidden" onclick="closeTransactionModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-lg m-4" onclick="event.stopPropagation()"> <div class="flex justify-between items-center mb-4 border-b dark:border-slate-600 pb-3"> <h3 id="transaction-modal-title" class="text-xl font-bold text-slate-800 dark:text-slate-100">Nova Transação</h3> <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"><i data-lucide="x" class="w-6 h-6"></i></button> </div> <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"> <input type="hidden" id="transaction-id"> <div class="md:col-span-2"><p class="block text-slate-600 dark:text-slate-300 font-medium mb-2">Tipo</p><div class="flex gap-6"><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="expense" class="h-4 w-4 text-rose-600 focus:ring-rose-500" checked><span class="text-slate-700 dark:text-slate-300">Despesa</span></label><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="income" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300">Receita</span></label></div></div> <div class="md:col-span-2"><label for="description" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Descrição</label><input type="text" id="description" placeholder="Ex: Salário, Aluguel..." class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div><label for="amount" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Valor (R$)</label><input type="number" id="amount" placeholder="250,50" step="0.01" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div id="due-date-section"><label for="due-date" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Data</label><input type="date" id="due-date" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition dark:[color-scheme:dark]" required></div> <div id="category-section" class="md:col-span-2"><label for="category-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Categoria</label><select id="category-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div id="account-section" class="md:col-span-2"><label for="account-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Conta</label><select id="account-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div class="md:col-span-2"><label for="notes" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Notas</label><textarea id="notes" placeholder="Detalhes adicionais..." rows="2" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></textarea></div> <div class="md:col-span-2 flex items-center justify-between"> <div id="recurring-payment-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-recurring" class="h-4 w-4 text-sky-600 rounded focus:ring-sky-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Despesa Recorrente</span></label></div> <div id="status-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-paid" class="h-4 w-4 text-emerald-600 rounded focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Já foi paga/recebida?</span></label></div> </div> <div class="md:col-span-2 flex justify-end gap-4 mt-4"> <button type="button" onclick="closeTransactionModal()" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">Salvar</button> </div> </form> </div> </div>
     <div id="payment-modal" class="modal-backdrop hidden" onclick="closePaymentModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Confirmar Pagamento</h3> <div class="text-left space-y-4"> <p id="payment-modal-description" class="font-semibold"></p> <div><label for="payment-modal-account" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Pagar com a Conta</label><select id="payment-modal-account" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="payment-modal-type" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Tipo de Pagamento</label><select id="payment-modal-type" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="payment-modal-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Data de Pagamento</label><input type="date" id="payment-modal-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]" required></div> </div> <div class="flex justify-center gap-4 mt-6"> <button id="payment-modal-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="payment-modal-confirm" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">Confirmar</button> </div> </div> </div>
     <div id="pay-cc-bill-modal" class="modal-backdrop hidden" onclick="closePayCcBillModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Pagar Fatura do Cartão</h3> <div class="text-left space-y-4"> <p id="pay-cc-bill-description" class="font-semibold"></p> <input type="hidden" id="pay-cc-bill-account-id"> <div><label for="pay-cc-bill-from-account" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Pagar usando a conta</label><select id="pay-cc-bill-from-account" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="pay-cc-bill-amount" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor a Pagar (R$)</label><input type="number" step="0.01" id="pay-cc-bill-amount" placeholder="Valor da fatura" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></div> <div><label for="pay-cc-bill-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Data do Pagamento</label><input type="date" id="pay-cc-bill-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]" required></div> </div> <div class="flex justify-center gap-4 mt-6"> <button id="pay-cc-bill-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="pay-cc-bill-confirm" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">Confirmar Pagamento</button> </div> </div> </div>
     <div id="alert-modal" class="modal-backdrop hidden" onclick="closeAlertModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-sky-100 dark:bg-sky-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="info" class="w-8 h-8 text-sky-500"></i></div> <h3 id="alert-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Aviso</h3> <p id="alert-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Mensagem de aviso.</p> <button id="alert-modal-ok" class="w-full bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div>
     <div id="confirm-modal" class="modal-backdrop hidden" onclick="handleConfirm(false)"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-8 h-8 text-amber-500"></i></div> <h3 id="confirm-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Atenção</h3> <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Você tem certeza?</p> <div class="flex justify-center gap-4"> <button id="confirm-modal-cancel" class="flex-1 bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="confirm-modal-confirm" class="flex-1 bg-rose-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-rose-700 transition">Confirmar</button> </div> </div> </div>
-    <!-- Modal de Input -->
     <div id="input-modal" class="modal-backdrop hidden"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm m-4" onclick="event.stopPropagation()"> <h3 id="input-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Input</h3> <div class="space-y-2"> <label id="input-modal-label" for="input-modal-field" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor:</label> <input type="text" id="input-modal-field" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"> </div> <div class="flex justify-end gap-4 mt-6"> <button id="input-modal-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="input-modal-confirm" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div> </div>
 
     <script type="module">
@@ -322,7 +310,7 @@
             messagingSenderId: "588430087487",
             appId: "1:588430087487:web:73632e879a49bcb2212f8a"
         };
-         
+        
         console.log("[INIT] Using Firebase Config:", JSON.stringify(firebaseConfig)); 
 
         let app; 
@@ -456,6 +444,8 @@
         let appInitialized = false; // Flag para UI principal
         let listenersAttached = false; // Flag para listeners do Firestore
         let initialLoadTimeout = null; // Referência para timeout
+         // CORREÇÃO: Variável dataReady movida para escopo global
+         let dataReady = { accounts: false, categories: false, paymentTypes: false, transactions: false, budgets: false };
         
         const SUGGESTED_CATEGORIES = [ 'Não especificado', 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Vestuário', 'Cuidados Pessoais', 'Dívidas', 'Investimentos', 'Impostos', 'Doações', 'Assinaturas e Serviços', 'Pets', 'Outros' ]; // Adicionado 'Não especificado'
 
@@ -474,17 +464,19 @@
         function updateTheme(isDark) { /* ... (inalterada) ... */ }
         function unsubscribeAllListeners() { /* ... (inalterada) ... */ }
         
-        // Configura os listeners do Firestore (OTIMIZADO v2)
+        // Configura os listeners do Firestore (OTIMIZADO v3 - Prioriza Contas)
         function setupFirestoreListeners() { 
-             if (!currentUser) { console.warn("[LISTENER] Attempted setup without user."); return; }
+            if (!currentUser) { console.warn("[LISTENER] Attempted setup without user."); return; }
             if (listenersAttached) { console.log("[LISTENER] Listeners already attached, skipping setup."); return; }
             
             console.log("[LISTENER] Attaching Firestore listeners for user:", currentUser.uid);
             if(loadingIndicator) loadingIndicator.style.display = 'block'; 
             if(loadingMessage) loadingMessage.textContent = 'Carregando dados essenciais...'; 
 
-            let dataReady = { accounts: false, categories: false, paymentTypes: false, transactions: false, budgets: false };
-            let initialEssentialsLoadComplete = false; 
+            // Reinicia o estado de carregamento para esta nova tentativa
+            // CORREÇÃO: Usa a variável global dataReady
+            dataReady = { accounts: false, categories: false, paymentTypes: false, transactions: false, budgets: false };
+            let initialAccountLoadComplete = false; // Flag SÓ para contas
             
             clearTimeout(initialLoadTimeout); 
             initialLoadTimeout = setTimeout(() => {
@@ -502,32 +494,35 @@
 
             // Função chamada após CADA listener receber o primeiro snapshot
             const checkInitialLoad = (collectionName) => {
+                // Só marca como pronto se ainda não estava pronto
                 if (!dataReady[collectionName]) { 
                     dataReady[collectionName] = true; 
                     console.log(`[LISTENER] Initial data received for: ${collectionName}. Status updated:`, JSON.stringify(dataReady));
                 } else {
+                    // Log para atualizações subsequentes (pode ajudar a debugar loops)
                     console.log(`[LISTENER] Subsequent data update for: ${collectionName}. Status:`, JSON.stringify(dataReady));
                 }
                 
-                 console.log(`[INIT] Checking essentials: accounts=${dataReady.accounts}, categories=${dataReady.categories}, !initialEssentialsLoadComplete=${!initialEssentialsLoadComplete}`);
-                
-                 // CORREÇÃO: Inicializa a UI assim que 'accounts' carregar (prioridade máxima)
-                if (!initialEssentialsLoadComplete && dataReady.accounts) {
+                 console.log(`[INIT] Checking accounts: accounts=${dataReady.accounts}, !initialAccountLoadComplete=${!initialAccountLoadComplete}`);
+                // CORREÇÃO: Inicializa a UI assim que 'accounts' carregar (prioridade máxima)
+                if (!initialAccountLoadComplete && dataReady.accounts) {
                     console.log("[INIT] Essential data (Accounts) loaded! Initializing UI...");
-                    initialEssentialsLoadComplete = true; // Marca que o essencial (agora só contas) carregou
+                    initialAccountLoadComplete = true; 
                     if (!appInitialized) { 
                          console.log("[INIT] Calling initApp()...");
                         initApp(); 
                     } else {
                          console.log("[INIT] UI already initialized after accounts loaded, skipping initApp but calling renderAll.");
-                         renderAll(); // Renderiza com as contas já disponíveis
+                         renderAll(); 
                     }
                 } 
                 
+                 // Limpa o timeout SE TUDO já carregou
                  if (Object.values(dataReady).every(status => status === true)) {
-                    console.log("[LISTENER] All collections loaded. Clearing timeout.");
-                    clearTimeout(initialLoadTimeout); 
-                } 
+                     console.log("[LISTENER] All collections loaded. Clearing timeout.");
+                     clearTimeout(initialLoadTimeout); 
+                 } 
+                // Atualiza a mensagem de loading ENQUANTO a UI não foi inicializada
                 else if (!appInitialized && loadingMessage) { 
                     const loadedCount = Object.values(dataReady).filter(Boolean).length;
                     const totalCount = Object.keys(dataReady).length;
@@ -535,43 +530,45 @@
                 }
             };
 
+
              const handleListenerError = (error, collectionName) => { 
-                console.error(`[LISTENER] Error loading ${collectionName}:`, error);
-                if (!appInitialized && loadingIndicator) { 
-                    loadingIndicator.innerHTML = `<p class='text-red-500'>Erro ao carregar ${collectionName} (${error.code || 'sem código'}). <a href='javascript:location.reload();' class='underline font-semibold'>Recarregar</a>.</p>`;
-                    clearTimeout(initialLoadTimeout); 
-                    unsubscribeAllListeners(); 
-                } else {
-                     // Se for erro nas categorias, tenta adicionar a padrão mesmo assim
-                     if(collectionName === 'categorias' && !localCategories.some(c => c.name.toLowerCase() === 'não especificado')) {
-                        console.warn("[INIT] Error loading categories, but attempting to add default 'Não especificado' anyway.");
-                         addDoc(categoriesCol, { name: "Não especificado" }).catch(e => console.error("[INIT] Failed to add default category after error:", e));
-                     }
-                    showAlert(`Erro ao atualizar ${collectionName}. Alguns dados podem estar desatualizados.`, "Erro de Sincronização");
-                }
-            };
+                 console.error(`[LISTENER] Error loading ${collectionName}:`, error);
+                 // Erro Crítico se contas falharem antes da UI iniciar
+                 if (collectionName === 'contas' && !appInitialized && loadingIndicator) {
+                      loadingIndicator.innerHTML = `<p class='text-red-500'>Erro crítico ao carregar contas (${error.code || 'sem código'}). <a href='javascript:location.reload();' class='underline font-semibold'>Recarregar</a>.</p>`;
+                      clearTimeout(initialLoadTimeout); 
+                      unsubscribeAllListeners();
+                 } 
+                 // Erro não crítico se outras coleções falharem, ou se UI já iniciou
+                 else if (!appInitialized && loadingIndicator) { 
+                     // Se outra coleção falhar antes de iniciar, ainda tenta iniciar só com contas (mas avisa)
+                     loadingMessage.innerHTML = `<span class='text-orange-500'>Erro ao carregar ${collectionName}. Tentando continuar...</span>`;
+                      // Força a verificação para iniciar o app se as contas já carregaram
+                      if(dataReady.accounts && !appInitialized) {
+                           console.warn(`[INIT] Error loading ${collectionName}, but accounts are ready. Force calling initApp()`);
+                           initApp();
+                      }
+                 } else if (appInitialized) {
+                     showAlert(`Erro ao atualizar ${collectionName}. Alguns dados podem estar desatualizados.`, "Erro de Sincronização");
+                 }
+             };
 
             // Anexa os listeners
             console.log("[LISTENER] Attaching: accounts");
             unsubscribeListeners.push(onSnapshot(query(accountsCol), (snapshot) => { console.log(`[DATA] Accounts: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localAccounts = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt?.toDate() })); checkInitialLoad('accounts'); renderAccountsList(); populateAccountSelects(); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'contas')));
             
             console.log("[LISTENER] Attaching: categories");
-            // Listener de categorias (simplificado, adição de sugestões movida)
             unsubscribeListeners.push(onSnapshot(query(categoriesCol), (snapshot) => { 
                 console.log(`[DATA] Categories: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); 
                 localCategories = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); 
-                
-                // Marca como pronto no primeiro snapshot
-                if (!dataReady.categories) {
-                    console.log("[LISTENER] Marking categories as ready on first snapshot (v2).");
-                    checkInitialLoad('categories'); // Chama checkInitialLoad AQUI
-                }
-                
-                // Atualizações da UI que dependem de categorias (sempre que houver mudança)
+                checkInitialLoad('categories'); // Marca como pronto imediatamente
                 renderCategoriesList(); 
                 populateCategorySelects(); 
                 populateCategoryFilter(); 
-                if (appInitialized) renderAll(); // Renderiza tudo se a UI já iniciou
+                if (appInitialized) {
+                    renderAll(); 
+                     ensureDefaultCategoriesExist(); // Chama a verificação aqui, APÓS app iniciar e categorias carregarem
+                }
             }, (error) => handleListenerError(error, 'categorias')));
 
             console.log("[LISTENER] Attaching: paymentTypes");
@@ -589,23 +586,27 @@
 
         // Função para garantir que categorias padrão existam (chamada DEPOIS de initApp)
         async function ensureDefaultCategoriesExist() {
+            // CORREÇÃO: Acessa a variável global dataReady
+             if (!dataReady || !dataReady.categories) {
+                 console.log("[INIT] Skipping ensureDefaultCategoriesExist as categories not loaded yet (checked global state).");
+                 return;
+             }
             console.log("[INIT] Ensuring default categories exist...");
-            // Verifica se 'Não especificado' existe
             const hasUnspecified = localCategories.some(c => c.name.toLowerCase() === 'não especificado');
-            // Verifica se a lista inicial está vazia ou quase vazia (só 'Não especificado')
-            const needsSuggested = localCategories.length <= 1; 
+            // Só adiciona sugestões se a lista estiver realmente vazia (sem contar 'Não especificado')
+            const needsSuggested = localCategories.filter(c => c.name.toLowerCase() !== 'não especificado').length === 0; 
 
+            // Condição para adicionar: Ou falta 'Não especificado', OU a lista está vazia (exceto por 'Não especificado')
             if (!hasUnspecified || needsSuggested) {
-                console.log(`[INIT] Needs defaults: hasUnspecified=${hasUnspecified}, needsSuggested=${needsSuggested}. Calling addSuggestedCategories.`);
+                 console.log(`[INIT] Needs defaults: hasUnspecified=${hasUnspecified}, needsSuggested=${needsSuggested}. Calling addSuggestedCategories.`);
                  try {
-                     // Adiciona silenciosamente (true)
-                    await addSuggestedCategories(true);
-                     console.log("[INIT] addSuggestedCategories completed (called from ensureDefault).");
+                     await addSuggestedCategories(true); // true = silencioso
+                      console.log("[INIT] addSuggestedCategories completed (called from ensureDefault).");
                  } catch(e) {
                       console.error("[INIT] Error ensuring default categories:", e);
                  }
             } else {
-                console.log("[INIT] Default categories already exist.");
+                 console.log("[INIT] Default categories already exist or list is populated.");
             }
         }
 
@@ -619,11 +620,8 @@
             renderAll(); // Renderiza todos os componentes
             lucide.createIcons(); 
             console.log("[INIT] App UI Initialized and first render complete.");
-
-            // Chama a verificação/adição de categorias padrão DEPOIS que a UI iniciou
-            ensureDefaultCategoriesExist(); 
         }
-        function switchPage(pageKey, tabKey = null) { /* ... (inalterada) ... */ }
+        function switchPage(pageKey, tabKey = null) { /* ... (inalterada - logs já adicionados) ... */ }
         function switchConfigTab(tabKey) { /* ... (inalterada) ... */ }
         function toggleSidebar(forceOpen) { /* ... (inalterada) ... */ }
         function renderAll() { /* ... (inalterada) ... */ } 
@@ -733,66 +731,78 @@
         });
         
         // --- Event Listeners Globais ---
-             console.log("[INIT] DOMContentLoaded event fired.");
-             // Define variáveis de tema
-             themeToggleBtn = document.getElementById('theme-toggle');
-             themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-             themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-             themeToggleText = document.getElementById('theme-toggle-text');
-             
-            const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            updateTheme(isDark); 
-            
-            lucide.createIcons(); 
+        // ***** CORREÇÃO: Removido o 'DOMContentLoaded' wrapper מכאן *****
+        console.log("[INIT] DOMContentLoaded event fired.");
+        // Define variáveis de tema
+        themeToggleBtn = document.getElementById('theme-toggle');
+        themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        themeToggleText = document.getElementById('theme-toggle-text');
+        
+        const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        updateTheme(isDark); 
+        
+        lucide.createIcons(); 
 
-            // Listener do botão de tema principal
-            const themeClickHandler = () => updateTheme(!document.documentElement.classList.contains('dark'));
-            if(themeToggleBtn) { themeToggleBtn.addEventListener('click', themeClickHandler); } 
-            else { console.warn("Theme toggle button (main) not found."); }
-            
-            console.log("[INIT] DOMContentLoaded setup complete. Adding event listeners...");
+        // Listener do botão de tema principal
+        const themeClickHandler = () => updateTheme(!document.documentElement.classList.contains('dark'));
+        if(themeToggleBtn) { themeToggleBtn.addEventListener('click', themeClickHandler); } 
+        else { console.warn("Theme toggle button (main) not found."); }
+        
+        console.log("[INIT] DOMContentLoaded setup complete. Adding event listeners...");
 
-             // Listeners dos elementos da UI principal (adicionados aqui para garantir que todas as funções estejam definidas)
-             if(menuToggle) menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
-             if(sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
-             navButtons.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); switchPage(e.currentTarget.dataset.page); }));
-             navButtonLinks.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); switchPage(e.currentTarget.dataset.page, e.currentTarget.dataset.configTab); }));
-             if(configTabs) configTabs.addEventListener('click', (e) => { const button = e.target.closest('.tab-button'); if (button) { switchConfigTab(button.dataset.tab); } });
-             document.body.addEventListener('click', (e) => { const button = e.target.closest('button'); if (!button) return; const { action, id } = button.dataset; switch (action) { case 'delete-transaction': removeTransaction(id); break; case 'edit-transaction': openTransactionModal(id); break; case 'pay-transaction': openPaymentModal(id); break; case 'delete-category': removeCategory(id); break; case 'delete-payment-type': removePaymentType(id); break; case 'delete-account': removeAccount(id); break; case 'pay-cc-bill': openPayCcBillModal(id); break; } });
-             if(openTransactionModalBtn) openTransactionModalBtn.addEventListener('click', () => openTransactionModal(null));
-             if(alertModal) alertModal.addEventListener('click', (e) => { if (e.target === alertModal) closeAlertModal(); }); 
-             document.getElementById('alert-modal-ok')?.addEventListener('click', closeAlertModal);
-             if(confirmModal) confirmModal.addEventListener('click', (e) => { if(e.target === confirmModal) handleConfirm(false); }); 
-             document.getElementById('confirm-modal-cancel')?.addEventListener('click', () => handleConfirm(false));
-             document.getElementById('confirm-modal-confirm')?.addEventListener('click', () => handleConfirm(true));
-             if(inputModal) inputModal.addEventListener('click', (e) => { if(e.target === inputModal) handleInputCancel(); }); 
-             document.getElementById('input-modal-confirm')?.addEventListener('click', handleInputConfirm); 
-             document.getElementById('input-modal-cancel')?.addEventListener('click', handleInputCancel); 
-             if(transactionForm) transactionForm.addEventListener('submit', handleFormSubmit);
-             document.querySelectorAll('input[name="type"]').forEach(radio => radio.addEventListener('change', toggleTransactionFormVisibility));
-             if(isPaidInput) isPaidInput.addEventListener('change', toggleTransactionFormVisibility);
-             if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); 
-             document.getElementById('payment-modal-confirm')?.addEventListener('click', confirmPayment);
-             document.getElementById('payment-modal-cancel')?.addEventListener('click', closePaymentModal); 
-             document.getElementById('pay-cc-bill-confirm')?.addEventListener('click', confirmPayCcBill);
-             document.getElementById('pay-cc-bill-cancel')?.addEventListener('click', closePayCcBillModal); 
-             if(filter) filter.addEventListener('change', renderAll); 
-             if(filterCategory) filterCategory.addEventListener('change', renderAll);
-             if(accountForm) accountForm.addEventListener('submit', handleAccountFormSubmit);
-             if(accountTypeSelect) accountTypeSelect.addEventListener('change', () => { if(accountLimitSection) accountLimitSection.classList.toggle('hidden', accountTypeSelect.value !== 'credit'); }); 
-             if(categoryForm) categoryForm.addEventListener('submit', addCategory);
-             if(suggestCategoriesBtn) suggestCategoriesBtn.addEventListener('click', () => addSuggestedCategories(false));
-             if(paymentTypeForm) paymentTypeForm.addEventListener('submit', addPaymentType);
-             if(budgetsListContainer) budgetsListContainer.addEventListener('change', handleBudgetChange);
-             if(generateReportBtn) generateReportBtn.addEventListener('click', generateReport);
-             if(exportExcelBtn) exportExcelBtn.addEventListener('click', exportToExcel);
-             if(exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPDF);
-             if(xlsxFileInput) xlsxFileInput.addEventListener('change', handleFileSelect);
-             if(confirmImportBtn) confirmImportBtn.addEventListener('click', confirmImport); 
-             if(cancelImportBtn) cancelImportBtn.addEventListener('click', resetImportState);
-             
-             console.log("[INIT] All event listeners attached.");
-    
+         // Listeners dos elementos da UI principal (adicionados aqui para garantir que todas as funções estejam definidas)
+         if(menuToggle) menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+         if(sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+         
+         // CORREÇÃO: Adiciona listeners aos botões da sidebar
+         navButtons.forEach(button => {
+             button.addEventListener('click', (e) => { 
+                 e.preventDefault(); 
+                 const pageKey = e.currentTarget.dataset.page;
+                 console.log(`[NAV] Clicked sidebar button: ${pageKey}`); // Log Adicionado
+                 switchPage(pageKey); 
+             });
+         });
+
+         navButtonLinks.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); console.log(`[NAV] Clicked link: ${e.currentTarget.dataset.page}, tab: ${e.currentTarget.dataset.configTab}`); switchPage(e.currentTarget.dataset.page, e.currentTarget.dataset.configTab); })); // Log Adicionado
+         if(configTabs) configTabs.addEventListener('click', (e) => { const button = e.target.closest('.tab-button'); if (button) { console.log(`[NAV] Clicked config tab: ${button.dataset.tab}`); switchConfigTab(button.dataset.tab); } }); // Log Adicionado
+         document.body.addEventListener('click', (e) => { const button = e.target.closest('button'); if (!button) return; const { action, id } = button.dataset; switch (action) { case 'delete-transaction': removeTransaction(id); break; case 'edit-transaction': openTransactionModal(id); break; case 'pay-transaction': openPaymentModal(id); break; case 'delete-category': removeCategory(id); break; case 'delete-payment-type': removePaymentType(id); break; case 'delete-account': removeAccount(id); break; case 'pay-cc-bill': openPayCcBillModal(id); break; } });
+         if(openTransactionModalBtn) openTransactionModalBtn.addEventListener('click', () => openTransactionModal(null));
+         if(alertModal) alertModal.addEventListener('click', (e) => { if (e.target === alertModal) closeAlertModal(); }); 
+         document.getElementById('alert-modal-ok')?.addEventListener('click', closeAlertModal);
+         if(confirmModal) confirmModal.addEventListener('click', (e) => { if(e.target === confirmModal) handleConfirm(false); }); 
+         document.getElementById('confirm-modal-cancel')?.addEventListener('click', () => handleConfirm(false));
+         document.getElementById('confirm-modal-confirm')?.addEventListener('click', () => handleConfirm(true));
+         if(inputModal) inputModal.addEventListener('click', (e) => { if(e.target === inputModal) handleInputCancel(); }); 
+         document.getElementById('input-modal-confirm')?.addEventListener('click', handleInputConfirm); 
+         document.getElementById('input-modal-cancel')?.addEventListener('click', handleInputCancel); 
+         if(transactionForm) transactionForm.addEventListener('submit', handleFormSubmit);
+         document.querySelectorAll('input[name="type"]').forEach(radio => radio.addEventListener('change', toggleTransactionFormVisibility));
+         if(isPaidInput) isPaidInput.addEventListener('change', toggleTransactionFormVisibility);
+         if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); 
+         document.getElementById('payment-modal-confirm')?.addEventListener('click', confirmPayment);
+         document.getElementById('payment-modal-cancel')?.addEventListener('click', closePaymentModal); 
+         document.getElementById('pay-cc-bill-confirm')?.addEventListener('click', confirmPayCcBill);
+         document.getElementById('pay-cc-bill-cancel')?.addEventListener('click', closePayCcBillModal); 
+         if(filter) filter.addEventListener('change', renderAll); 
+         if(filterCategory) filterCategory.addEventListener('change', renderAll);
+         if(accountForm) accountForm.addEventListener('submit', handleAccountFormSubmit);
+         if(accountTypeSelect) accountTypeSelect.addEventListener('change', () => { if(accountLimitSection) accountLimitSection.classList.toggle('hidden', accountTypeSelect.value !== 'credit'); }); 
+         if(categoryForm) categoryForm.addEventListener('submit', addCategory);
+         if(suggestCategoriesBtn) suggestCategoriesBtn.addEventListener('click', () => addSuggestedCategories(false));
+         if(paymentTypeForm) paymentTypeForm.addEventListener('submit', addPaymentType);
+         if(budgetsListContainer) budgetsListContainer.addEventListener('change', handleBudgetChange);
+         if(generateReportBtn) generateReportBtn.addEventListener('click', generateReport);
+         if(exportExcelBtn) exportExcelBtn.addEventListener('click', exportToExcel);
+         if(exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPDF);
+         if(xlsxFileInput) xlsxFileInput.addEventListener('change', handleFileSelect);
+         if(confirmImportBtn) confirmImportBtn.addEventListener('click', confirmImport); 
+         if(cancelImportBtn) cancelImportBtn.addEventListener('click', resetImportState);
+         
+         console.log("[INIT] All event listeners attached.");
+        // ***** CORREÇÃO: Removido o '});' wrapper daqui *****
+        
     </script>
 </body>
 </html>
