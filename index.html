@@ -303,7 +303,7 @@
     <div id="pay-cc-bill-modal" class="modal-backdrop hidden" onclick="closePayCcBillModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Pagar Fatura do Cartão</h3> <div class="text-left space-y-4"> <p id="pay-cc-bill-description" class="font-semibold"></p> <input type="hidden" id="pay-cc-bill-account-id"> <div><label for="pay-cc-bill-from-account" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Pagar usando a conta</label><select id="pay-cc-bill-from-account" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="pay-cc-bill-amount" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor a Pagar (R$)</label><input type="number" step="0.01" id="pay-cc-bill-amount" placeholder="Valor da fatura" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></div> <div><label for="pay-cc-bill-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Data do Pagamento</label><input type="date" id="pay-cc-bill-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]" required></div> </div> <div class="flex justify-center gap-4 mt-6"> <button id="pay-cc-bill-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="pay-cc-bill-confirm" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">Confirmar Pagamento</button> </div> </div> </div>
     <div id="alert-modal" class="modal-backdrop hidden" onclick="closeAlertModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-sky-100 dark:bg-sky-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="info" class="w-8 h-8 text-sky-500"></i></div> <h3 id="alert-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Aviso</h3> <p id="alert-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Mensagem de aviso.</p> <button id="alert-modal-ok" class="w-full bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div>
     <div id="confirm-modal" class="modal-backdrop hidden" onclick="handleConfirm(false)"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-8 h-8 text-amber-500"></i></div> <h3 id="confirm-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Atenção</h3> <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Você tem certeza?</p> <div class="flex justify-center gap-4"> <button id="confirm-modal-cancel" class="flex-1 bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="confirm-modal-confirm" class="flex-1 bg-rose-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-rose-700 transition">Confirmar</button> </div> </div> </div>
-    <!-- NOVO: Modal de Input -->
+    <!-- Modal de Input -->
     <div id="input-modal" class="modal-backdrop hidden"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm m-4" onclick="event.stopPropagation()"> <h3 id="input-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Input</h3> <div class="space-y-2"> <label id="input-modal-label" for="input-modal-field" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor:</label> <input type="text" id="input-modal-field" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"> </div> <div class="flex justify-end gap-4 mt-6"> <button id="input-modal-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="input-modal-confirm" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div> </div>
 
     <script type="module">
@@ -457,7 +457,7 @@
         let listenersAttached = false; // Flag para listeners do Firestore
         let initialLoadTimeout = null; // Referência para timeout
         
-        const SUGGESTED_CATEGORIES = [ 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Vestuário', 'Cuidados Pessoais', 'Dívidas', 'Investimentos', 'Impostos', 'Doações', 'Assinaturas e Serviços', 'Pets', 'Outros' ];
+        const SUGGESTED_CATEGORIES = [ 'Não especificado', 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Vestuário', 'Cuidados Pessoais', 'Dívidas', 'Investimentos', 'Impostos', 'Doações', 'Assinaturas e Serviços', 'Pets', 'Outros' ]; // Adicionado 'Não especificado'
 
         // --- DEFINIÇÃO DE TODAS AS FUNÇÕES ---
         const formatCurrency = (number) => number != null ? number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
@@ -473,61 +473,61 @@
         function handleInputCancel() { /* ... (inalterada) ... */ }
         function updateTheme(isDark) { /* ... (inalterada) ... */ }
         function unsubscribeAllListeners() { /* ... (inalterada) ... */ }
+        
+        // Configura os listeners do Firestore (OTIMIZADO v2)
         function setupFirestoreListeners() { 
              if (!currentUser) { console.warn("[LISTENER] Attempted setup without user."); return; }
             if (listenersAttached) { console.log("[LISTENER] Listeners already attached, skipping setup."); return; }
             
             console.log("[LISTENER] Attaching Firestore listeners for user:", currentUser.uid);
-            // Garante que o loader interno está visível
             if(loadingIndicator) loadingIndicator.style.display = 'block'; 
-            if(loadingMessage) loadingMessage.textContent = 'Carregando dados essenciais...'; // Reset message
+            if(loadingMessage) loadingMessage.textContent = 'Carregando dados essenciais...'; 
 
-            // Estado de carregamento específico para esta chamada
             let dataReady = { accounts: false, categories: false, paymentTypes: false, transactions: false, budgets: false };
-            let initialEssentialsLoadComplete = false; // Flag para UI principal (accounts + categories)
+            let initialEssentialsLoadComplete = false; 
             
-            // Limpa timeout anterior e inicia um novo MAIS LONGO
             clearTimeout(initialLoadTimeout); 
             initialLoadTimeout = setTimeout(() => {
-                if (!appInitialized) { // Só mostra erro se a UI ainda não apareceu
+                if (!appInitialized) { 
                     console.error("[INIT] Timeout: Initial data load took longer than 60 seconds.");
                     const loadedCount = Object.values(dataReady).filter(Boolean).length;
                     const totalCount = Object.keys(dataReady).length;
-                     // Adicionado log detalhado do estado no timeout
                      console.log("[INIT] Timeout state:", JSON.stringify(dataReady));
                      if(loadingMessage) loadingMessage.innerHTML = `<span class='text-orange-500'>Carregamento demorando (${loadedCount}/${totalCount} concluídos). Verifique sua conexão ou <a href='javascript:location.reload();' class='underline font-semibold'>recarregue</a>.</span>`;
-                     if(loadingIndicator) loadingIndicator.style.display = 'block'; // Garante que o indicador está visível
+                     if(loadingIndicator) loadingIndicator.style.display = 'block'; 
                 } else {
                      console.log("[INIT] Timeout triggered but UI already initialized. Ignoring.");
                 }
-            }, 60000); // Timeout de 60 segundos
+            }, 60000); 
 
             // Função chamada após CADA listener receber o primeiro snapshot
             const checkInitialLoad = (collectionName) => {
-                dataReady[collectionName] = true; // Marca a coleção como carregada
-                console.log(`[LISTENER] Initial data received for: ${collectionName}. Status:`, JSON.stringify(dataReady));
+                if (!dataReady[collectionName]) { 
+                    dataReady[collectionName] = true; 
+                    console.log(`[LISTENER] Initial data received for: ${collectionName}. Status updated:`, JSON.stringify(dataReady));
+                } else {
+                    console.log(`[LISTENER] Subsequent data update for: ${collectionName}. Status:`, JSON.stringify(dataReady));
+                }
                 
-                // Condição para mostrar a UI: Contas E Categorias carregadas
-                 // ADICIONADO Log para verificar a condição
                  console.log(`[INIT] Checking essentials: accounts=${dataReady.accounts}, categories=${dataReady.categories}, !initialEssentialsLoadComplete=${!initialEssentialsLoadComplete}`);
-                if (!initialEssentialsLoadComplete && dataReady.accounts && dataReady.categories) {
-                    console.log("[INIT] Essential data (Accounts & Categories) loaded! Initializing UI...");
-                    initialEssentialsLoadComplete = true; // Marca que o essencial carregou
-                    if (!appInitialized) { // Só inicializa a UI uma vez
+                
+                 // CORREÇÃO: Inicializa a UI assim que 'accounts' carregar (prioridade máxima)
+                if (!initialEssentialsLoadComplete && dataReady.accounts) {
+                    console.log("[INIT] Essential data (Accounts) loaded! Initializing UI...");
+                    initialEssentialsLoadComplete = true; // Marca que o essencial (agora só contas) carregou
+                    if (!appInitialized) { 
                          console.log("[INIT] Calling initApp()...");
-                        initApp(); // Chama a função para mostrar a UI principal
+                        initApp(); 
                     } else {
-                         console.log("[INIT] UI already initialized after essentials loaded, skipping initApp but calling renderAll.");
-                         renderAll(); // Se UI já iniciou mas algo recarregou, renderiza
+                         console.log("[INIT] UI already initialized after accounts loaded, skipping initApp but calling renderAll.");
+                         renderAll(); // Renderiza com as contas já disponíveis
                     }
                 } 
                 
-                // Verifica se TUDO carregou para poder limpar o timeout
                  if (Object.values(dataReady).every(status => status === true)) {
                     console.log("[LISTENER] All collections loaded. Clearing timeout.");
-                    clearTimeout(initialLoadTimeout); // Cancela o timeout pois tudo carregou
+                    clearTimeout(initialLoadTimeout); 
                 } 
-                // Atualiza a mensagem de loading se a UI ainda não foi inicializada
                 else if (!appInitialized && loadingMessage) { 
                     const loadedCount = Object.values(dataReady).filter(Boolean).length;
                     const totalCount = Object.keys(dataReady).length;
@@ -537,37 +537,92 @@
 
              const handleListenerError = (error, collectionName) => { 
                 console.error(`[LISTENER] Error loading ${collectionName}:`, error);
-                // Se o erro ocorrer ANTES da UI inicializar, mostra erro fatal no loader
                 if (!appInitialized && loadingIndicator) { 
                     loadingIndicator.innerHTML = `<p class='text-red-500'>Erro ao carregar ${collectionName} (${error.code || 'sem código'}). <a href='javascript:location.reload();' class='underline font-semibold'>Recarregar</a>.</p>`;
-                    clearTimeout(initialLoadTimeout); // Cancela timeout
-                    unsubscribeAllListeners(); // Cancela outros listeners em caso de erro fatal
+                    clearTimeout(initialLoadTimeout); 
+                    unsubscribeAllListeners(); 
                 } else {
-                    // Se a app já iniciou, mostra um alerta não-fatal
+                     // Se for erro nas categorias, tenta adicionar a padrão mesmo assim
+                     if(collectionName === 'categorias' && !localCategories.some(c => c.name.toLowerCase() === 'não especificado')) {
+                        console.warn("[INIT] Error loading categories, but attempting to add default 'Não especificado' anyway.");
+                         addDoc(categoriesCol, { name: "Não especificado" }).catch(e => console.error("[INIT] Failed to add default category after error:", e));
+                     }
                     showAlert(`Erro ao atualizar ${collectionName}. Alguns dados podem estar desatualizados.`, "Erro de Sincronização");
                 }
             };
 
-            // Anexa os listeners e guarda as funções de unsubscribe
+            // Anexa os listeners
             console.log("[LISTENER] Attaching: accounts");
-            unsubscribeListeners.push(onSnapshot(query(accountsCol), (snapshot) => { console.log(`[DATA] Accounts: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localAccounts = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt?.toDate() })); if (!dataReady.accounts || snapshot.metadata.fromCache === false) checkInitialLoad('accounts'); renderAccountsList(); populateAccountSelects(); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'contas')));
+            unsubscribeListeners.push(onSnapshot(query(accountsCol), (snapshot) => { console.log(`[DATA] Accounts: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localAccounts = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt?.toDate() })); checkInitialLoad('accounts'); renderAccountsList(); populateAccountSelects(); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'contas')));
             
             console.log("[LISTENER] Attaching: categories");
-            unsubscribeListeners.push(onSnapshot(query(categoriesCol), async (snapshot) => { console.log(`[DATA] Categories: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localCategories = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); let categoriesNowReady = true; if (!dataReady.categories || snapshot.metadata.fromCache === false) { if (snapshot.empty && !snapshot.metadata.fromCache && !snapshot.metadata.hasPendingWrites) { console.log("[INIT] No categories found, adding suggested..."); try { await addSuggestedCategories(true); categoriesNowReady=false; /* Espera recarregar via snapshot */ } catch (e) { console.error("Error adding suggested categories on init:", e); categoriesNowReady = true; /* Continua mesmo se falhar */ } } if(categoriesNowReady) checkInitialLoad('categories'); } renderCategoriesList(); populateCategorySelects(); populateCategoryFilter(); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'categorias')));
+            // Listener de categorias (simplificado, adição de sugestões movida)
+            unsubscribeListeners.push(onSnapshot(query(categoriesCol), (snapshot) => { 
+                console.log(`[DATA] Categories: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); 
+                localCategories = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); 
+                
+                // Marca como pronto no primeiro snapshot
+                if (!dataReady.categories) {
+                    console.log("[LISTENER] Marking categories as ready on first snapshot (v2).");
+                    checkInitialLoad('categories'); // Chama checkInitialLoad AQUI
+                }
+                
+                // Atualizações da UI que dependem de categorias (sempre que houver mudança)
+                renderCategoriesList(); 
+                populateCategorySelects(); 
+                populateCategoryFilter(); 
+                if (appInitialized) renderAll(); // Renderiza tudo se a UI já iniciou
+            }, (error) => handleListenerError(error, 'categorias')));
 
             console.log("[LISTENER] Attaching: paymentTypes");
-            unsubscribeListeners.push(onSnapshot(query(paymentTypesCol), (snapshot) => { console.log(`[DATA] Payment Types: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localPaymentTypes = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); if (!dataReady.paymentTypes || snapshot.metadata.fromCache === false) checkInitialLoad('paymentTypes'); renderPaymentTypesList(); populatePaymentTypeSelects(); }, (error) => handleListenerError(error, 'tipos de pagamento')));
+            unsubscribeListeners.push(onSnapshot(query(paymentTypesCol), (snapshot) => { console.log(`[DATA] Payment Types: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localPaymentTypes = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); checkInitialLoad('paymentTypes'); renderPaymentTypesList(); populatePaymentTypeSelects(); }, (error) => handleListenerError(error, 'tipos de pagamento')));
 
             console.log("[LISTENER] Attaching: transactions");
-            unsubscribeListeners.push(onSnapshot(query(transactionsCol), (snapshot) => { console.log(`[DATA] Transactions: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); if (!dataReady.transactions || snapshot.metadata.fromCache === false) checkInitialLoad('transactions'); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'transações')));
+            unsubscribeListeners.push(onSnapshot(query(transactionsCol), (snapshot) => { console.log(`[DATA] Transactions: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); checkInitialLoad('transactions'); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'transações')));
 
             console.log("[LISTENER] Attaching: budgets");
-            unsubscribeListeners.push(onSnapshot(query(budgetsCol), (snapshot) => { console.log(`[DATA] Budgets: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localBudgets = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); if (!dataReady.budgets || snapshot.metadata.fromCache === false) checkInitialLoad('budgets'); if (appInitialized) renderBudgets(); }, (error) => handleListenerError(error, 'orçamentos')));
+            unsubscribeListeners.push(onSnapshot(query(budgetsCol), (snapshot) => { console.log(`[DATA] Budgets: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localBudgets = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); checkInitialLoad('budgets'); if (appInitialized) renderBudgets(); }, (error) => handleListenerError(error, 'orçamentos')));
             
             listenersAttached = true; // Marca que foram anexados
             console.log("[LISTENER] All listener attachments initiated.");
         }
-        function initApp() { /* ... (inalterada) ... */ }
+
+        // Função para garantir que categorias padrão existam (chamada DEPOIS de initApp)
+        async function ensureDefaultCategoriesExist() {
+            console.log("[INIT] Ensuring default categories exist...");
+            // Verifica se 'Não especificado' existe
+            const hasUnspecified = localCategories.some(c => c.name.toLowerCase() === 'não especificado');
+            // Verifica se a lista inicial está vazia ou quase vazia (só 'Não especificado')
+            const needsSuggested = localCategories.length <= 1; 
+
+            if (!hasUnspecified || needsSuggested) {
+                console.log(`[INIT] Needs defaults: hasUnspecified=${hasUnspecified}, needsSuggested=${needsSuggested}. Calling addSuggestedCategories.`);
+                 try {
+                     // Adiciona silenciosamente (true)
+                    await addSuggestedCategories(true);
+                     console.log("[INIT] addSuggestedCategories completed (called from ensureDefault).");
+                 } catch(e) {
+                      console.error("[INIT] Error ensuring default categories:", e);
+                 }
+            } else {
+                console.log("[INIT] Default categories already exist.");
+            }
+        }
+
+        function initApp() { 
+            if (appInitialized) { console.log("[INIT] UI already initialized, skipping."); return; }
+            console.log("[INIT] Initializing App UI...");
+            if(loadingIndicator) loadingIndicator.style.display = 'none'; // Esconde o loader
+            if(appContent) appContent.classList.remove('hidden'); // Mostra o conteúdo principal
+            if(openTransactionModalBtn) openTransactionModalBtn.classList.remove('hidden'); // Mostra o botão '+'
+            appInitialized = true; // Marca como inicializado ANTES do primeiro render
+            renderAll(); // Renderiza todos os componentes
+            lucide.createIcons(); 
+            console.log("[INIT] App UI Initialized and first render complete.");
+
+            // Chama a verificação/adição de categorias padrão DEPOIS que a UI iniciou
+            ensureDefaultCategoriesExist(); 
+        }
         function switchPage(pageKey, tabKey = null) { /* ... (inalterada) ... */ }
         function switchConfigTab(tabKey) { /* ... (inalterada) ... */ }
         function toggleSidebar(forceOpen) { /* ... (inalterada) ... */ }
@@ -685,8 +740,7 @@
              themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
              themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
              themeToggleText = document.getElementById('theme-toggle-text');
-             // REMOVIDO: Variáveis de tema da tela de auth
-
+             
             const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
             updateTheme(isDark); 
             
@@ -696,11 +750,10 @@
             const themeClickHandler = () => updateTheme(!document.documentElement.classList.contains('dark'));
             if(themeToggleBtn) { themeToggleBtn.addEventListener('click', themeClickHandler); } 
             else { console.warn("Theme toggle button (main) not found."); }
-            // REMOVIDO: Listener do botão de tema auth
-
+            
             console.log("[INIT] DOMContentLoaded setup complete. Adding event listeners...");
 
-             // Listeners dos elementos da UI principal
+             // Listeners dos elementos da UI principal (adicionados aqui para garantir que todas as funções estejam definidas)
              if(menuToggle) menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
              if(sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
              navButtons.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); switchPage(e.currentTarget.dataset.page); }));
@@ -719,7 +772,7 @@
              if(transactionForm) transactionForm.addEventListener('submit', handleFormSubmit);
              document.querySelectorAll('input[name="type"]').forEach(radio => radio.addEventListener('change', toggleTransactionFormVisibility));
              if(isPaidInput) isPaidInput.addEventListener('change', toggleTransactionFormVisibility);
-             if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); // Listener CORRIGIDO
+             if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); 
              document.getElementById('payment-modal-confirm')?.addEventListener('click', confirmPayment);
              document.getElementById('payment-modal-cancel')?.addEventListener('click', closePaymentModal); 
              document.getElementById('pay-cc-bill-confirm')?.addEventListener('click', confirmPayCcBill);
@@ -727,7 +780,7 @@
              if(filter) filter.addEventListener('change', renderAll); 
              if(filterCategory) filterCategory.addEventListener('change', renderAll);
              if(accountForm) accountForm.addEventListener('submit', handleAccountFormSubmit);
-             if(accountTypeSelect) accountTypeSelect.addEventListener('change', () => { if(accountLimitSection) accountLimitSection.classList.toggle('hidden', accountTypeSelect.value !== 'credit'); }); // Added null check
+             if(accountTypeSelect) accountTypeSelect.addEventListener('change', () => { if(accountLimitSection) accountLimitSection.classList.toggle('hidden', accountTypeSelect.value !== 'credit'); }); 
              if(categoryForm) categoryForm.addEventListener('submit', addCategory);
              if(suggestCategoriesBtn) suggestCategoriesBtn.addEventListener('click', () => addSuggestedCategories(false));
              if(paymentTypeForm) paymentTypeForm.addEventListener('submit', addPaymentType);
@@ -739,12 +792,9 @@
              if(confirmImportBtn) confirmImportBtn.addEventListener('click', confirmImport); 
              if(cancelImportBtn) cancelImportBtn.addEventListener('click', resetImportState);
              
-             // REMOVIDO: Listeners de Auth (loginForm, registerForm, etc.)
-
              console.log("[INIT] All event listeners attached.");
         });
         
     </script>
 </body>
 </html>
-
