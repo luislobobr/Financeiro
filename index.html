@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanças Pro+ v4.1 | Seu Dashboard Financeiro</title>
+    
+    <!-- Scripts e Fontes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Libs de Gráficos e Exportação -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- Configuração do Tailwind CSS -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                           50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
+                           400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
+                           800: '#075985', 900: '#0c4a6e', 950: '#082f49',
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+
+    <!-- Estilos Personalizados -->
+    <style>
+        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .transaction.paid { border-left-color: #10b981; } /* Emerald-500 */
+        .transaction.unpaid { border-left-color: #f97316; } /* Orange-500 */
+        .transaction.income { border-left-color: #22c55e; } /* Green-500 */
+        .transaction.overdue { border-left-color: #ef4444; } /* Red-500 */
+        .transaction.cc_payment_expense { border-left-color: #6366f1; } /* Indigo-500 */
+        .transaction.cc_payment_credit { border-left-color: #ec4899; } /* Pink-500 */
+        
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000;
+            backdrop-filter: blur(4px); transition: opacity 0.2s ease-in-out; opacity: 0; pointer-events: none;
+        }
+        .modal-backdrop:not(.hidden) { opacity: 1; pointer-events: auto; }
+        .modal-content { transition: all 0.2s ease-in-out; transform: translateY(20px); }
+        .modal-backdrop:not(.hidden) .modal-content { transform: translateY(0); }
+
+        .nav-button { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; font-weight: 600; border-radius: 0.5rem; transition: all 0.2s ease-in-out; color: #334155; }
+        .dark .nav-button { color: #cbd5e1; }
+        .nav-button:hover { background-color: #e2e8f0; }
+        .dark .nav-button:hover { background-color: #334155; }
+        .nav-button.active { background-color: #0ea5e9; color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .nav-button.active:hover { background-color: #0284c7; }
+        .nav-button svg { width: 20px; height: 20px; flex-shrink: 0; }
+        
+        .tab-button.active { border-color: #0ea5e9; color: #0ea5e9; font-weight: 700; }
+
+        .loader { border: 4px solid #e5e7eb; border-top: 4px solid #0ea5e9; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .budget-progress::-webkit-progress-bar { background-color: #e5e7eb; border-radius: 8px; }
+        .budget-progress::-webkit-progress-value { background-color: #3b82f6; border-radius: 8px; transition: width 0.5s ease; }
+        .budget-progress.over-budget::-webkit-progress-value { background-color: #ef4444; }
+
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        @media (max-width: 1023px) {
+            #sidebar { transform: translateX(-100%); }
+            #sidebar.open { transform: translateX(0); z-index: 100; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+            #sidebar-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 90; transition: opacity 0.3s ease-in-out; }
+        }
+
+        .import-item.needs-correction { border: 1px solid #f97316; background-color: #fff7ed !important; }
+        .dark .import-item.needs-correction { border-color: #fb923c; background-color: #7c2d12 !important; }
+        .import-account-select { min-width: 150px; }
+
+        /* Auth Form Styles */
+        #auth-container { max-width: 400px; margin: auto; padding-top: 5vh; }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans">
+
+     <!-- Container Autenticação (Inicialmente visível se não logado) -->
+    <div id="auth-container" class="hidden"> <!-- Começa oculto até JS verificar auth -->
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700">
+            <!-- Logo Centralizado -->
+             <div class="flex items-center justify-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-sky-600 rounded-lg flex items-center justify-center text-white">
+                    <i data-lucide="wallet-cards"></i>
+                </div>
+                <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">
+                    Finanças Pro+
+                </h1>
+            </div>
+
+            <!-- Mensagem de Erro/Status Auth -->
+            <div id="auth-message" class="mb-4 text-center text-sm"></div>
+
+            <!-- Formulário de Login (Inicialmente visível) -->
+            <form id="login-form" class="">
+                <h2 class="text-xl font-bold text-center mb-6 text-slate-700 dark:text-slate-200">Acessar Conta</h2>
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">E-mail</label>
+                    <input type="email" id="login-email" required class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+                </div>
+                <div class="mb-6">
+                    <label for="login-password" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Senha</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+                </div>
+                <button type="submit" class="w-full bg-sky-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-700 transition mb-4 flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-5 h-5"></i> Entrar
+                </button>
+                <p class="text-center text-sm text-slate-500 dark:text-slate-400">
+                    Não tem conta? <a href="#" id="show-register-link" class="font-semibold text-sky-600 hover:text-sky-700">Cadastre-se</a>
+                </p>
+            </form>
+
+            <!-- Formulário de Cadastro (Inicialmente oculto) -->
+            <form id="register-form" class="hidden">
+                 <h2 class="text-xl font-bold text-center mb-6 text-slate-700 dark:text-slate-200">Criar Conta</h2>
+                <div class="mb-4">
+                    <label for="register-email" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">E-mail</label>
+                    <input type="email" id="register-email" required class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+                </div>
+                <div class="mb-4">
+                    <label for="register-password" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Senha (mínimo 6 caracteres)</label>
+                    <input type="password" id="register-password" required minlength="6" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+                </div>
+                 <div class="mb-6">
+                    <label for="register-password-confirm" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Confirmar Senha</label>
+                    <input type="password" id="register-password-confirm" required minlength="6" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-700 transition mb-4 flex items-center justify-center gap-2">
+                     <i data-lucide="user-plus" class="w-5 h-5"></i> Cadastrar
+                </button>
+                <p class="text-center text-sm text-slate-500 dark:text-slate-400">
+                    Já tem conta? <a href="#" id="show-login-link" class="font-semibold text-sky-600 hover:text-sky-700">Faça login</a>
+                </p>
+            </form>
+            <!-- Botão de Tema no Container de Auth -->
+             <div class="mt-6 border-t border-slate-200 dark:border-slate-700 pt-4">
+                <button id="theme-toggle-auth" type="button" class="w-full flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
+                    <i id="theme-toggle-dark-icon-auth" data-lucide="moon" class="hidden"></i>
+                    <i id="theme-toggle-light-icon-auth" data-lucide="sun" class="hidden"></i>
+                    <span id="theme-toggle-text-auth"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Container Principal do App (Inicialmente oculto) -->
+    <div id="main-app-container" class="hidden flex h-screen overflow-hidden w-full">
+        
+        <div id="sidebar-backdrop" class="hidden lg:hidden" onclick="toggleSidebar(false)"></div>
+        
+        <aside id="sidebar" class="w-64 bg-white dark:bg-slate-800 fixed lg:static h-full flex flex-col z-50 shadow-lg lg:shadow-none">
+            <div class="flex items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-700">
+                <div class="w-10 h-10 bg-sky-600 rounded-lg flex items-center justify-center text-white"><i data-lucide="wallet-cards"></i></div>
+                <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Finanças Pro+</h1>
+            </div>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="#" class="nav-button active" data-page="dashboard"><i data-lucide="layout-dashboard"></i><span>Visão Geral</span></a>
+                <a href="#" class="nav-button" data-page="accounts"><i data-lucide="landmark"></i><span>Contas</span></a>
+                <a href="#" class="nav-button" data-page="manage"><i data-lucide="list-filter"></i><span>Lançamentos</span></a>
+                <a href="#" class="nav-button" data-page="budgets"><i data-lucide="piggy-bank"></i><span>Orçamentos</span></a>
+                <a href="#" class="nav-button" data-page="bi"><i data-lucide="bar-chart-3"></i><span>Análises</span></a>
+                <a href="#" class="nav-button" data-page="reports"><i data-lucide="file-text"></i><span>Relatórios</span></a>
+                <a href="#" class="nav-button" data-page="import"><i data-lucide="import"></i><span>Importar</span></a>
+                <a href="#" class="nav-button" data-page="config"><i data-lucide="settings"></i><span>Configurações</span></a>
+            </nav>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                <div class="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+                    <span id="user-email-display" title="E-mail do Usuário" class="truncate"></span> <!-- Adicionado truncate -->
+                    <span id="user-id-display" title="Seu ID de Usuário"></span>
+                </div>
+                 <button id="logout-btn" type="button" class="w-full flex items-center justify-center gap-2 text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 focus:outline-none focus:ring-4 focus:ring-rose-200 dark:focus:ring-rose-700 rounded-lg font-semibold text-sm p-2.5">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Sair
+                </button>
+                <button id="theme-toggle" type="button" class="w-full flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
+                    <i id="theme-toggle-dark-icon" data-lucide="moon" class="hidden"></i>
+                    <i id="theme-toggle-light-icon" data-lucide="sun" class="hidden"></i>
+                    <span id="theme-toggle-text"></span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
+            
+            <header class="lg:hidden sticky top-0 bg-white dark:bg-slate-800 shadow-md p-4 z-40 flex items-center justify-between">
+                <button id="menu-toggle" type="button" class="text-slate-500 dark:text-slate-400 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"><i data-lucide="menu"></i></button>
+                <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Finanças Pro+</h1>
+                <div class="w-10"></div> 
+            </header>
+
+            <div class="p-4 md:p-8 max-w-7xl mx-auto w-full">
+                
+                <div id="loading-indicator" class="text-center p-8 hidden"> <!-- Loader interno, inicialmente oculto -->
+                    <div class="loader"></div>
+                    <p id="loading-message" class="text-slate-500 dark:text-slate-400">Carregando dados...</p>
+                </div>
+
+                <div id="app-content" class="hidden"> <!-- Conteúdo principal começa oculto -->
+                    
+                    <main id="page-dashboard">
+                       <!-- ... (Conteúdo Dashboard Inalterado) ... -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="scale" class="w-4 h-4"></i>Saldo Total (Contas)</h2><p id="total-balance" class="text-3xl font-bold text-sky-600 dark:text-sky-500 mt-2">R$ 0,00</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i>Receitas (Mês)</h2><p id="total-income" class="text-3xl font-bold text-emerald-500 mt-2">R$ 0,00</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="trending-down" class="w-4 h-4"></i>Despesas (Mês)</h2><p id="total-expenses-paid" class="text-3xl font-bold text-rose-500 mt-2">R$ 0,00</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="banknote" class="w-4 h-4"></i>Balanço (Mês)</h2><p id="month-balance" class="text-3xl font-bold text-slate-700 dark:text-slate-300 mt-2">R$ 0,00</p></div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-2 space-y-8">
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200">Minhas Contas</h2>
+                                        <button data-page="config" data-config-tab="accounts" class="nav-button-link text-sm font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1">Gerenciar <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                                    </div>
+                                    <div id="dashboard-accounts-list" class="space-y-4"></div>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                                    <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Próximos Vencimentos (15 dias)</h2>
+                                    <ul id="reminders-list" class="space-y-4"></ul>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                                <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Diagnóstico Rápido</h2>
+                                <div id="financial-diagnosis" class="space-y-6"></div>
+                            </div>
+                        </div>
+                    </main>
+                    <main id="page-accounts" class="hidden">
+                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                            <div class="flex justify-between items-center border-b dark:border-slate-600 pb-3 mb-4">
+                                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Minhas Contas</h2>
+                                <button data-page="config" data-config-tab="accounts" class="nav-button-link bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition text-sm flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Nova Conta</button>
+                            </div>
+                             <div id="accounts-page-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                        </div>
+                    </main>
+                    <main id="page-budgets" class="hidden">
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-1">Orçamentos do Mês</h2>
+                            <p class="text-slate-500 dark:text-slate-400 mb-6">Defina um limite de gastos para cada categoria e acompanhe seu progresso.</p>
+                            <div id="budgets-list" class="space-y-6"></div>
+                        </div>
+                    </main>
+                    <main id="page-bi" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 text-center"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold">Despesas (30d)</h2><p id="bi-total-expenses" class="text-2xl font-bold text-rose-500 mt-2">R$ 0,00</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 text-center"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold">Média Gasto/Dia</h2><p id="bi-avg-daily-expense" class="text-2xl font-bold text-amber-500 mt-2">R$ 0,00</p></div>
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 text-center col-span-1 md:col-span-2"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold">Principal Categoria (30d)</h2><p id="bi-top-category" class="text-2xl font-bold text-slate-700 dark:text-slate-300 mt-2">-</p></div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">Receitas vs Despesas (6 meses)</h3><div class="h-80"><canvas id="income-expense-chart"></canvas></div></div>
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">Despesas por Categoria (30 dias)</h3><div class="h-80" id="expense-chart-container"><canvas id="expense-chart"></canvas></div></div>
+                            <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">Evolução do Saldo (Contas Corrente)</h3><div class="h-80"><canvas id="balance-evolution-chart"></canvas></div></div>
+                        </div>
+                    </main>
+                    <main id="page-manage" class="hidden">
+                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-6">
+                            <div class="flex flex-col md:flex-row justify-between md:items-center border-b dark:border-slate-600 pb-3 mb-4 gap-4">
+                                <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-200">Histórico de Transações</h2>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <select id="filter" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"><option value="all">Status: Todos</option><option value="unpaid">A Pagar</option><option value="paid">Pagas</option></select>
+                                    <select id="filter-category" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"><option value="all">Categoria: Todas</option></select>
+                                </div>
+                            </div>
+                            <ul id="transaction-list" class="space-y-4"></ul>
+                        </div>
+                    </main>
+                    <main id="page-config" class="hidden">
+                         <div class="bg-white dark:bg-slate-800 p-0 md:p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                            <div class="border-b border-slate-200 dark:border-slate-700 px-4 md:px-0">
+                                <nav class="flex -mb-px space-x-6 overflow-x-auto" id="config-tabs">
+                                    <button data-tab="accounts" class="tab-button active shrink-0 border-b-2 py-4 px-1 text-sm font-medium border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-200"><i data-lucide="landmark" class="w-4 h-4 inline-block -mt-1 mr-1"></i> Contas</button>
+                                    <button data-tab="categories" class="tab-button shrink-0 border-b-2 py-4 px-1 text-sm font-medium border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-200"><i data-lucide="layout-grid" class="w-4 h-4 inline-block -mt-1 mr-1"></i> Categorias</button>
+                                    <button data-tab="payment-types" class="tab-button shrink-0 border-b-2 py-4 px-1 text-sm font-medium border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-200"><i data-lucide="credit-card" class="w-4 h-4 inline-block -mt-1 mr-1"></i> Tipos de Pagamento</button>
+                                </nav>
+                            </div>
+                            <div class="py-6 px-4 md:px-0">
+                                <div id="tab-content-accounts">
+                                    <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Gerenciar Contas</h2>
+                                    <form id="account-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 items-end">
+                                        <div class="lg:col-span-1"><label for="account-name" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Nome da Conta</label><input type="text" id="account-name" placeholder="Ex: Carteira, Nubank" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div>
+                                        <div class="lg:col-span-1"><label for="account-type" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Tipo</label><select id="account-type" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"><option value="checking">Conta Corrente/Carteira</option><option value="credit">Cartão de Crédito</option></select></div>
+                                        <div class="lg:col-span-1"><label for="account-initial-balance" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Saldo Inicial (R$)</label><input type="number" step="0.01" id="account-initial-balance" placeholder="0,00" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required value="0"></div>
+                                        <div id="account-limit-section" class="hidden lg:col-span-1"><label for="account-limit" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Limite do Cartão (R$)</label><input type="number" step="0.01" id="account-limit" placeholder="1000,00" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></div>
+                                        <button type="submit" class="md:col-span-2 lg:col-span-4 bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition flex items-center justify-center gap-2 mt-4 lg:mt-0"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar Conta</button>
+                                    </form>
+                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4">Contas Cadastradas</h3>
+                                    <ul id="accounts-list" class="space-y-3"></ul>
+                                </div>
+                                <div id="tab-content-categories" class="hidden">
+                                    <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-700 dark:text-slate-200">Gerenciar Categorias</h2><button id="suggest-categories-btn" class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-600 transition text-sm flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4"></i> Sugerir</button></div>
+                                    <form id="category-form" class="flex gap-4 mb-6"><input type="text" id="category-name" placeholder="Ex: Alimentação" class="flex-grow px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"><button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition flex items-center justify-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></form>
+                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4">Categorias Cadastradas</h3>
+                                    <ul id="categories-list" class="space-y-3"></ul>
+                                </div>
+                                <div id="tab-content-payment-types" class="hidden">
+                                    <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Gerenciar Tipos de Pagamento</h2>
+                                    <form id="payment-type-form" class="flex gap-4 mb-6"><input type="text" id="payment-type-name" placeholder="Ex: Cartão de Crédito, PIX" class="flex-grow px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"><button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition flex items-center justify-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></form>
+                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4">Tipos Cadastrados</h3>
+                                    <ul id="payment-types-list" class="space-y-3"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <main id="page-reports" class="hidden">
+                          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-6">
+                            <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 border-b dark:border-slate-600 pb-3 mb-4">Filtros do Relatório</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                                <div><label for="report-start-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">De</label><input type="date" id="report-start-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]"></div>
+                                <div><label for="report-end-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Até</label><input type="date" id="report-end-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]"></div>
+                                <div><label for="report-payment-type" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Tipo de Pagamento</label><select id="report-payment-type" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg"><option value="all">Todas</option></select></div>
+                                <div><label for="report-status" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Status</label><select id="report-status" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg"><option value="all">Todos</option><option value="paid">Pago</option><option value="unpaid">A Pagar</option></select></div>
+                            </div>
+                            <button id="generate-report-btn" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition flex items-center justify-center gap-2"><i data-lucide="play" class="w-5 h-5"></i> Gerar Relatório</button>
+                        </div>
+                        <div id="report-results-section" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                            <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Resultados do Relatório</h2>
+                            <div class="bg-slate-100 dark:bg-slate-700 p-4 rounded-lg mb-4 text-center">
+                                <p class="text-slate-500 dark:text-slate-400">Total Filtrado</p>
+                                <p id="report-filtered-total" class="text-2xl font-bold text-sky-600 dark:text-sky-500"></p>
+                            </div>
+                            <div id="export-buttons" class="hidden my-4 flex flex-col sm:flex-row gap-4">
+                                <button id="export-excel-btn" class="flex-1 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Exportar para Excel</button>
+                                <button id="export-pdf-btn" class="flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i> Exportar para PDF</button>
+                            </div>
+                            <ul id="report-results-list" class="space-y-4"></ul>
+                        </div>
+                    </main>
+                    <main id="page-import" class="hidden">
+                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-6">
+                            <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 border-b dark:border-slate-600 pb-3 mb-4">Importar Transações de Excel (.xlsx)</h2>
+                            <div class="bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500 text-sky-800 dark:text-sky-300 p-4 mb-6 rounded-lg" role="alert"><p class="font-bold">Instruções:</p><p class="mt-2">Selecione o arquivo Excel exportado da versão anterior. Você poderá associar as transações pagas às suas contas cadastradas antes de confirmar.</p></div>
+                            <label for="xlsx-file-input" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Selecione o arquivo Excel</label>
+                            <input type="file" id="xlsx-file-input" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 dark:file:bg-slate-700 file:text-sky-700 dark:file:text-slate-300 hover:file:bg-sky-100 dark:hover:file:bg-slate-600">
+                            <div id="import-loader" class="hidden my-4"><div class="loader"></div><p class="text-slate-500 dark:text-slate-400 text-center">Processando...</p></div>
+                        </div>
+                        <div id="import-preview-section" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                            <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Pré-visualização da Importação</h2>
+                            <p class="text-slate-600 dark:text-slate-300 mb-4">Encontramos <b id="import-count">0</b> transações. Associe as transações pagas/recebidas a uma conta e confirme.</p>
+                            <div class="max-h-[60vh] overflow-y-auto bg-slate-100 dark:bg-slate-700 p-4 rounded-lg border dark:border-slate-600"><ul id="import-preview-list" class="space-y-2"></ul></div>
+                            <div class="mt-6 flex gap-4"><button id="confirm-import-btn" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition flex items-center justify-center gap-2"><i data-lucide="check-check" class="w-5 h-5"></i> Confirmar e Salvar</button><button id="cancel-import-btn" class="w-full bg-slate-400 text-white font-bold py-3 rounded-lg hover:bg-slate-500 transition flex items-center justify-center gap-2"><i data-lucide="x" class="w-5 h-5"></i> Cancelar</button></div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+            <footer class="text-center text-slate-500 text-sm p-4 mt-8"><span>Finanças Pro+ | Versão 4.1</span></footer>
+        </div>
+    </div>
+    
+    <button id="open-transaction-modal-btn" title="Adicionar Transação" class="hidden fixed bottom-6 right-6 z-50 bg-sky-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-sky-700 transition-all duration-300 transform hover:scale-110"><i data-lucide="plus" class="w-7 h-7"></i></button>
+    
+
+    <!-- MODAIS -->
+    <!-- (Modal de Transação, Pagamento, Pagar Fatura, Alerta, Confirmação, Input - Conteúdo Inalterado) -->
+     <div id="transaction-modal" class="modal-backdrop hidden" onclick="closeTransactionModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-lg m-4" onclick="event.stopPropagation()"> <div class="flex justify-between items-center mb-4 border-b dark:border-slate-600 pb-3"> <h3 id="transaction-modal-title" class="text-xl font-bold text-slate-800 dark:text-slate-100">Nova Transação</h3> <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"><i data-lucide="x" class="w-6 h-6"></i></button> </div> <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"> <input type="hidden" id="transaction-id"> <div class="md:col-span-2"><p class="block text-slate-600 dark:text-slate-300 font-medium mb-2">Tipo</p><div class="flex gap-6"><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="expense" class="h-4 w-4 text-rose-600 focus:ring-rose-500" checked><span class="text-slate-700 dark:text-slate-300">Despesa</span></label><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="income" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300">Receita</span></label></div></div> <div class="md:col-span-2"><label for="description" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Descrição</label><input type="text" id="description" placeholder="Ex: Salário, Aluguel..." class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div><label for="amount" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Valor (R$)</label><input type="number" id="amount" placeholder="250,50" step="0.01" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div id="due-date-section"><label for="due-date" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Data</label><input type="date" id="due-date" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition dark:[color-scheme:dark]" required></div> <div id="category-section" class="md:col-span-2"><label for="category-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Categoria</label><select id="category-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div id="account-section" class="md:col-span-2"><label for="account-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Conta</label><select id="account-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div class="md:col-span-2"><label for="notes" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Notas</label><textarea id="notes" placeholder="Detalhes adicionais..." rows="2" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></textarea></div> <div class="md:col-span-2 flex items-center justify-between"> <div id="recurring-payment-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-recurring" class="h-4 w-4 text-sky-600 rounded focus:ring-sky-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Despesa Recorrente</span></label></div> <div id="status-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-paid" class="h-4 w-4 text-emerald-600 rounded focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Já foi paga/recebida?</span></label></div> </div> <div class="md:col-span-2 flex justify-end gap-4 mt-4"> <button type="button" onclick="closeTransactionModal()" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">Salvar</button> </div> </form> </div> </div>
+    <div id="payment-modal" class="modal-backdrop hidden" onclick="closePaymentModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Confirmar Pagamento</h3> <div class="text-left space-y-4"> <p id="payment-modal-description" class="font-semibold"></p> <div><label for="payment-modal-account" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Pagar com a Conta</label><select id="payment-modal-account" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="payment-modal-type" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Tipo de Pagamento</label><select id="payment-modal-type" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="payment-modal-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Data de Pagamento</label><input type="date" id="payment-modal-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]" required></div> </div> <div class="flex justify-center gap-4 mt-6"> <button id="payment-modal-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="payment-modal-confirm" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">Confirmar</button> </div> </div> </div>
+    <div id="pay-cc-bill-modal" class="modal-backdrop hidden" onclick="closePayCcBillModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Pagar Fatura do Cartão</h3> <div class="text-left space-y-4"> <p id="pay-cc-bill-description" class="font-semibold"></p> <input type="hidden" id="pay-cc-bill-account-id"> <div><label for="pay-cc-bill-from-account" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Pagar usando a conta</label><select id="pay-cc-bill-from-account" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="pay-cc-bill-amount" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor a Pagar (R$)</label><input type="number" step="0.01" id="pay-cc-bill-amount" placeholder="Valor da fatura" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></div> <div><label for="pay-cc-bill-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Data do Pagamento</label><input type="date" id="pay-cc-bill-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]" required></div> </div> <div class="flex justify-center gap-4 mt-6"> <button id="pay-cc-bill-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="pay-cc-bill-confirm" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">Confirmar Pagamento</button> </div> </div> </div>
+    <div id="alert-modal" class="modal-backdrop hidden" onclick="closeAlertModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-sky-100 dark:bg-sky-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="info" class="w-8 h-8 text-sky-500"></i></div> <h3 id="alert-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Aviso</h3> <p id="alert-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Mensagem de aviso.</p> <button id="alert-modal-ok" class="w-full bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div>
+    <div id="confirm-modal" class="modal-backdrop hidden" onclick="handleConfirm(false)"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-8 h-8 text-amber-500"></i></div> <h3 id="confirm-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Atenção</h3> <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Você tem certeza?</p> <div class="flex justify-center gap-4"> <button id="confirm-modal-cancel" class="flex-1 bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="confirm-modal-confirm" class="flex-1 bg-rose-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-rose-700 transition">Confirmar</button> </div> </div> </div>
+    <!-- NOVO: Modal de Input -->
+    <div id="input-modal" class="modal-backdrop hidden"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm m-4" onclick="event.stopPropagation()"> <h3 id="input-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Input</h3> <div class="space-y-2"> <label id="input-modal-label" for="input-modal-field" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor:</label> <input type="text" id="input-modal-field" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"> </div> <div class="flex justify-end gap-4 mt-6"> <button id="input-modal-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="input-modal-confirm" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div> </div>
+
+    <script type="module">
+        // --- Imports Firebase ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // CORREÇÃO: Importa funções de auth por email/senha E anônimo/token
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, writeBatch, query, setDoc, getDoc, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+
+        // --- Configuração Firebase ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'financas-pro-plus-local';
+        // Configuração inserida pelo usuário
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyCYfw1s61o3OgK_sXuR3lklm6GkPTr4XYo",
+            authDomain: "meu-controle-financeiro-82dfe.firebaseapp.com",
+            projectId: "meu-controle-financeiro-82dfe",
+            storageBucket: "meu-controle-financeiro-82dfe.appspot.com", 
+            messagingSenderId: "588430087487",
+            appId: "1:588430087487:web:73632e879a49bcb2212f8a"
+        };
+         
+        console.log("[INIT] Using Firebase Config:", JSON.stringify(firebaseConfig)); 
+
+        let app; 
+        try {
+            app = initializeApp(firebaseConfig);
+            console.log("[INIT] Firebase App initialized successfully.");
+        } catch (e) { 
+             console.error("[INIT] Firebase initialization failed:", e);
+             const authContainerEl = document.getElementById('auth-container');
+             if (authContainerEl) {
+                 authContainerEl.classList.remove('hidden'); // Garante visibilidade
+                 const authMsgEl = document.getElementById('auth-message');
+                 if (authMsgEl) {
+                     authMsgEl.textContent = `Falha crítica na inicialização (${e.message}). Verifique a configuração.`;
+                     authMsgEl.className = 'mb-4 text-center text-sm text-red-500 font-semibold';
+                 }
+             } else {
+                 document.body.innerHTML = "<p style='color:red; padding: 20px;'>Falha crítica na inicialização do Firebase. Verifique a configuração no console.</p>";
+             }
+             throw new Error("Firebase init failed"); 
+        }
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        // setLogLevel('debug'); 
+
+        // --- Referências Coleções ---
+        let transactionsCol, categoriesCol, paymentTypesCol, budgetsCol, accountsCol;
+        let unsubscribeListeners = []; 
+
+        // --- DOM Elements ---
+         // Elementos Auth
+        const authContainer = document.getElementById('auth-container'); 
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegisterLink = document.getElementById('show-register-link');
+        const showLoginLink = document.getElementById('show-login-link');
+        const authMessage = document.getElementById('auth-message'); 
+        const mainAppContainer = document.getElementById('main-app-container'); 
+        const logoutBtn = document.getElementById('logout-btn'); 
+        const userEmailDisplay = document.getElementById('user-email-display'); 
+        // Elementos App Principal
+        const pages = { dashboard: document.getElementById('page-dashboard'), accounts: document.getElementById('page-accounts'), bi: document.getElementById('page-bi'), manage: document.getElementById('page-manage'), config: document.getElementById('page-config'), reports: document.getElementById('page-reports'), import: document.getElementById('page-import'), budgets: document.getElementById('page-budgets') };
+        const navButtons = document.querySelectorAll('.nav-button');
+        const navButtonLinks = document.querySelectorAll('.nav-button-link');
+        const loadingIndicator = document.getElementById('loading-indicator'); 
+        const loadingMessage = document.getElementById('loading-message'); 
+        const appContent = document.getElementById('app-content'); 
+        const userIdDisplay = document.getElementById('user-id-display');
+        const openTransactionModalBtn = document.getElementById('open-transaction-modal-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const menuToggle = document.getElementById('menu-toggle');
+        const balanceDisplay = document.getElementById('total-balance'); 
+        const incomeDisplay = document.getElementById('total-income'); 
+        const expensesPaidDisplay = document.getElementById('total-expenses-paid'); 
+        const monthBalanceDisplay = document.getElementById('month-balance');
+        const remindersList = document.getElementById('reminders-list'); 
+        const financialDiagnosisContainer = document.getElementById('financial-diagnosis');
+        const dashboardAccountsList = document.getElementById('dashboard-accounts-list');
+        const transactionList = document.getElementById('transaction-list'); 
+        const filter = document.getElementById('filter'); 
+        const filterCategory = document.getElementById('filter-category'); 
+        const configTabs = document.getElementById('config-tabs');
+        const tabContents = { accounts: document.getElementById('tab-content-accounts'), categories: document.getElementById('tab-content-categories'), paymentTypes: document.getElementById('tab-content-payment-types'), };
+        const accountForm = document.getElementById('account-form');
+        const accountNameInput = document.getElementById('account-name');
+        const accountTypeSelect = document.getElementById('account-type');
+        const accountInitialBalanceInput = document.getElementById('account-initial-balance');
+        const accountLimitSection = document.getElementById('account-limit-section');
+        const accountLimitInput = document.getElementById('account-limit');
+        const accountsList = document.getElementById('accounts-list');
+        const accountsPageList = document.getElementById('accounts-page-list');
+        const categoryForm = document.getElementById('category-form'); 
+        const categoryNameInput = document.getElementById('category-name'); 
+        const categoriesList = document.getElementById('categories-list'); 
+        const suggestCategoriesBtn = document.getElementById('suggest-categories-btn'); 
+        const paymentTypeForm = document.getElementById('payment-type-form'); 
+        const paymentTypeNameInput = document.getElementById('payment-type-name'); 
+        const paymentTypesList = document.getElementById('payment-types-list');
+        const budgetsListContainer = document.getElementById('budgets-list');
+        const generateReportBtn = document.getElementById('generate-report-btn'); 
+        const reportResultsSection = document.getElementById('report-results-section'); 
+        const reportResultsList = document.getElementById('report-results-list'); 
+        const reportFilteredTotal = document.getElementById('report-filtered-total'); 
+        const exportButtonsContainer = document.getElementById('export-buttons'); 
+        const exportExcelBtn = document.getElementById('export-excel-btn'); 
+        const exportPdfBtn = document.getElementById('export-pdf-btn');
+        const xlsxFileInput = document.getElementById('xlsx-file-input'); 
+        const importLoader = document.getElementById('import-loader'); 
+        const importPreviewSection = document.getElementById('import-preview-section'); 
+        const importPreviewList = document.getElementById('import-preview-list'); 
+        const importCount = document.getElementById('import-count'); 
+        const confirmImportBtn = document.getElementById('confirm-import-btn'); 
+        const cancelImportBtn = document.getElementById('cancel-import-btn');
+        let expenseChart, incomeExpenseChart, balanceEvolutionChart;
+        const biTotalExpenses = document.getElementById('bi-total-expenses'); 
+        const biAvgDailyExpense = document.getElementById('bi-avg-daily-expense'); 
+        const biTopCategory = document.getElementById('bi-top-category');
+        const transactionModal = document.getElementById('transaction-modal');
+        const transactionModalTitle = document.getElementById('transaction-modal-title');
+        const transactionForm = document.getElementById('transaction-form');
+        const transactionIdInput = document.getElementById('transaction-id');
+        const descriptionInput = document.getElementById('description'); 
+        const amountInput = document.getElementById('amount'); 
+        const dueDateInput = document.getElementById('due-date');
+        const dueDateSection = document.getElementById('due-date-section');
+        const notesInput = document.getElementById('notes');
+        const categorySelect = document.getElementById('category-select'); 
+        const categorySection = document.getElementById('category-section'); 
+        const accountSelect = document.getElementById('account-select');
+        const accountSection = document.getElementById('account-section');
+        const isRecurringInput = document.getElementById('is-recurring'); 
+        const recurringPaymentSection = document.getElementById('recurring-payment-section'); 
+        const statusSection = document.getElementById('status-section');
+        const isPaidInput = document.getElementById('is-paid');
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentModalDescription = document.getElementById('payment-modal-description');
+        const paymentModalAccountSelect = document.getElementById('payment-modal-account');
+        const paymentModalTypeSelect = document.getElementById('payment-modal-type');
+        const paymentModalDateInput = document.getElementById('payment-modal-date');
+        const payCcBillModal = document.getElementById('pay-cc-bill-modal');
+        const payCcBillDescription = document.getElementById('pay-cc-bill-description');
+        const payCcBillAccountIdInput = document.getElementById('pay-cc-bill-account-id');
+        const payCcBillFromAccountSelect = document.getElementById('pay-cc-bill-from-account');
+        const payCcBillAmountInput = document.getElementById('pay-cc-bill-amount');
+        const payCcBillDateInput = document.getElementById('pay-cc-bill-date');
+        const alertModal = document.getElementById('alert-modal');
+        const alertModalTitle = document.getElementById('alert-modal-title');
+        const alertModalMessage = document.getElementById('alert-modal-message');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmModalTitle = document.getElementById('confirm-modal-title');
+        const confirmModalMessage = document.getElementById('confirm-modal-message');
+        const inputModal = document.getElementById('input-modal'); 
+        const inputModalTitle = document.getElementById('input-modal-title'); 
+        const inputModalLabel = document.getElementById('input-modal-label'); 
+        const inputModalField = document.getElementById('input-modal-field'); 
+        // Variáveis de Tema (serão definidas no DOMContentLoaded)
+        let themeToggleBtn, themeToggleDarkIcon, themeToggleLightIcon, themeToggleText;
+        let themeToggleBtnAuth, themeToggleDarkIconAuth, themeToggleLightIconAuth, themeToggleTextAuth;
+
+        // --- Estado da Aplicação ---
+        let localTransactions = []; let localPaymentTypes = []; let localCategories = []; 
+        let localBudgets = []; let localAccounts = []; let transactionToPay = null; 
+        let transactionsToImport = []; let transactionToEditId = null; 
+        let selectThisCategoryId = null; let filteredReportData = []; let currentUser = null; 
+        let confirmResolve = null; let inputResolve = null; 
+        let appInitialized = false; // Flag para UI principal
+        let listenersAttached = false; // Flag para listeners do Firestore
+        let initialLoadTimeout = null; // Referência para timeout
+        
+        const SUGGESTED_CATEGORIES = [ 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Vestuário', 'Cuidados Pessoais', 'Dívidas', 'Investimentos', 'Impostos', 'Doações', 'Assinaturas e Serviços', 'Pets', 'Outros' ];
+
+        // --- DEFINIÇÃO DE TODAS AS FUNÇÕES ---
+        // (Coloque a definição de TODAS as funções aqui, antes de onAuthStateChanged e DOMContentLoaded)
+
+        const formatCurrency = (number) => number != null ? number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
+        const formatDate = (dateString) => { if (!dateString) return ''; try { const date = dateString.includes('T') ? new Date(dateString) : new Date(dateString + "T12:00:00Z"); if (isNaN(date)) return ''; return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' }); } catch (e) { console.warn("Erro ao formatar data:", dateString, e); return ''; } };
+        const getTodayDateString = () => new Date().toISOString().split('T')[0];
+        
+        function showAlert(message, title = "Aviso") { /* ... */ }
+        function closeAlertModal() { /* ... */ }
+        function showConfirm(message, title = "Atenção") { /* ... */ }
+        function handleConfirm(confirmed) { /* ... */ }
+        function showInput(label, title = "Entrada", defaultValue = "") { /* ... */ }
+        function handleInputConfirm() { /* ... */ }
+        function handleInputCancel() { /* ... */ }
+        function updateTheme(isDark) { /* ... */ }
+        function showLoginForm() { /* ... */ }
+        function showRegisterForm() { /* ... */ }
+        async function handleLogin(e) { /* ... */ }
+        async function handleRegister(e) { /* ... */ }
+        async function handleLogout() { /* ... */ }
+        function mapAuthError(code) { /* ... */ }
+        function unsubscribeAllListeners() { /* ... */ }
+        function setupFirestoreListeners() { /* ... */ }
+        function initApp() { /* ... */ }
+        function switchPage(pageKey, tabKey = null) { /* ... */ }
+        function switchConfigTab(tabKey) { /* ... */ }
+        function toggleSidebar(forceOpen) { /* ... */ }
+        function renderAll() { /* ... */ } 
+        async function handleAccountFormSubmit(e) { /* ... */ }
+        async function removeAccount(id) { /* ... */ }
+        function calculateAccountBalance(accountId) { /* ... */ }
+        function calculateAvailableCredit(accountId) { /* ... */ }
+        function updateAccountBalances() { /* ... */ }
+        function renderAccountsList() { /* ... */ }
+        function updateMainKPIs() { /* ... */ }
+        function renderFinancialDiagnosis() { /* ... */ }
+        function openTransactionModal(id = null) { /* ... */ }
+        function closeTransactionModal() { /* ... */ }
+        async function handleFormSubmit(e) { /* ... */ }
+        async function removeTransaction(id) { /* ... */ }
+        function toggleTransactionFormVisibility() { /* ... */ }
+        function openPaymentModal(id) { /* ... */ }
+        async function confirmPayment() { /* ... */ }
+        function closePaymentModal() { /* ... */ } 
+        function openPayCcBillModal(accountId) { /* ... */ }
+        async function confirmPayCcBill() { /* ... */ }
+        function closePayCcBillModal() { /* ... */ } 
+        async function createNextRecurring(transaction) { /* ... */ }
+        function renderTransactionList(transactionsToRender, targetListElement) { /* ... */ }
+        function renderReminders() { /* ... */ }
+        function renderCategoriesList() { /* ... */ }
+        function renderPaymentTypesList() { /* ... */ }
+        function populateCategorySelects() { /* ... */ }
+        function populateCategoryFilter() { /* ... */ }
+        function populatePaymentTypeSelects() { /* ... */ }
+        function populateAccountSelects(includeCreditCards = true, filterType = null, targetSelect = null) { /* ... */ }
+        async function handleCategoryChange(event) { /* ... */ } // Esta função já estava aqui
+        async function addCategory(e) { /* ... */ }
+        async function removeCategory(id) { /* ... */ }
+        async function addPaymentType(e) { /* ... */ }
+        async function removePaymentType(id) { /* ... */ }
+        async function addSuggestedCategories(isSilent = false) { /* ... */ }
+        function renderBudgets() { /* ... */ } 
+        async function handleBudgetChange(event) { /* ... */ }
+        function getChartOptions() { /* ... */ }
+        function renderBIDashboard() { /* ... */ } 
+        function renderExpenseDoughnutChart(expenseData) { /* ... */ }
+        function renderIncomeVsExpenseChart() { /* ... */ }
+        function renderBalanceEvolutionChart() { /* ... */ }
+        function generateReport() { /* ... */ }
+        function exportToExcel() { /* ... */ }
+        function exportToPDF() { /* ... */ }
+        function handleFileSelect(event) { /* ... */ }
+        function parseDateFromBR(dateString) { /* ... */ }
+        function processExportedFile(data) { /* ... */ }
+        function renderImportPreview() { /* ... */ }
+        async function confirmImport() { /* ... */ }
+        function resetImportState() { /* ... */ }
+
+        // --- Autenticação e Interface ---
+        // Listener principal que reage a mudanças no estado de autenticação (login/logout)
+        onAuthStateChanged(auth, (user) => {
+            console.log(`[AUTH] State changed. User: ${user ? user.uid : 'null'}`);
+            clearTimeout(initialLoadTimeout); // Limpa timeout ao detectar mudança de estado
+            unsubscribeAllListeners(); // Cancela listeners de dados antigos
+
+            if (user) {
+                // Usuário está LOGADO
+                currentUser = user;
+                console.log("[AUTH] User is logged in:", currentUser.uid, currentUser.email);
+                
+                // Esconde forms de login/cadastro e mostra o container principal do app
+                if(authContainer) authContainer.classList.add('hidden'); 
+                if(mainAppContainer) mainAppContainer.classList.remove('hidden'); 
+                
+                // Mostra o loader INTERNO do app enquanto carrega os dados
+                if(loadingIndicator) loadingIndicator.style.display = 'block'; 
+                if(loadingMessage) loadingMessage.textContent = 'Carregando dados...'; 
+                if(appContent) appContent.classList.add('hidden'); // Esconde o conteúdo até carregar
+                
+                // Atualiza informações do usuário na UI
+                if(userIdDisplay) {
+                    userIdDisplay.textContent = `ID: ${user.uid.substring(0,8)}...`;
+                    userIdDisplay.classList.remove('hidden');
+                }
+                if(userEmailDisplay) {
+                    userEmailDisplay.textContent = user.email || 'Usuário Anônimo'; // Mostra email ou 'Anônimo'
+                    userEmailDisplay.classList.remove('hidden');
+                }
+
+                // Define as referências das coleções do Firestore para este usuário
+                 const basePath = `artifacts/${appId}/users/${currentUser.uid}`;
+                transactionsCol = collection(db, basePath, 'transactions');
+                categoriesCol = collection(db, basePath, 'categories');
+                paymentTypesCol = collection(db, basePath, 'paymentTypes');
+                budgetsCol = collection(db, basePath, 'budgets');
+                accountsCol = collection(db, basePath, 'accounts');
+                console.log("[INIT] Firestore collections defined:", basePath);
+                
+                // Inicia o processo de carregar os dados (listeners)
+                setupFirestoreListeners(); 
+
+            } else {
+                // Usuário está DESLOGADO
+                currentUser = null; listenersAttached = false; appInitialized = false; 
+                console.log("[AUTH] User is logged out.");
+                
+                // Mostra forms de login/cadastro e esconde o container principal do app
+                if(authContainer) authContainer.classList.remove('hidden'); 
+                if(mainAppContainer) mainAppContainer.classList.add('hidden'); 
+                
+                // Esconde informações do usuário e loader interno
+                if(userIdDisplay) userIdDisplay.classList.add('hidden');
+                if(userEmailDisplay) userEmailDisplay.classList.add('hidden');
+                if(loadingIndicator) loadingIndicator.style.display = 'none'; 
+                
+                // Limpa mensagem de erro/status e mostra o formulário de login por padrão
+                if(authMessage) authMessage.textContent = ''; 
+                showLoginForm(); 
+                 
+                // Garante que o tema correto seja aplicado na tela de auth
+                const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                updateTheme(isDark);
+            }
+        });
+        
+        // --- Event Listeners Globais ---
+        document.addEventListener('DOMContentLoaded', () => {
+             console.log("[INIT] DOMContentLoaded event fired.");
+             // CORREÇÃO: Define TODAS as variáveis de elementos aqui
+             themeToggleBtn = document.getElementById('theme-toggle');
+             themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+             themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+             themeToggleText = document.getElementById('theme-toggle-text');
+             themeToggleBtnAuth = document.getElementById('theme-toggle-auth');
+             themeToggleDarkIconAuth = document.getElementById('theme-toggle-dark-icon-auth');
+             themeToggleLightIconAuth = document.getElementById('theme-toggle-light-icon-auth');
+             themeToggleTextAuth = document.getElementById('theme-toggle-text-auth');
+             // ... (todas as outras atribuições de getElementById foram movidas para o topo)
+
+            const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            updateTheme(isDark); 
+            
+            lucide.createIcons(); 
+
+            // Adiciona listener aos dois botões de trocar tema
+            const themeClickHandler = () => updateTheme(!document.documentElement.classList.contains('dark'));
+            if(themeToggleBtn) { themeToggleBtn.addEventListener('click', themeClickHandler); } 
+            else { console.warn("Theme toggle button (main) not found."); }
+             if(themeToggleBtnAuth) { themeToggleBtnAuth.addEventListener('click', themeClickHandler); } 
+            else { console.warn("Theme toggle button (auth) not found."); }
+
+            console.log("[INIT] DOMContentLoaded setup complete. Adding event listeners...");
+
+             // Adiciona listeners restantes que dependem do DOM aqui
+             if(menuToggle) menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+             if(sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+             navButtons.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); switchPage(e.currentTarget.dataset.page); }));
+             navButtonLinks.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); switchPage(e.currentTarget.dataset.page, e.currentTarget.dataset.configTab); }));
+             if(configTabs) configTabs.addEventListener('click', (e) => { const button = e.target.closest('.tab-button'); if (button) { switchConfigTab(button.dataset.tab); } });
+             document.body.addEventListener('click', (e) => { const button = e.target.closest('button'); if (!button) return; const { action, id } = button.dataset; switch (action) { case 'delete-transaction': removeTransaction(id); break; case 'edit-transaction': openTransactionModal(id); break; case 'pay-transaction': openPaymentModal(id); break; case 'delete-category': removeCategory(id); break; case 'delete-payment-type': removePaymentType(id); break; case 'delete-account': removeAccount(id); break; case 'pay-cc-bill': openPayCcBillModal(id); break; } });
+             if(openTransactionModalBtn) openTransactionModalBtn.addEventListener('click', () => openTransactionModal(null));
+             if(alertModal) alertModal.addEventListener('click', (e) => { if (e.target === alertModal) closeAlertModal(); }); 
+             document.getElementById('alert-modal-ok')?.addEventListener('click', closeAlertModal);
+             if(confirmModal) confirmModal.addEventListener('click', (e) => { if(e.target === confirmModal) handleConfirm(false); }); 
+             document.getElementById('confirm-modal-cancel')?.addEventListener('click', () => handleConfirm(false));
+             document.getElementById('confirm-modal-confirm')?.addEventListener('click', () => handleConfirm(true));
+             if(inputModal) inputModal.addEventListener('click', (e) => { if(e.target === inputModal) handleInputCancel(); }); 
+             document.getElementById('input-modal-confirm')?.addEventListener('click', handleInputConfirm); 
+             document.getElementById('input-modal-cancel')?.addEventListener('click', handleInputCancel); 
+             if(transactionForm) transactionForm.addEventListener('submit', handleFormSubmit);
+             document.querySelectorAll('input[name="type"]').forEach(radio => radio.addEventListener('change', toggleTransactionFormVisibility));
+             if(isPaidInput) isPaidInput.addEventListener('change', toggleTransactionFormVisibility);
+             if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); // Este é o listener que causava o erro
+             document.getElementById('payment-modal-confirm')?.addEventListener('click', confirmPayment);
+             document.getElementById('payment-modal-cancel')?.addEventListener('click', closePaymentModal); 
+             document.getElementById('pay-cc-bill-confirm')?.addEventListener('click', confirmPayCcBill);
+             document.getElementById('pay-cc-bill-cancel')?.addEventListener('click', closePayCcBillModal); 
+             if(filter) filter.addEventListener('change', renderAll); 
+             if(filterCategory) filterCategory.addEventListener('change', renderAll);
+             if(accountForm) accountForm.addEventListener('submit', handleAccountFormSubmit);
+             if(accountTypeSelect) accountTypeSelect.addEventListener('change', () => { if(accountLimitSection) accountLimitSection.classList.toggle('hidden', accountTypeSelect.value !== 'credit'); }); // Added null check
+             if(categoryForm) categoryForm.addEventListener('submit', addCategory);
+             if(suggestCategoriesBtn) suggestCategoriesBtn.addEventListener('click', () => addSuggestedCategories(false));
+             if(paymentTypeForm) paymentTypeForm.addEventListener('submit', addPaymentType);
+             if(budgetsListContainer) budgetsListContainer.addEventListener('change', handleBudgetChange);
+             if(generateReportBtn) generateReportBtn.addEventListener('click', generateReport);
+             if(exportExcelBtn) exportExcelBtn.addEventListener('click', exportToExcel);
+             if(exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPDF);
+             if(xlsxFileInput) xlsxFileInput.addEventListener('change', handleFileSelect);
+             if(confirmImportBtn) confirmImportBtn.addEventListener('click', confirmImport); 
+             if(cancelImportBtn) cancelImportBtn.addEventListener('click', resetImportState);
+             
+            // --- Listeners de Autenticação (CORREÇÃO: Movidos PARA CÁ) ---
+            if (loginForm) loginForm.addEventListener('submit', handleLogin);
+            if (registerForm) registerForm.addEventListener('submit', handleRegister);
+            if (showRegisterLink) showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterForm(); });
+            if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginForm(); });
+            if (logoutBtn) logoutBtn.addEventListener('click', handleLogout); 
+
+             console.log("[INIT] All event listeners attached.");
+        });
+        
+    </script>
+</body>
+</html>
+
