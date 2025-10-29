@@ -90,83 +90,12 @@
         .dark .import-item.needs-correction { border-color: #fb923c; background-color: #7c2d12 !important; }
         .import-account-select { min-width: 150px; }
 
-        /* Auth Form Styles */
-        #auth-container { max-width: 400px; margin: auto; padding-top: 5vh; }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans">
 
-     <!-- Container Autenticação (Inicialmente visível se não logado) -->
-    <div id="auth-container" class="hidden"> <!-- Começa oculto até JS verificar auth -->
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700">
-            <!-- Logo Centralizado -->
-             <div class="flex items-center justify-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-sky-600 rounded-lg flex items-center justify-center text-white">
-                    <i data-lucide="wallet-cards"></i>
-                </div>
-                <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">
-                    Finanças Pro+
-                </h1>
-            </div>
-
-            <!-- Mensagem de Erro/Status Auth -->
-            <div id="auth-message" class="mb-4 text-center text-sm"></div>
-
-            <!-- Formulário de Login (Inicialmente visível) -->
-            <form id="login-form" class="">
-                <h2 class="text-xl font-bold text-center mb-6 text-slate-700 dark:text-slate-200">Acessar Conta</h2>
-                <div class="mb-4">
-                    <label for="login-email" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">E-mail</label>
-                    <input type="email" id="login-email" required class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
-                </div>
-                <div class="mb-6">
-                    <label for="login-password" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Senha</label>
-                    <input type="password" id="login-password" required class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
-                </div>
-                <button type="submit" class="w-full bg-sky-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-700 transition mb-4 flex items-center justify-center gap-2">
-                    <i data-lucide="log-in" class="w-5 h-5"></i> Entrar
-                </button>
-                <p class="text-center text-sm text-slate-500 dark:text-slate-400">
-                    Não tem conta? <a href="#" id="show-register-link" class="font-semibold text-sky-600 hover:text-sky-700">Cadastre-se</a>
-                </p>
-            </form>
-
-            <!-- Formulário de Cadastro (Inicialmente oculto) -->
-            <form id="register-form" class="hidden">
-                 <h2 class="text-xl font-bold text-center mb-6 text-slate-700 dark:text-slate-200">Criar Conta</h2>
-                <div class="mb-4">
-                    <label for="register-email" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">E-mail</label>
-                    <input type="email" id="register-email" required class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
-                </div>
-                <div class="mb-4">
-                    <label for="register-password" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Senha (mínimo 6 caracteres)</label>
-                    <input type="password" id="register-password" required minlength="6" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
-                </div>
-                 <div class="mb-6">
-                    <label for="register-password-confirm" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Confirmar Senha</label>
-                    <input type="password" id="register-password-confirm" required minlength="6" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
-                </div>
-                <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-700 transition mb-4 flex items-center justify-center gap-2">
-                     <i data-lucide="user-plus" class="w-5 h-5"></i> Cadastrar
-                </button>
-                <p class="text-center text-sm text-slate-500 dark:text-slate-400">
-                    Já tem conta? <a href="#" id="show-login-link" class="font-semibold text-sky-600 hover:text-sky-700">Faça login</a>
-                </p>
-            </form>
-            <!-- Botão de Tema no Container de Auth -->
-             <div class="mt-6 border-t border-slate-200 dark:border-slate-700 pt-4">
-                <button id="theme-toggle-auth" type="button" class="w-full flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
-                    <i id="theme-toggle-dark-icon-auth" data-lucide="moon" class="hidden"></i>
-                    <i id="theme-toggle-light-icon-auth" data-lucide="sun" class="hidden"></i>
-                    <span id="theme-toggle-text-auth"></span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Container Principal do App (Inicialmente oculto) -->
-    <div id="main-app-container" class="hidden flex h-screen overflow-hidden w-full">
+    <!-- Container Principal do App -->
+    <div id="main-app-container" class="flex h-screen overflow-hidden w-full">
         
         <div id="sidebar-backdrop" class="hidden lg:hidden" onclick="toggleSidebar(false)"></div>
         
@@ -186,13 +115,7 @@
                 <a href="#" class="nav-button" data-page="config"><i data-lucide="settings"></i><span>Configurações</span></a>
             </nav>
             <div class="p-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
-                <div class="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
-                    <span id="user-email-display" title="E-mail do Usuário" class="truncate"></span> <!-- Adicionado truncate -->
-                    <span id="user-id-display" title="Seu ID de Usuário"></span>
-                </div>
-                 <button id="logout-btn" type="button" class="w-full flex items-center justify-center gap-2 text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 focus:outline-none focus:ring-4 focus:ring-rose-200 dark:focus:ring-rose-700 rounded-lg font-semibold text-sm p-2.5">
-                    <i data-lucide="log-out" class="w-4 h-4"></i> Sair
-                </button>
+                 <span id="user-id-display" class="text-xs text-slate-400 dark:text-slate-500 hidden mb-2 text-center block" title="Seu ID de Usuário"></span>
                 <button id="theme-toggle" type="button" class="w-full flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
                     <i id="theme-toggle-dark-icon" data-lucide="moon" class="hidden"></i>
                     <i id="theme-toggle-light-icon" data-lucide="sun" class="hidden"></i>
@@ -211,12 +134,14 @@
 
             <div class="p-4 md:p-8 max-w-7xl mx-auto w-full">
                 
-                <div id="loading-indicator" class="text-center p-8 hidden"> <!-- Loader interno, inicialmente oculto -->
+                <!-- Loader inicial (oculto quando app estiver pronto) -->
+                <div id="loading-indicator" class="text-center p-8"> 
                     <div class="loader"></div>
-                    <p id="loading-message" class="text-slate-500 dark:text-slate-400">Carregando dados...</p>
+                    <p id="loading-message" class="text-slate-500 dark:text-slate-400">Autenticando e carregando dados...</p>
                 </div>
 
-                <div id="app-content" class="hidden"> <!-- Conteúdo principal começa oculto -->
+                <!-- Conteúdo principal (começa oculto) -->
+                <div id="app-content" class="hidden"> 
                     
                     <main id="page-dashboard">
                        <!-- ... (Conteúdo Dashboard Inalterado) ... -->
@@ -384,13 +309,12 @@
     <script type="module">
         // --- Imports Firebase ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // CORREÇÃO: Importa funções de auth por email/senha E anônimo/token
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // REMOVIDO: Imports de auth por email/senha
+        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, writeBatch, query, setDoc, getDoc, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
         // --- Configuração Firebase ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'financas-pro-plus-local';
-        // Configuração inserida pelo usuário
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCYfw1s61o3OgK_sXuR3lklm6GkPTr4XYo",
             authDomain: "meu-controle-financeiro-82dfe.firebaseapp.com",
@@ -408,14 +332,9 @@
             console.log("[INIT] Firebase App initialized successfully.");
         } catch (e) { 
              console.error("[INIT] Firebase initialization failed:", e);
-             const authContainerEl = document.getElementById('auth-container');
-             if (authContainerEl) {
-                 authContainerEl.classList.remove('hidden'); // Garante visibilidade
-                 const authMsgEl = document.getElementById('auth-message');
-                 if (authMsgEl) {
-                     authMsgEl.textContent = `Falha crítica na inicialização (${e.message}). Verifique a configuração.`;
-                     authMsgEl.className = 'mb-4 text-center text-sm text-red-500 font-semibold';
-                 }
+             const loadingIndicatorEl = document.getElementById('loading-indicator'); // Usa o loader principal
+             if (loadingIndicatorEl) {
+                 loadingIndicatorEl.innerHTML = `<p class='text-red-500'>Falha crítica na inicialização (${e.message}). Verifique a configuração.</p>`;
              } else {
                  document.body.innerHTML = "<p style='color:red; padding: 20px;'>Falha crítica na inicialização do Firebase. Verifique a configuração no console.</p>";
              }
@@ -430,17 +349,9 @@
         let unsubscribeListeners = []; 
 
         // --- DOM Elements ---
-         // Elementos Auth
-        const authContainer = document.getElementById('auth-container'); 
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const showRegisterLink = document.getElementById('show-register-link');
-        const showLoginLink = document.getElementById('show-login-link');
-        const authMessage = document.getElementById('auth-message'); 
+        // REMOVIDO: Elementos Auth
         const mainAppContainer = document.getElementById('main-app-container'); 
-        const logoutBtn = document.getElementById('logout-btn'); 
-        const userEmailDisplay = document.getElementById('user-email-display'); 
-        // Elementos App Principal
+        // REMOVIDO: logoutBtn, userEmailDisplay
         const pages = { dashboard: document.getElementById('page-dashboard'), accounts: document.getElementById('page-accounts'), bi: document.getElementById('page-bi'), manage: document.getElementById('page-manage'), config: document.getElementById('page-config'), reports: document.getElementById('page-reports'), import: document.getElementById('page-import'), budgets: document.getElementById('page-budgets') };
         const navButtons = document.querySelectorAll('.nav-button');
         const navButtonLinks = document.querySelectorAll('.nav-button-link');
@@ -536,9 +447,8 @@
         const inputModalTitle = document.getElementById('input-modal-title'); 
         const inputModalLabel = document.getElementById('input-modal-label'); 
         const inputModalField = document.getElementById('input-modal-field'); 
-        // Variáveis de Tema (serão definidas no DOMContentLoaded)
         let themeToggleBtn, themeToggleDarkIcon, themeToggleLightIcon, themeToggleText;
-        let themeToggleBtnAuth, themeToggleDarkIconAuth, themeToggleLightIconAuth, themeToggleTextAuth;
+        // REMOVIDO: Variáveis de tema da tela de auth
 
         // --- Estado da Aplicação ---
         let localTransactions = []; let localPaymentTypes = []; let localCategories = []; 
@@ -553,8 +463,6 @@
         const SUGGESTED_CATEGORIES = [ 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Vestuário', 'Cuidados Pessoais', 'Dívidas', 'Investimentos', 'Impostos', 'Doações', 'Assinaturas e Serviços', 'Pets', 'Outros' ];
 
         // --- DEFINIÇÃO DE TODAS AS FUNÇÕES ---
-        // (Coloque a definição de TODAS as funções aqui, antes de onAuthStateChanged e DOMContentLoaded)
-
         const formatCurrency = (number) => number != null ? number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
         const formatDate = (dateString) => { if (!dateString) return ''; try { const date = dateString.includes('T') ? new Date(dateString) : new Date(dateString + "T12:00:00Z"); if (isNaN(date)) return ''; return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' }); } catch (e) { console.warn("Erro ao formatar data:", dateString, e); return ''; } };
         const getTodayDateString = () => new Date().toISOString().split('T')[0];
@@ -567,12 +475,7 @@
         function handleInputConfirm() { /* ... */ }
         function handleInputCancel() { /* ... */ }
         function updateTheme(isDark) { /* ... */ }
-        function showLoginForm() { /* ... */ }
-        function showRegisterForm() { /* ... */ }
-        async function handleLogin(e) { /* ... */ }
-        async function handleRegister(e) { /* ... */ }
-        async function handleLogout() { /* ... */ }
-        function mapAuthError(code) { /* ... */ }
+        // REMOVIDO: Funções de Auth (showLogin/Register, handleLogin/Register/Logout, mapAuthError)
         function unsubscribeAllListeners() { /* ... */ }
         function setupFirestoreListeners() { /* ... */ }
         function initApp() { /* ... */ }
@@ -608,7 +511,7 @@
         function populateCategoryFilter() { /* ... */ }
         function populatePaymentTypeSelects() { /* ... */ }
         function populateAccountSelects(includeCreditCards = true, filterType = null, targetSelect = null) { /* ... */ }
-        async function handleCategoryChange(event) { /* ... */ } // Esta função já estava aqui
+        async function handleCategoryChange(event) { /* ... */ } 
         async function addCategory(e) { /* ... */ }
         async function removeCategory(id) { /* ... */ }
         async function addPaymentType(e) { /* ... */ }
@@ -631,38 +534,29 @@
         async function confirmImport() { /* ... */ }
         function resetImportState() { /* ... */ }
 
-        // --- Autenticação e Interface ---
-        // Listener principal que reage a mudanças no estado de autenticação (login/logout)
-        onAuthStateChanged(auth, (user) => {
+        // --- Autenticação Simplificada ---
+        onAuthStateChanged(auth, async (user) => {
             console.log(`[AUTH] State changed. User: ${user ? user.uid : 'null'}`);
-            clearTimeout(initialLoadTimeout); // Limpa timeout ao detectar mudança de estado
-            unsubscribeAllListeners(); // Cancela listeners de dados antigos
+            clearTimeout(initialLoadTimeout); 
+            unsubscribeAllListeners(); 
 
             if (user) {
-                // Usuário está LOGADO
+                // Usuário LOGADO (seja por token ou anônimo)
                 currentUser = user;
-                console.log("[AUTH] User is logged in:", currentUser.uid, currentUser.email);
-                
-                // Esconde forms de login/cadastro e mostra o container principal do app
-                if(authContainer) authContainer.classList.add('hidden'); 
-                if(mainAppContainer) mainAppContainer.classList.remove('hidden'); 
+                console.log("[AUTH] User authenticated:", currentUser.uid);
                 
                 // Mostra o loader INTERNO do app enquanto carrega os dados
                 if(loadingIndicator) loadingIndicator.style.display = 'block'; 
                 if(loadingMessage) loadingMessage.textContent = 'Carregando dados...'; 
                 if(appContent) appContent.classList.add('hidden'); // Esconde o conteúdo até carregar
                 
-                // Atualiza informações do usuário na UI
+                // Atualiza ID do usuário na UI
                 if(userIdDisplay) {
                     userIdDisplay.textContent = `ID: ${user.uid.substring(0,8)}...`;
                     userIdDisplay.classList.remove('hidden');
                 }
-                if(userEmailDisplay) {
-                    userEmailDisplay.textContent = user.email || 'Usuário Anônimo'; // Mostra email ou 'Anônimo'
-                    userEmailDisplay.classList.remove('hidden');
-                }
 
-                // Define as referências das coleções do Firestore para este usuário
+                // Define as coleções do Firestore
                  const basePath = `artifacts/${appId}/users/${currentUser.uid}`;
                 transactionsCol = collection(db, basePath, 'transactions');
                 categoriesCol = collection(db, basePath, 'categories');
@@ -675,58 +569,57 @@
                 setupFirestoreListeners(); 
 
             } else {
-                // Usuário está DESLOGADO
+                // Usuário DESLOGADO OU NUNCA LOGOU ANTES
                 currentUser = null; listenersAttached = false; appInitialized = false; 
-                console.log("[AUTH] User is logged out.");
+                console.log("[AUTH] No user found. Attempting initial sign-in...");
                 
-                // Mostra forms de login/cadastro e esconde o container principal do app
-                if(authContainer) authContainer.classList.remove('hidden'); 
-                if(mainAppContainer) mainAppContainer.classList.add('hidden'); 
-                
-                // Esconde informações do usuário e loader interno
+                // Mostra loader PRINCIPAL
+                if(loadingIndicator) loadingIndicator.style.display = 'block'; 
+                if(loadingMessage) loadingMessage.textContent = 'Autenticando...'; 
+                if(appContent) appContent.classList.add('hidden');
                 if(userIdDisplay) userIdDisplay.classList.add('hidden');
-                if(userEmailDisplay) userEmailDisplay.classList.add('hidden');
-                if(loadingIndicator) loadingIndicator.style.display = 'none'; 
-                
-                // Limpa mensagem de erro/status e mostra o formulário de login por padrão
-                if(authMessage) authMessage.textContent = ''; 
-                showLoginForm(); 
-                 
-                // Garante que o tema correto seja aplicado na tela de auth
-                const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                updateTheme(isDark);
+
+                // Tenta logar com token ou anonimamente
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        console.log("[AUTH] Attempting sign in with custom token...");
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        console.log("[AUTH] Attempting sign in anonymously...");
+                        await signInAnonymously(auth);
+                    }
+                     console.log("[AUTH] Sign-in initiated. Waiting for next auth state change.");
+                } catch (error) {
+                    console.error("[AUTH] CRITICAL: Initial sign-in failed:", error);
+                     if (loadingIndicator) loadingIndicator.innerHTML = `<p class='text-red-500'>Falha crítica na autenticação (${error.code || 'sem código'}). Verifique sua conexão e configuração. Recarregue a página.</p>`;
+                }
             }
         });
         
         // --- Event Listeners Globais ---
         document.addEventListener('DOMContentLoaded', () => {
              console.log("[INIT] DOMContentLoaded event fired.");
-             // CORREÇÃO: Define TODAS as variáveis de elementos aqui
+             // Define variáveis de tema
              themeToggleBtn = document.getElementById('theme-toggle');
              themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
              themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
              themeToggleText = document.getElementById('theme-toggle-text');
-             themeToggleBtnAuth = document.getElementById('theme-toggle-auth');
-             themeToggleDarkIconAuth = document.getElementById('theme-toggle-dark-icon-auth');
-             themeToggleLightIconAuth = document.getElementById('theme-toggle-light-icon-auth');
-             themeToggleTextAuth = document.getElementById('theme-toggle-text-auth');
-             // ... (todas as outras atribuições de getElementById foram movidas para o topo)
+             // REMOVIDO: Variáveis de tema da tela de auth
 
             const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
             updateTheme(isDark); 
             
             lucide.createIcons(); 
 
-            // Adiciona listener aos dois botões de trocar tema
+            // Listener do botão de tema principal
             const themeClickHandler = () => updateTheme(!document.documentElement.classList.contains('dark'));
             if(themeToggleBtn) { themeToggleBtn.addEventListener('click', themeClickHandler); } 
             else { console.warn("Theme toggle button (main) not found."); }
-             if(themeToggleBtnAuth) { themeToggleBtnAuth.addEventListener('click', themeClickHandler); } 
-            else { console.warn("Theme toggle button (auth) not found."); }
+            // REMOVIDO: Listener do botão de tema auth
 
             console.log("[INIT] DOMContentLoaded setup complete. Adding event listeners...");
 
-             // Adiciona listeners restantes que dependem do DOM aqui
+             // Listeners dos elementos da UI principal
              if(menuToggle) menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
              if(sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
              navButtons.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); switchPage(e.currentTarget.dataset.page); }));
@@ -765,12 +658,7 @@
              if(confirmImportBtn) confirmImportBtn.addEventListener('click', confirmImport); 
              if(cancelImportBtn) cancelImportBtn.addEventListener('click', resetImportState);
              
-            // --- Listeners de Autenticação (CORREÇÃO: Movidos PARA CÁ) ---
-            if (loginForm) loginForm.addEventListener('submit', handleLogin);
-            if (registerForm) registerForm.addEventListener('submit', handleRegister);
-            if (showRegisterLink) showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterForm(); });
-            if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginForm(); });
-            if (logoutBtn) logoutBtn.addEventListener('click', handleLogout); 
+             // REMOVIDO: Listeners de Auth (loginForm, registerForm, etc.)
 
              console.log("[INIT] All event listeners attached.");
         });
