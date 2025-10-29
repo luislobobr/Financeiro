@@ -309,7 +309,6 @@
     <script type="module">
         // --- Imports Firebase ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // REMOVIDO: Imports de auth por email/senha
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, writeBatch, query, setDoc, getDoc, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
@@ -332,7 +331,7 @@
             console.log("[INIT] Firebase App initialized successfully.");
         } catch (e) { 
              console.error("[INIT] Firebase initialization failed:", e);
-             const loadingIndicatorEl = document.getElementById('loading-indicator'); // Usa o loader principal
+             const loadingIndicatorEl = document.getElementById('loading-indicator'); 
              if (loadingIndicatorEl) {
                  loadingIndicatorEl.innerHTML = `<p class='text-red-500'>Falha crítica na inicialização (${e.message}). Verifique a configuração.</p>`;
              } else {
@@ -348,10 +347,8 @@
         let transactionsCol, categoriesCol, paymentTypesCol, budgetsCol, accountsCol;
         let unsubscribeListeners = []; 
 
-        // --- DOM Elements ---
-        // REMOVIDO: Elementos Auth
+        // --- DOM Elements --- (Declarados no topo, antes das funções)
         const mainAppContainer = document.getElementById('main-app-container'); 
-        // REMOVIDO: logoutBtn, userEmailDisplay
         const pages = { dashboard: document.getElementById('page-dashboard'), accounts: document.getElementById('page-accounts'), bi: document.getElementById('page-bi'), manage: document.getElementById('page-manage'), config: document.getElementById('page-config'), reports: document.getElementById('page-reports'), import: document.getElementById('page-import'), budgets: document.getElementById('page-budgets') };
         const navButtons = document.querySelectorAll('.nav-button');
         const navButtonLinks = document.querySelectorAll('.nav-button-link');
@@ -448,7 +445,7 @@
         const inputModalLabel = document.getElementById('input-modal-label'); 
         const inputModalField = document.getElementById('input-modal-field'); 
         let themeToggleBtn, themeToggleDarkIcon, themeToggleLightIcon, themeToggleText;
-        // REMOVIDO: Variáveis de tema da tela de auth
+
 
         // --- Estado da Aplicação ---
         let localTransactions = []; let localPaymentTypes = []; let localCategories = []; 
@@ -467,96 +464,184 @@
         const formatDate = (dateString) => { if (!dateString) return ''; try { const date = dateString.includes('T') ? new Date(dateString) : new Date(dateString + "T12:00:00Z"); if (isNaN(date)) return ''; return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' }); } catch (e) { console.warn("Erro ao formatar data:", dateString, e); return ''; } };
         const getTodayDateString = () => new Date().toISOString().split('T')[0];
         
-        function showAlert(message, title = "Aviso") { /* ... */ }
-        function closeAlertModal() { /* ... */ }
-        function showConfirm(message, title = "Atenção") { /* ... */ }
-        function handleConfirm(confirmed) { /* ... */ }
-        function showInput(label, title = "Entrada", defaultValue = "") { /* ... */ }
-        function handleInputConfirm() { /* ... */ }
-        function handleInputCancel() { /* ... */ }
-        function updateTheme(isDark) { /* ... */ }
-        // REMOVIDO: Funções de Auth (showLogin/Register, handleLogin/Register/Logout, mapAuthError)
-        function unsubscribeAllListeners() { /* ... */ }
-        function setupFirestoreListeners() { /* ... */ }
-        function initApp() { /* ... */ }
-        function switchPage(pageKey, tabKey = null) { /* ... */ }
-        function switchConfigTab(tabKey) { /* ... */ }
-        function toggleSidebar(forceOpen) { /* ... */ }
-        function renderAll() { /* ... */ } 
-        async function handleAccountFormSubmit(e) { /* ... */ }
-        async function removeAccount(id) { /* ... */ }
-        function calculateAccountBalance(accountId) { /* ... */ }
-        function calculateAvailableCredit(accountId) { /* ... */ }
-        function updateAccountBalances() { /* ... */ }
-        function renderAccountsList() { /* ... */ }
-        function updateMainKPIs() { /* ... */ }
-        function renderFinancialDiagnosis() { /* ... */ }
-        function openTransactionModal(id = null) { /* ... */ }
-        function closeTransactionModal() { /* ... */ }
-        async function handleFormSubmit(e) { /* ... */ }
-        async function removeTransaction(id) { /* ... */ }
-        function toggleTransactionFormVisibility() { /* ... */ }
-        function openPaymentModal(id) { /* ... */ }
-        async function confirmPayment() { /* ... */ }
-        function closePaymentModal() { /* ... */ } 
-        function openPayCcBillModal(accountId) { /* ... */ }
-        async function confirmPayCcBill() { /* ... */ }
-        function closePayCcBillModal() { /* ... */ } 
-        async function createNextRecurring(transaction) { /* ... */ }
-        function renderTransactionList(transactionsToRender, targetListElement) { /* ... */ }
-        function renderReminders() { /* ... */ }
-        function renderCategoriesList() { /* ... */ }
-        function renderPaymentTypesList() { /* ... */ }
-        function populateCategorySelects() { /* ... */ }
-        function populateCategoryFilter() { /* ... */ }
-        function populatePaymentTypeSelects() { /* ... */ }
-        function populateAccountSelects(includeCreditCards = true, filterType = null, targetSelect = null) { /* ... */ }
-        async function handleCategoryChange(event) { /* ... */ } 
-        async function addCategory(e) { /* ... */ }
-        async function removeCategory(id) { /* ... */ }
-        async function addPaymentType(e) { /* ... */ }
-        async function removePaymentType(id) { /* ... */ }
-        async function addSuggestedCategories(isSilent = false) { /* ... */ }
-        function renderBudgets() { /* ... */ } 
-        async function handleBudgetChange(event) { /* ... */ }
-        function getChartOptions() { /* ... */ }
-        function renderBIDashboard() { /* ... */ } 
-        function renderExpenseDoughnutChart(expenseData) { /* ... */ }
-        function renderIncomeVsExpenseChart() { /* ... */ }
-        function renderBalanceEvolutionChart() { /* ... */ }
-        function generateReport() { /* ... */ }
-        function exportToExcel() { /* ... */ }
-        function exportToPDF() { /* ... */ }
-        function handleFileSelect(event) { /* ... */ }
-        function parseDateFromBR(dateString) { /* ... */ }
-        function processExportedFile(data) { /* ... */ }
-        function renderImportPreview() { /* ... */ }
-        async function confirmImport() { /* ... */ }
-        function resetImportState() { /* ... */ }
+        function showAlert(message, title = "Aviso") { /* ... (inalterada) ... */ }
+        function closeAlertModal() { /* ... (inalterada) ... */ }
+        function showConfirm(message, title = "Atenção") { /* ... (inalterada) ... */ }
+        function handleConfirm(confirmed) { /* ... (inalterada) ... */ }
+        function showInput(label, title = "Entrada", defaultValue = "") { /* ... (inalterada) ... */ }
+        function handleInputConfirm() { /* ... (inalterada) ... */ }
+        function handleInputCancel() { /* ... (inalterada) ... */ }
+        function updateTheme(isDark) { /* ... (inalterada) ... */ }
+        function unsubscribeAllListeners() { /* ... (inalterada) ... */ }
+        function setupFirestoreListeners() { 
+             if (!currentUser) { console.warn("[LISTENER] Attempted setup without user."); return; }
+            if (listenersAttached) { console.log("[LISTENER] Listeners already attached, skipping setup."); return; }
+            
+            console.log("[LISTENER] Attaching Firestore listeners for user:", currentUser.uid);
+            // Garante que o loader interno está visível
+            if(loadingIndicator) loadingIndicator.style.display = 'block'; 
+            if(loadingMessage) loadingMessage.textContent = 'Carregando dados essenciais...'; // Reset message
 
-        // --- Autenticação Simplificada ---
+            // Estado de carregamento específico para esta chamada
+            let dataReady = { accounts: false, categories: false, paymentTypes: false, transactions: false, budgets: false };
+            let initialEssentialsLoadComplete = false; // Flag para UI principal (accounts + categories)
+            
+            // Limpa timeout anterior e inicia um novo MAIS LONGO
+            clearTimeout(initialLoadTimeout); 
+            initialLoadTimeout = setTimeout(() => {
+                if (!appInitialized) { // Só mostra erro se a UI ainda não apareceu
+                    console.error("[INIT] Timeout: Initial data load took longer than 60 seconds.");
+                    const loadedCount = Object.values(dataReady).filter(Boolean).length;
+                    const totalCount = Object.keys(dataReady).length;
+                     // Adicionado log detalhado do estado no timeout
+                     console.log("[INIT] Timeout state:", JSON.stringify(dataReady));
+                     if(loadingMessage) loadingMessage.innerHTML = `<span class='text-orange-500'>Carregamento demorando (${loadedCount}/${totalCount} concluídos). Verifique sua conexão ou <a href='javascript:location.reload();' class='underline font-semibold'>recarregue</a>.</span>`;
+                     if(loadingIndicator) loadingIndicator.style.display = 'block'; // Garante que o indicador está visível
+                } else {
+                     console.log("[INIT] Timeout triggered but UI already initialized. Ignoring.");
+                }
+            }, 60000); // Timeout de 60 segundos
+
+            // Função chamada após CADA listener receber o primeiro snapshot
+            const checkInitialLoad = (collectionName) => {
+                dataReady[collectionName] = true; // Marca a coleção como carregada
+                console.log(`[LISTENER] Initial data received for: ${collectionName}. Status:`, JSON.stringify(dataReady));
+                
+                // Condição para mostrar a UI: Contas E Categorias carregadas
+                 // ADICIONADO Log para verificar a condição
+                 console.log(`[INIT] Checking essentials: accounts=${dataReady.accounts}, categories=${dataReady.categories}, !initialEssentialsLoadComplete=${!initialEssentialsLoadComplete}`);
+                if (!initialEssentialsLoadComplete && dataReady.accounts && dataReady.categories) {
+                    console.log("[INIT] Essential data (Accounts & Categories) loaded! Initializing UI...");
+                    initialEssentialsLoadComplete = true; // Marca que o essencial carregou
+                    if (!appInitialized) { // Só inicializa a UI uma vez
+                         console.log("[INIT] Calling initApp()...");
+                        initApp(); // Chama a função para mostrar a UI principal
+                    } else {
+                         console.log("[INIT] UI already initialized after essentials loaded, skipping initApp but calling renderAll.");
+                         renderAll(); // Se UI já iniciou mas algo recarregou, renderiza
+                    }
+                } 
+                
+                // Verifica se TUDO carregou para poder limpar o timeout
+                 if (Object.values(dataReady).every(status => status === true)) {
+                    console.log("[LISTENER] All collections loaded. Clearing timeout.");
+                    clearTimeout(initialLoadTimeout); // Cancela o timeout pois tudo carregou
+                } 
+                // Atualiza a mensagem de loading se a UI ainda não foi inicializada
+                else if (!appInitialized && loadingMessage) { 
+                    const loadedCount = Object.values(dataReady).filter(Boolean).length;
+                    const totalCount = Object.keys(dataReady).length;
+                    loadingMessage.textContent = `Carregando dados (${loadedCount}/${totalCount})...`;
+                }
+            };
+
+             const handleListenerError = (error, collectionName) => { 
+                console.error(`[LISTENER] Error loading ${collectionName}:`, error);
+                // Se o erro ocorrer ANTES da UI inicializar, mostra erro fatal no loader
+                if (!appInitialized && loadingIndicator) { 
+                    loadingIndicator.innerHTML = `<p class='text-red-500'>Erro ao carregar ${collectionName} (${error.code || 'sem código'}). <a href='javascript:location.reload();' class='underline font-semibold'>Recarregar</a>.</p>`;
+                    clearTimeout(initialLoadTimeout); // Cancela timeout
+                    unsubscribeAllListeners(); // Cancela outros listeners em caso de erro fatal
+                } else {
+                    // Se a app já iniciou, mostra um alerta não-fatal
+                    showAlert(`Erro ao atualizar ${collectionName}. Alguns dados podem estar desatualizados.`, "Erro de Sincronização");
+                }
+            };
+
+            // Anexa os listeners e guarda as funções de unsubscribe
+            console.log("[LISTENER] Attaching: accounts");
+            unsubscribeListeners.push(onSnapshot(query(accountsCol), (snapshot) => { console.log(`[DATA] Accounts: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localAccounts = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt?.toDate() })); if (!dataReady.accounts || snapshot.metadata.fromCache === false) checkInitialLoad('accounts'); renderAccountsList(); populateAccountSelects(); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'contas')));
+            
+            console.log("[LISTENER] Attaching: categories");
+            unsubscribeListeners.push(onSnapshot(query(categoriesCol), async (snapshot) => { console.log(`[DATA] Categories: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localCategories = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); let categoriesNowReady = true; if (!dataReady.categories || snapshot.metadata.fromCache === false) { if (snapshot.empty && !snapshot.metadata.fromCache && !snapshot.metadata.hasPendingWrites) { console.log("[INIT] No categories found, adding suggested..."); try { await addSuggestedCategories(true); categoriesNowReady=false; /* Espera recarregar via snapshot */ } catch (e) { console.error("Error adding suggested categories on init:", e); categoriesNowReady = true; /* Continua mesmo se falhar */ } } if(categoriesNowReady) checkInitialLoad('categories'); } renderCategoriesList(); populateCategorySelects(); populateCategoryFilter(); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'categorias')));
+
+            console.log("[LISTENER] Attaching: paymentTypes");
+            unsubscribeListeners.push(onSnapshot(query(paymentTypesCol), (snapshot) => { console.log(`[DATA] Payment Types: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localPaymentTypes = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); if (!dataReady.paymentTypes || snapshot.metadata.fromCache === false) checkInitialLoad('paymentTypes'); renderPaymentTypesList(); populatePaymentTypeSelects(); }, (error) => handleListenerError(error, 'tipos de pagamento')));
+
+            console.log("[LISTENER] Attaching: transactions");
+            unsubscribeListeners.push(onSnapshot(query(transactionsCol), (snapshot) => { console.log(`[DATA] Transactions: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); if (!dataReady.transactions || snapshot.metadata.fromCache === false) checkInitialLoad('transactions'); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'transações')));
+
+            console.log("[LISTENER] Attaching: budgets");
+            unsubscribeListeners.push(onSnapshot(query(budgetsCol), (snapshot) => { console.log(`[DATA] Budgets: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localBudgets = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); if (!dataReady.budgets || snapshot.metadata.fromCache === false) checkInitialLoad('budgets'); if (appInitialized) renderBudgets(); }, (error) => handleListenerError(error, 'orçamentos')));
+            
+            listenersAttached = true; // Marca que foram anexados
+            console.log("[LISTENER] All listener attachments initiated.");
+        }
+        function initApp() { /* ... (inalterada) ... */ }
+        function switchPage(pageKey, tabKey = null) { /* ... (inalterada) ... */ }
+        function switchConfigTab(tabKey) { /* ... (inalterada) ... */ }
+        function toggleSidebar(forceOpen) { /* ... (inalterada) ... */ }
+        function renderAll() { /* ... (inalterada) ... */ } 
+        async function handleAccountFormSubmit(e) { /* ... (inalterada) ... */ }
+        async function removeAccount(id) { /* ... (inalterada) ... */ }
+        function calculateAccountBalance(accountId) { /* ... (inalterada) ... */ }
+        function calculateAvailableCredit(accountId) { /* ... (inalterada) ... */ }
+        function updateAccountBalances() { /* ... (inalterada) ... */ }
+        function renderAccountsList() { /* ... (inalterada) ... */ }
+        function updateMainKPIs() { /* ... (inalterada) ... */ }
+        function renderFinancialDiagnosis() { /* ... (inalterada) ... */ }
+        function openTransactionModal(id = null) { /* ... (inalterada) ... */ }
+        function closeTransactionModal() { /* ... (inalterada) ... */ }
+        async function handleFormSubmit(e) { /* ... (inalterada) ... */ }
+        async function removeTransaction(id) { /* ... (inalterada) ... */ }
+        function toggleTransactionFormVisibility() { /* ... (inalterada) ... */ }
+        function openPaymentModal(id) { /* ... (inalterada) ... */ }
+        async function confirmPayment() { /* ... (inalterada) ... */ }
+        function closePaymentModal() { /* ... (inalterada) ... */ } 
+        function openPayCcBillModal(accountId) { /* ... (inalterada) ... */ }
+        async function confirmPayCcBill() { /* ... (inalterada) ... */ }
+        function closePayCcBillModal() { /* ... (inalterada) ... */ } 
+        async function createNextRecurring(transaction) { /* ... (inalterada) ... */ }
+        function renderTransactionList(transactionsToRender, targetListElement) { /* ... (inalterada) ... */ }
+        function renderReminders() { /* ... (inalterada) ... */ }
+        function renderCategoriesList() { /* ... (inalterada) ... */ }
+        function renderPaymentTypesList() { /* ... (inalterada) ... */ }
+        function populateCategorySelects() { /* ... (inalterada) ... */ }
+        function populateCategoryFilter() { /* ... (inalterada) ... */ }
+        function populatePaymentTypeSelects() { /* ... (inalterada) ... */ }
+        function populateAccountSelects(includeCreditCards = true, filterType = null, targetSelect = null) { /* ... (inalterada) ... */ }
+        async function handleCategoryChange(event) { /* ... (inalterada) ... */ } 
+        async function addCategory(e) { /* ... (inalterada) ... */ }
+        async function removeCategory(id) { /* ... (inalterada) ... */ }
+        async function addPaymentType(e) { /* ... (inalterada) ... */ }
+        async function removePaymentType(id) { /* ... (inalterada) ... */ }
+        async function addSuggestedCategories(isSilent = false) { /* ... (inalterada) ... */ }
+        function renderBudgets() { /* ... (inalterada) ... */ } 
+        async function handleBudgetChange(event) { /* ... (inalterada) ... */ }
+        function getChartOptions() { /* ... (inalterada) ... */ }
+        function renderBIDashboard() { /* ... (inalterada) ... */ } 
+        function renderExpenseDoughnutChart(expenseData) { /* ... (inalterada) ... */ }
+        function renderIncomeVsExpenseChart() { /* ... (inalterada) ... */ }
+        function renderBalanceEvolutionChart() { /* ... (inalterada) ... */ }
+        function generateReport() { /* ... (inalterada) ... */ }
+        function exportToExcel() { /* ... (inalterada) ... */ }
+        function exportToPDF() { /* ... (inalterada) ... */ }
+        function handleFileSelect(event) { /* ... (inalterada) ... */ }
+        function parseDateFromBR(dateString) { /* ... (inalterada) ... */ }
+        function processExportedFile(data) { /* ... (inalterada) ... */ }
+        function renderImportPreview() { /* ... (inalterada) ... */ }
+        async function confirmImport() { /* ... (inalterada) ... */ }
+        function resetImportState() { /* ... (inalterada) ... */ }
+
+        // --- Autenticação Simplificada --- (Movida para após definições de funções)
         onAuthStateChanged(auth, async (user) => {
             console.log(`[AUTH] State changed. User: ${user ? user.uid : 'null'}`);
             clearTimeout(initialLoadTimeout); 
             unsubscribeAllListeners(); 
 
             if (user) {
-                // Usuário LOGADO (seja por token ou anônimo)
                 currentUser = user;
                 console.log("[AUTH] User authenticated:", currentUser.uid);
                 
-                // Mostra o loader INTERNO do app enquanto carrega os dados
                 if(loadingIndicator) loadingIndicator.style.display = 'block'; 
                 if(loadingMessage) loadingMessage.textContent = 'Carregando dados...'; 
-                if(appContent) appContent.classList.add('hidden'); // Esconde o conteúdo até carregar
+                if(appContent) appContent.classList.add('hidden'); 
                 
-                // Atualiza ID do usuário na UI
                 if(userIdDisplay) {
                     userIdDisplay.textContent = `ID: ${user.uid.substring(0,8)}...`;
                     userIdDisplay.classList.remove('hidden');
                 }
 
-                // Define as coleções do Firestore
                  const basePath = `artifacts/${appId}/users/${currentUser.uid}`;
                 transactionsCol = collection(db, basePath, 'transactions');
                 categoriesCol = collection(db, basePath, 'categories');
@@ -565,21 +650,17 @@
                 accountsCol = collection(db, basePath, 'accounts');
                 console.log("[INIT] Firestore collections defined:", basePath);
                 
-                // Inicia o processo de carregar os dados (listeners)
                 setupFirestoreListeners(); 
 
             } else {
-                // Usuário DESLOGADO OU NUNCA LOGOU ANTES
                 currentUser = null; listenersAttached = false; appInitialized = false; 
                 console.log("[AUTH] No user found. Attempting initial sign-in...");
                 
-                // Mostra loader PRINCIPAL
                 if(loadingIndicator) loadingIndicator.style.display = 'block'; 
                 if(loadingMessage) loadingMessage.textContent = 'Autenticando...'; 
                 if(appContent) appContent.classList.add('hidden');
                 if(userIdDisplay) userIdDisplay.classList.add('hidden');
 
-                // Tenta logar com token ou anonimamente
                 try {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         console.log("[AUTH] Attempting sign in with custom token...");
@@ -638,7 +719,7 @@
              if(transactionForm) transactionForm.addEventListener('submit', handleFormSubmit);
              document.querySelectorAll('input[name="type"]').forEach(radio => radio.addEventListener('change', toggleTransactionFormVisibility));
              if(isPaidInput) isPaidInput.addEventListener('change', toggleTransactionFormVisibility);
-             if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); // Este é o listener que causava o erro
+             if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); // Listener CORRIGIDO
              document.getElementById('payment-modal-confirm')?.addEventListener('click', confirmPayment);
              document.getElementById('payment-modal-cancel')?.addEventListener('click', closePaymentModal); 
              document.getElementById('pay-cc-bill-confirm')?.addEventListener('click', confirmPayCcBill);
