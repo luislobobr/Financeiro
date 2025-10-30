@@ -1,936 +1,1630 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finanças Pro+ v4.1 | Seu Dashboard Financeiro</title>
-    
+    <title>Controle Financeiro para Casais</title>
+    <!-- Carrega o Tailwind CSS a partir de um CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Carrega SheetJS (xlsx.js) para ler Excel e CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        sky: {
-                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
-                            400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
-                            800: '#075985', 900: '#0c4a6e', 950: '#082f49',
-                        }
-                    }
-                },
-            },
-        }
-    </script>
-
     <style>
-        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        .transaction.paid { border-left-color: #10b981; } /* Emerald-500 */
-        .transaction.unpaid { border-left-color: #f97316; } /* Orange-500 */
-        .transaction.income { border-left-color: #22c55e; } /* Green-500 */
-        .transaction.overdue { border-left-color: #ef4444; } /* Red-500 */
-        .transaction.cc_payment_expense { border-left-color: #6366f1; } /* Indigo-500 */
-        .transaction.cc_payment_credit { border-left-color: #ec4899; } /* Pink-500 */
-        
-        .modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); display: flex;
-            justify-content: center; align-items: center; z-index: 1000;
-            backdrop-filter: blur(4px); transition: opacity 0.2s ease-in-out; opacity: 0; pointer-events: none;
+        /* Estilo para o spinner de carregamento */
+        .spinner {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
         }
-        .modal-backdrop:not(.hidden) { opacity: 1; pointer-events: auto; }
-        .modal-content { transition: all 0.2s ease-in-out; transform: translateY(20px); }
-        .modal-backdrop:not(.hidden) .modal-content { transform: translateY(0); }
-
-        .nav-button { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; font-weight: 600; border-radius: 0.5rem; transition: all 0.2s ease-in-out; color: #334155; }
-        .dark .nav-button { color: #cbd5e1; }
-        .nav-button:hover { background-color: #e2e8f0; }
-        .dark .nav-button:hover { background-color: #334155; }
-        .nav-button.active { background-color: #0ea5e9; color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
-        .nav-button.active:hover { background-color: #0284c7; }
-        .nav-button svg { width: 20px; height: 20px; flex-shrink: 0; }
-        
-        .tab-button.active { border-color: #0ea5e9; color: #0ea5e9; font-weight: 700; }
-
-        .loader { border: 4px solid #e5e7eb; border-top: 4px solid #0ea5e9; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .budget-progress::-webkit-progress-bar { background-color: #e5e7eb; border-radius: 8px; }
-        .budget-progress::-webkit-progress-value { background-color: #3b82f6; border-radius: 8px; transition: width 0.5s ease; }
-        .budget-progress.over-budget::-webkit-progress-value { background-color: #ef4444; }
-
-        #sidebar { transition: transform 0.3s ease-in-out; }
-        @media (max-width: 1023px) {
-            #sidebar { transform: translateX(-100%); }
-            #sidebar.open { transform: translateX(0); z-index: 100; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
-            #sidebar-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 90; transition: opacity 0.3s ease-in-out; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-
-        .import-item.needs-correction { border: 1px solid #f97316; background-color: #fff7ed !important; }
-        .dark .import-item.needs-correction { border-color: #fb923c; background-color: #7c2d12 !important; }
-        .import-account-select { min-width: 150px; }
-
+        /* Estilos para abas ativas e inativas */
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            border-bottom-color: #3b82f6; /* blue-500 */
+            color: #3b82f6;
+        }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans">
+<body class="bg-gray-100 font-sans antialiased">
 
-    <div id="main-app-container" class="flex h-screen overflow-hidden w-full">
-        
-        <div id="sidebar-backdrop" class="hidden lg:hidden" onclick="toggleSidebar(false)"></div>
-        
-        <aside id="sidebar" class="w-64 bg-white dark:bg-slate-800 fixed lg:static h-full flex flex-col z-50 shadow-lg lg:shadow-none">
-            <div class="flex items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-700">
-                <div class="w-10 h-10 bg-sky-600 rounded-lg flex items-center justify-center text-white"><i data-lucide="wallet-cards"></i></div>
-                <h1 class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">Finanças Pro+</h1>
+    <!-- ===== 1. MODAL DE SELEÇÃO DE FAMÍLIA ===== -->
+    <div id="familyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Bem-vindo!</h2>
+            <p class="text-gray-600 mb-6">Como você gostaria de começar?</p>
+            
+            <div class="space-y-4">
+                <button id="createFamilyBtn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    Criar Nova Família
+                </button>
+                <div class="relative flex items-center justify-center">
+                    <span class="absolute bg-white px-2 text-gray-500 text-sm">ou</span>
+                    <div class="h-px bg-gray-300 w-full"></div>
+                </div>
+                <div class="space-y-3">
+                    <input type="text" id="familyIdInput" placeholder="Cole o ID da Família aqui" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="joinFamilyBtn" class="w-full bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-gray-800 transition duration-300">
+                        Juntar-se a uma Família
+                    </button>
+                </div>
             </div>
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <a href="#" class="nav-button active" data-page="dashboard"><i data-lucide="layout-dashboard"></i><span>Visão Geral</span></a>
-                <a href="#" class="nav-button" data-page="accounts"><i data-lucide="landmark"></i><span>Contas</span></a>
-                <a href="#" class="nav-button" data-page="manage"><i data-lucide="list-filter"></i><span>Lançamentos</span></a>
-                <a href="#" class="nav-button" data-page="budgets"><i data-lucide="piggy-bank"></i><span>Orçamentos</span></a>
-                <a href="#" class="nav-button" data-page="bi"><i data-lucide="bar-chart-3"></i><span>Análises</span></a>
-                <a href="#" class="nav-button" data-page="reports"><i data-lucide="file-text"></i><span>Relatórios</span></a>
-                <a href="#" class="nav-button" data-page="import"><i data-lucide="import"></i><span>Importar</span></a>
-                <a href="#" class="nav-button" data-page="config"><i data-lucide="settings"></i><span>Configurações</span></a>
-            </nav>
-            <div class="p-4 border-t border-slate-200 dark:border-slate-700 space-y-2">
-                 <span id="user-id-display" class="text-xs text-slate-400 dark:text-slate-500 hidden mb-2 text-center block" title="Seu ID de Usuário"></span>
-                <button id="theme-toggle" type="button" class="w-full flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
-                    <i id="theme-toggle-dark-icon" data-lucide="moon" class="hidden"></i>
-                    <i id="theme-toggle-light-icon" data-lucide="sun" class="hidden"></i>
-                    <span id="theme-toggle-text"></span>
+            
+            <!-- Mostra o ID da nova família após a criação -->
+            <div id="newFamilyIdSection" class="mt-6 hidden">
+                <p class="text-gray-700">Compartilhe este ID com seu parceiro:</p>
+                <div class="bg-gray-200 text-gray-800 font-mono text-lg p-3 my-2 rounded-lg break-words" id="familyIdDisplay"></div>
+                <button id="copyFamilyIdBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                    Copiar ID
+                </button>
+                <button id="startAppBtn" class="mt-4 w-full text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-blue-100 transition duration-300">
+                    Começar a Usar
                 </button>
             </div>
-        </aside>
-
-        <div class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
-            
-            <header class="lg:hidden sticky top-0 bg-white dark:bg-slate-800 shadow-md p-4 z-40 flex items-center justify-between">
-                <button id="menu-toggle" type="button" class="text-slate-500 dark:text-slate-400 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"><i data-lucide="menu"></i></button>
-                <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Finanças Pro+</h1>
-                <div class="w-10"></div> 
-            </header>
-
-            <div class="p-4 md:p-8 max-w-7xl mx-auto w-full">
-                
-                <div id="loading-indicator" class="text-center p-8"> 
-                    <div class="loader"></div>
-                    <p id="loading-message" class="text-slate-500 dark:text-slate-400">Autenticando e carregando dados...</p>
-                </div>
-
-                <div id="app-content" class="hidden"> 
-                    
-                    <main id="page-dashboard">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="scale" class="w-4 h-4"></i>Saldo Total (Contas)</h2><p id="total-balance" class="text-3xl font-bold text-sky-600 dark:text-sky-500 mt-2">R$ 0,00</p></div>
-                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i>Receitas (Mês)</h2><p id="total-income" class="text-3xl font-bold text-emerald-500 mt-2">R$ 0,00</p></div>
-                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="trending-down" class="w-4 h-4"></i>Despesas (Mês)</h2><p id="total-expenses-paid" class="text-3xl font-bold text-rose-500 mt-2">R$ 0,00</p></div>
-                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold flex items-center gap-2"><i data-lucide="banknote" class="w-4 h-4"></i>Balanço (Mês)</h2><p id="month-balance" class="text-3xl font-bold text-slate-700 dark:text-slate-300 mt-2">R$ 0,00</p></div>
-                         </div>
-                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                             <div class="lg:col-span-2 space-y-8">
-                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                                     <div class="flex justify-between items-center mb-4">
-                                         <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200">Minhas Contas</h2>
-                                         <button data-page="config" data-config-tab="accounts" class="nav-button-link text-sm font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1">Gerenciar <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
-                                     </div>
-                                     <div id="dashboard-accounts-list" class="space-y-4"></div>
-                                 </div>
-                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                                     <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Próximos Vencimentos (15 dias)</h2>
-                                     <ul id="reminders-list" class="space-y-4"></ul>
-                                 </div>
-                             </div>
-                             <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                                 <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Diagnóstico Rápido</h2>
-                                 <div id="financial-diagnosis" class="space-y-6"></div>
-                             </div>
-                         </div>
-                    </main>
-                    <main id="page-accounts" class="hidden">
-                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                             <div class="flex justify-between items-center border-b dark:border-slate-600 pb-3 mb-4">
-                                 <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Minhas Contas</h2>
-                                 <button data-page="config" data-config-tab="accounts" class="nav-button-link bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-sky-700 transition text-sm flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Nova Conta</button>
-                             </div>
-                              <div id="accounts-page-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-                         </div>
-                    </main>
-                    <main id="page-budgets" class="hidden">
-                         <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                             <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-1">Orçamentos do Mês</h2>
-                             <p class="text-slate-500 dark:text-slate-400 mb-6">Defina um limite de gastos para cada categoria e acompanhe seu progresso.</p>
-                             <div id="budgets-list" class="space-y-6"></div>
-                         </div>
-                    </main>
-                    <main id="page-bi" class="hidden">
-                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                             <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 text-center"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold">Despesas (30d)</h2><p id="bi-total-expenses" class="text-2xl font-bold text-rose-500 mt-2">R$ 0,00</p></div>
-                             <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 text-center"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold">Média Gasto/Dia</h2><p id="bi-avg-daily-expense" class="text-2xl font-bold text-amber-500 mt-2">R$ 0,00</p></div>
-                             <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 text-center col-span-1 md:col-span-2"><h2 class="text-slate-500 dark:text-slate-400 uppercase text-sm font-semibold">Principal Categoria (30d)</h2><p id="bi-top-category" class="text-2xl font-bold text-slate-700 dark:text-slate-300 mt-2">-</p></div>
-                         </div>
-                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">Receitas vs Despesas (6 meses)</h3><div class="h-80"><canvas id="income-expense-chart"></canvas></div></div>
-                             <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">Despesas por Categoria (30 dias)</h3><div class="h-80" id="expense-chart-container"><canvas id="expense-chart"></canvas></div></div>
-                             <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700"><h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">Evolução do Saldo (Contas Corrente)</h3><div class="h-80"><canvas id="balance-evolution-chart"></canvas></div></div>
-                         </div>
-                    </main>
-                    <main id="page-manage" class="hidden">
-                          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-6">
-                             <div class="flex flex-col md:flex-row justify-between md:items-center border-b dark:border-slate-600 pb-3 mb-4 gap-4">
-                                 <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-200">Histórico de Transações</h2>
-                                 <div class="flex flex-col sm:flex-row gap-2">
-                                     <select id="filter" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"><option value="all">Status: Todos</option><option value="unpaid">A Pagar</option><option value="paid">Pagas</option></select>
-                                     <select id="filter-category" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500"><option value="all">Categoria: Todas</option></select>
-                                 </div>
-                             </div>
-                             <ul id="transaction-list" class="space-y-4"></ul>
-                         </div>
-                    </main>
-                    <main id="page-config" class="hidden">
-                          <div class="bg-white dark:bg-slate-800 p-0 md:p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                             <div class="border-b border-slate-200 dark:border-slate-700 px-4 md:px-0">
-                                 <nav class="flex -mb-px space-x-6 overflow-x-auto" id="config-tabs">
-                                     <button data-tab="accounts" class="tab-button active shrink-0 border-b-2 py-4 px-1 text-sm font-medium border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-200"><i data-lucide="landmark" class="w-4 h-4 inline-block -mt-1 mr-1"></i> Contas</button>
-                                     <button data-tab="categories" class="tab-button shrink-0 border-b-2 py-4 px-1 text-sm font-medium border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-200"><i data-lucide="layout-grid" class="w-4 h-4 inline-block -mt-1 mr-1"></i> Categorias</button>
-                                     <button data-tab="payment-types" class="tab-button shrink-0 border-b-2 py-4 px-1 text-sm font-medium border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-200"><i data-lucide="credit-card" class="w-4 h-4 inline-block -mt-1 mr-1"></i> Tipos de Pagamento</button>
-                                 </nav>
-                             </div>
-                             <div class="py-6 px-4 md:px-0">
-                                 <div id="tab-content-accounts">
-                                     <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Gerenciar Contas</h2>
-                                     <form id="account-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 items-end">
-                                         <div class="lg:col-span-1"><label for="account-name" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Nome da Conta</label><input type="text" id="account-name" placeholder="Ex: Carteira, Nubank" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div>
-                                         <div class="lg:col-span-1"><label for="account-type" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Tipo</label><select id="account-type" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"><option value="checking">Conta Corrente/Carteira</option><option value="credit">Cartão de Crédito</option></select></div>
-                                         <div class="lg:col-span-1"><label for="account-initial-balance" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Saldo Inicial (R$)</label><input type="number" step="0.01" id="account-initial-balance" placeholder="0,00" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required value="0"></div>
-                                         <div id="account-limit-section" class="hidden lg:col-span-1"><label for="account-limit" class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">Limite do Cartão (R$)</label><input type="number" step="0.01" id="account-limit" placeholder="1000,00" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></div>
-                                         <button type="submit" class="md:col-span-2 lg:col-span-4 bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition flex items-center justify-center gap-2 mt-4 lg:mt-0"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar Conta</button>
-                                     </form>
-                                     <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4">Contas Cadastradas</h3>
-                                     <ul id="accounts-list" class="space-y-3"></ul>
-                                 </div>
-                                 <div id="tab-content-categories" class="hidden">
-                                     <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-700 dark:text-slate-200">Gerenciar Categorias</h2><button id="suggest-categories-btn" class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-600 transition text-sm flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4"></i> Sugerir</button></div>
-                                     <form id="category-form" class="flex gap-4 mb-6"><input type="text" id="category-name" placeholder="Ex: Alimentação" class="flex-grow px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"><button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition flex items-center justify-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></form>
-                                     <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4">Categorias Cadastradas</h3>
-                                     <ul id="categories-list" class="space-y-3"></ul>
-                                 </div>
-                                 <div id="tab-content-payment-types" class="hidden">
-                                     <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Gerenciar Tipos de Pagamento</h2>
-                                     <form id="payment-type-form" class="flex gap-4 mb-6"><input type="text" id="payment-type-name" placeholder="Ex: Cartão de Crédito, PIX" class="flex-grow px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"><button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition flex items-center justify-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></form>
-                                     <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4">Tipos Cadastrados</h3>
-                                     <ul id="payment-types-list" class="space-y-3"></ul>
-                                 </div>
-                             </div>
-                         </div>
-                    </main>
-                    <main id="page-reports" class="hidden">
-                          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-6">
-                             <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 border-b dark:border-slate-600 pb-3 mb-4">Filtros do Relatório</h2>
-                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                                 <div><label for="report-start-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">De</label><input type="date" id="report-start-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]"></div>
-                                 <div><label for="report-end-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Até</label><input type="date" id="report-end-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]"></div>
-                                 <div><label for="report-payment-type" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Tipo de Pagamento</label><select id="report-payment-type" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg"><option value="all">Todas</option></select></div>
-                                 <div><label for="report-status" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Status</label><select id="report-status" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg"><option value="all">Todos</option><option value="paid">Pago</option><option value="unpaid">A Pagar</option></select></div>
-                             </div>
-                             <button id="generate-report-btn" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition flex items-center justify-center gap-2"><i data-lucide="play" class="w-5 h-5"></i> Gerar Relatório</button>
-                         </div>
-                         <div id="report-results-section" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                             <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Resultados do Relatório</h2>
-                             <div class="bg-slate-100 dark:bg-slate-700 p-4 rounded-lg mb-4 text-center">
-                                 <p class="text-slate-500 dark:text-slate-400">Total Filtrado</p>
-                                 <p id="report-filtered-total" class="text-2xl font-bold text-sky-600 dark:text-sky-500"></p>
-                             </div>
-                             <div id="export-buttons" class="hidden my-4 flex flex-col sm:flex-row gap-4">
-                                 <button id="export-excel-btn" class="flex-1 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Exportar para Excel</button>
-                                 <button id="export-pdf-btn" class="flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i> Exportar para PDF</button>
-                             </div>
-                             <ul id="report-results-list" class="space-y-4"></ul>
-                         </div>
-                    </main>
-                    <main id="page-import" class="hidden">
-                          <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-6">
-                             <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 border-b dark:border-slate-600 pb-3 mb-4">Importar Transações de Excel (.xlsx)</h2>
-                             <div class="bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500 text-sky-800 dark:text-sky-300 p-4 mb-6 rounded-lg" role="alert"><p class="font-bold">Instruções:</p><p class="mt-2">Selecione o arquivo Excel exportado da versão anterior. Você poderá associar as transações pagas às suas contas cadastradas antes de confirmar.</p></div>
-                             <label for="xlsx-file-input" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Selecione o arquivo Excel</label>
-                             <input type="file" id="xlsx-file-input" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 dark:file:bg-slate-700 file:text-sky-700 dark:file:text-slate-300 hover:file:bg-sky-100 dark:hover:file:bg-slate-600">
-                             <div id="import-loader" class="hidden my-4"><div class="loader"></div><p class="text-slate-500 dark:text-slate-400 text-center">Processando...</p></div>
-                         </div>
-                         <div id="import-preview-section" class="hidden bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                             <h2 class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">Pré-visualização da Importação</h2>
-                             <p class="text-slate-600 dark:text-slate-300 mb-4">Encontramos <b id="import-count">0</b> transações. Associe as transações pagas/recebidas a uma conta e confirme.</p>
-                             <div class="max-h-[60vh] overflow-y-auto bg-slate-100 dark:bg-slate-700 p-4 rounded-lg border dark:border-slate-600"><ul id="import-preview-list" class="space-y-2"></ul></div>
-                             <div class="mt-6 flex gap-4"><button id="confirm-import-btn" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition flex items-center justify-center gap-2"><i data-lucide="check-check" class="w-5 h-5"></i> Confirmar e Salvar</button><button id="cancel-import-btn" class="w-full bg-slate-400 text-white font-bold py-3 rounded-lg hover:bg-slate-500 transition flex items-center justify-center gap-2"><i data-lucide="x" class="w-5 h-5"></i> Cancelar</button></div>
-                         </div>
-                    </main>
-                </div>
-            </div>
-            <footer class="text-center text-slate-500 text-sm p-4 mt-8"><span>Finanças Pro+ | Versão 4.1</span></footer>
         </div>
     </div>
-    
-    <button id="open-transaction-modal-btn" title="Adicionar Transação" class="hidden fixed bottom-6 right-6 z-50 bg-sky-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-sky-700 transition-all duration-300 transform hover:scale-110"><i data-lucide="plus" class="w-7 h-7"></i></button>
-    
 
-    <div id="transaction-modal" class="modal-backdrop hidden" onclick="closeTransactionModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-lg m-4" onclick="event.stopPropagation()"> <div class="flex justify-between items-center mb-4 border-b dark:border-slate-600 pb-3"> <h3 id="transaction-modal-title" class="text-xl font-bold text-slate-800 dark:text-slate-100">Nova Transação</h3> <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"><i data-lucide="x" class="w-6 h-6"></i></button> </div> <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"> <input type="hidden" id="transaction-id"> <div class="md:col-span-2"><p class="block text-slate-600 dark:text-slate-300 font-medium mb-2">Tipo</p><div class="flex gap-6"><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="expense" class="h-4 w-4 text-rose-600 focus:ring-rose-500" checked><span class="text-slate-700 dark:text-slate-300">Despesa</span></label><label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="type" value="income" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300">Receita</span></label></div></div> <div class="md:col-span-2"><label for="description" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Descrição</label><input type="text" id="description" placeholder="Ex: Salário, Aluguel..." class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div><label for="amount" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Valor (R$)</label><input type="number" id="amount" placeholder="250,50" step="0.01" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition" required></div> <div id="due-date-section"><label for="due-date" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Data</label><input type="date" id="due-date" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition dark:[color-scheme:dark]" required></div> <div id="category-section" class="md:col-span-2"><label for="category-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Categoria</label><select id="category-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div id="account-section" class="md:col-span-2"><label for="account-select" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Conta</label><select id="account-select" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></select></div> <div class="md:col-span-2"><label for="notes" class="block text-slate-600 dark:text-slate-300 font-medium mb-1">Notas</label><textarea id="notes" placeholder="Detalhes adicionais..." rows="2" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"></textarea></div> <div class="md:col-span-2 flex items-center justify-between"> <div id="recurring-payment-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-recurring" class="h-4 w-4 text-sky-600 rounded focus:ring-sky-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Despesa Recorrente</span></label></div> <div id="status-section"><label class="flex items-center space-x-2 cursor-pointer mt-7"><input type="checkbox" id="is-paid" class="h-4 w-4 text-emerald-600 rounded focus:ring-emerald-500"><span class="text-slate-700 dark:text-slate-300 font-medium">Já foi paga/recebida?</span></label></div> </div> <div class="md:col-span-2 flex justify-end gap-4 mt-4"> <button type="button" onclick="closeTransactionModal()" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button type="submit" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">Salvar</button> </div> </form> </div> </div>
-     <div id="payment-modal" class="modal-backdrop hidden" onclick="closePaymentModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Confirmar Pagamento</h3> <div class="text-left space-y-4"> <p id="payment-modal-description" class="font-semibold"></p> <div><label for="payment-modal-account" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Pagar com a Conta</label><select id="payment-modal-account" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="payment-modal-type" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Tipo de Pagamento</label><select id="payment-modal-type" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="payment-modal-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Data de Pagamento</label><input type="date" id="payment-modal-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]" required></div> </div> <div class="flex justify-center gap-4 mt-6"> <button id="payment-modal-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="payment-modal-confirm" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">Confirmar</button> </div> </div> </div>
-     <div id="pay-cc-bill-modal" class="modal-backdrop hidden" onclick="closePayCcBillModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Pagar Fatura do Cartão</h3> <div class="text-left space-y-4"> <p id="pay-cc-bill-description" class="font-semibold"></p> <input type="hidden" id="pay-cc-bill-account-id"> <div><label for="pay-cc-bill-from-account" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Pagar usando a conta</label><select id="pay-cc-bill-from-account" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></select></div> <div><label for="pay-cc-bill-amount" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor a Pagar (R$)</label><input type="number" step="0.01" id="pay-cc-bill-amount" placeholder="Valor da fatura" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg" required></div> <div><label for="pay-cc-bill-date" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Data do Pagamento</label><input type="date" id="pay-cc-bill-date" class="w-full mt-1 p-2 border bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-lg dark:[color-scheme:dark]" required></div> </div> <div class="flex justify-center gap-4 mt-6"> <button id="pay-cc-bill-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="pay-cc-bill-confirm" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">Confirmar Pagamento</button> </div> </div> </div>
-     <div id="alert-modal" class="modal-backdrop hidden" onclick="closeAlertModal()"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-sky-100 dark:bg-sky-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="info" class="w-8 h-8 text-sky-500"></i></div> <h3 id="alert-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Aviso</h3> <p id="alert-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Mensagem de aviso.</p> <button id="alert-modal-ok" class="w-full bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div>
-     <div id="confirm-modal" class="modal-backdrop hidden" onclick="handleConfirm(false)"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm text-center m-4" onclick="event.stopPropagation()"> <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-8 h-8 text-amber-500"></i></div> <h3 id="confirm-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Atenção</h3> <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">Você tem certeza?</p> <div class="flex justify-center gap-4"> <button id="confirm-modal-cancel" class="flex-1 bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="confirm-modal-confirm" class="flex-1 bg-rose-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-rose-700 transition">Confirmar</button> </div> </div> </div>
-     <div id="input-modal" class="modal-backdrop hidden"> <div class="modal-content bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg w-full max-w-sm m-4" onclick="event.stopPropagation()"> <h3 id="input-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Input</h3> <div class="space-y-2"> <label id="input-modal-label" for="input-modal-field" class="block text-sm font-medium text-slate-600 dark:text-slate-300">Valor:</label> <input type="text" id="input-modal-field" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition"> </div> <div class="flex justify-end gap-4 mt-6"> <button id="input-modal-cancel" class="bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-400 transition">Cancelar</button> <button id="input-modal-confirm" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition">OK</button> </div> </div> </div>
+    <!-- ===== 2. INDICADOR DE CARREGAMENTO ===== -->
+    <div id="loadingIndicator" class="fixed inset-0 bg-gray-100 flex flex-col items-center justify-center z-40">
+        <div class="spinner w-12 h-12 border-4 border-gray-300 rounded-full"></div>
+        <p class="text-gray-600 mt-4 text-lg">Carregando finanças...</p>
+        <!-- Mensagem de erro de inicialização será injetada aqui -->
+    </div>
 
+    <!-- ===== 2.5 MODAL DE CONFIGURAÇÕES ===== -->
+    <div id="settingsModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeSettingsBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Configurações da Família</h2>
+            <form id="settingsForm" class="space-y-4">
+                <div>
+                    <label for="partner1NameInput" class="block text-sm font-medium text-gray-700">Nome (Parceiro 1)</label>
+                    <input type="text" id="partner1NameInput" placeholder="Ex: João" class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="partner2NameInput" class="block text-sm font-medium text-gray-700">Nome (Parceiro 2)</label>
+                    <input type="text" id="partner2NameInput" placeholder="Ex: Maria" class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button id="saveSettingsBtn" type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    Salvar Nomes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== 2.6 MODAL DE IMPORTAÇÃO ===== -->
+    <div id="importModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeImportModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Importar Transações (Planilha)</h2>
+            
+            <!-- Passo de Revisão -->
+            <div id="importReviewStep">
+                <p class="text-gray-600 mb-4">Por favor, revise os dados e defina um pagador padrão para todas as transações importadas.</p>
+                
+                <div class="mb-4">
+                    <label for="importPaidBy" class="block text-sm font-medium text-gray-700">Pagador Padrão (para todos os itens)</label>
+                    <select id="importPaidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Opções preenchidas pelo JS -->
+                    </select>
+                </div>
+                
+                <div class="mb-6 overflow-x-auto">
+                    <p class="text-sm font-medium text-gray-700 mb-2">Prévia (primeiras 5 linhas):</p>
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead id="csvPreviewHead" class="bg-gray-50">
+                            <!-- Cabeçalho preenchido pelo JS -->
+                        </thead>
+                        <tbody id="csvPreviewBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Linhas preenchidas pelo JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button id="cancelImportBtn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 transition duration-300">
+                        Cancelar
+                    </button>
+                    <button id="confirmImportBtn" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                        Confirmar e Importar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Passo de Carregamento -->
+            <div id="importLoadingStep" class="text-center py-10 hidden">
+                <div class="spinner w-12 h-12 border-4 border-gray-300 rounded-full mx-auto"></div>
+                <p class="text-gray-600 mt-4 text-lg">Importando transações... Por favor, aguarde.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 3. CONTEÚDO PRINCIPAL DA APLICAÇÃO ===== -->
+    <div id="appContent" class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 hidden">
+        
+        <!-- Cabeçalho -->
+        <header class="mb-4 flex flex-col sm:flex-row justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Meu Painel Financeiro</h1>
+                <p class="text-sm text-gray-500">
+                    ID da Família: <span id="currentFamilyId" class="font-mono"></span>
+                </p>
+            </div>
+            <div class="flex items-center space-x-2 mt-2 sm:mt-0">
+                <button id="copyIdBtn" title="Copiar ID da Família" class="bg-white text-gray-600 p-2 rounded-lg shadow-sm border border-gray-300 hover:bg-gray-50 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </button>
+                <button id="openSettingsBtn" title="Configurações da Família" class="bg-white text-gray-600 p-2 rounded-lg shadow-sm border border-gray-300 hover:bg-gray-50 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826 3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navegação por Abas -->
+        <nav class="mb-6 bg-white shadow-sm rounded-lg">
+            <div class="flex border-b border-gray-200">
+                <button id="tabBtnDashboard" class="tab-btn active text-gray-600 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500">
+                    Painel Principal
+                </button>
+                <button id="tabBtnPending" class="tab-btn text-gray-600 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500">
+                    Contas a Pagar
+                </button>
+                <button id="tabBtnPlanning" class="tab-btn text-gray-600 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500">
+                    Planejamento
+                </button>
+            </div>
+        </nav>
+
+        <!-- Container das Abas -->
+        <div>
+            <!-- ===== 3.1 ABA: PAINEL PRINCIPAL ===== -->
+            <div id="tabContentDashboard">
+                <!-- Seção do Dashboard -->
+                <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Cards de Resumo -->
+                    <div class="lg:col-span-1 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-6">
+                        <!-- Balanço Total -->
+                        <div class="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Balanço do Mês (Pago)</h3>
+                            <p id="totalBalance" class="text-3xl font-bold text-gray-900 mt-2">R$ 0,00</p>
+                        </div>
+                        <!-- Receitas -->
+                        <div class="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Receitas (Mês)</h3>
+                            <p id="totalIncome" class="text-2xl font-semibold text-green-600 mt-2">R$ 0,00</p>
+                        </div>
+                        <!-- Despesas -->
+                        <div class="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Despesas (Mês - Pago)</h3>
+                            <p id="totalExpense" class="text-2xl font-semibold text-red-600 mt-2">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <!-- Progresso do Orçamento -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Progresso do Orçamento (Mês)</h3>
+                        <div id="budgetProgressContainer" class="space-y-4">
+                            <!-- Barras de progresso serão inseridas pelo JS -->
+                        </div>
+                    </div>
+
+                    <!-- CARD: CONTAS ATRASADAS -->
+                    <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow-lg border-l-4 border-red-500">
+                         <h3 class="text-lg font-semibold text-red-700 mb-4 flex items-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                             </svg>
+                             Contas Atrasadas
+                         </h3>
+                         <!-- Estado Vazio -->
+                         <div id="emptyStateOverdue" class="text-center text-gray-500 py-6 hidden">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                             </svg>
+                             <h4 class="mt-2 text-md font-semibold text-gray-700">Nenhuma conta atrasada!</h4>
+                         </div>
+                         <!-- Lista de Contas Atrasadas -->
+                         <ul id="overdueList" class="divide-y divide-gray-200 max-h-60 overflow-y-auto">
+                             <!-- Itens da lista serão inseridos pelo JS -->
+                         </ul>
+                         <!-- Total Atrasado -->
+                         <p id="totalOverdueAmount" class="text-right font-semibold text-red-600 mt-4 pr-4"></p>
+                    </div>
+                </section>
+                
+                <!-- Seção do Formulário de Transação -->
+                <section class="mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <!-- Cabeçalho da Seção com Botão de Importar -->
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Adicionar/Editar Transação</h3>
+                            <button id="importCsvBtn" class="mt-2 sm:mt-0 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Importar Planilha
+                            </button>
+                        </div>
+                        <!-- Input de arquivo (oculto) -->
+                        <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
+
+                        <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                            <!-- Descrição -->
+                            <div class="md:col-span-2 lg:col-span-2">
+                                <label for="description" class="block text-sm font-medium text-gray-700">Descrição</label>
+                                <input type="text" id="description" name="description" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <!-- Valor -->
+                            <div>
+                                <label for="amount" class="block text-sm font-medium text-gray-700">Valor (R$)</label>
+                                <input type="number" id="amount" name="amount" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <!-- Tipo (Receita/Despesa) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                                <div class="mt-2 flex space-x-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="type" value="Receita" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" checked>
+                                        <span class="ml-2 text-sm text-gray-700">Receita</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="type" value="Despesa" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                        <span class="ml-2 text-sm text-gray-700">Despesa</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Categoria -->
+                            <div>
+                                <label for="category" class="block text-sm font-medium text-gray-700">Categoria</label>
+                                <select id="category" name="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <!-- Opções preenchidas pelo JS -->
+                                </select>
+                            </div>
+                            <!-- Pago Por -->
+                            <div>
+                                <label for="paidBy" class="block text-sm font-medium text-gray-700">Pago Por</label>
+                                <select id="paidBy" name="paidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <!-- Opções preenchidas pelo JS -->
+                                </select>
+                            </div>
+
+                            <!-- NOVOS CAMPOS: Status, Vencimento, Pagamento -->
+                            <!-- Status -->
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Pago</option>
+                                    <option>A Pagar</option>
+                                </select>
+                            </div>
+                            <!-- Data de Vencimento -->
+                            <div>
+                                <label for="dueDate" class="block text-sm font-medium text-gray-700">Data Vencimento</label>
+                                <input type="date" id="dueDate" name="dueDate" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <!-- Data de Pagamento -->
+                            <div>
+                                <label for="paymentDate" class="block text-sm font-medium text-gray-700">Data Pagamento</label>
+                                <input type="date" id="paymentDate" name="paymentDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <!-- Botão Adicionar / Atualizar -->
+                            <div class="md:col-span-2 lg:col-span-6">
+                                <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    Adicionar Transação
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Seção da Lista de Transações (Mês Corrente) -->
+                <section>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Histórico de Transações (Mês Corrente)</h3>
+                        <!-- Estado Vazio -->
+                        <div id="emptyState" class="text-center text-gray-500 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold">Nenhuma transação este mês</h4>
+                            <p class="mt-1 text-sm">Adicione sua primeira transação no formulário acima.</p>
+                        </div>
+                        <!-- Lista -->
+                        <ul id="transactionList" class="divide-y divide-gray-200">
+                            <!-- Itens da lista serão inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== 3.2 ABA: CONTAS A PAGAR ===== -->
+            <div id="tabContentPending" class="hidden">
+                <section>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Contas a Pagar (Todas)</h3>
+                        <!-- Estado Vazio -->
+                        <div id="emptyStatePending" class="text-center text-gray-500 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold">Nenhuma conta a pagar</h4>
+                            <p class="mt-1 text-sm">Você está em dia!</p>
+                        </div>
+                        <!-- Lista de Contas a Pagar -->
+                        <ul id="pendingList" class="divide-y divide-gray-200">
+                            <!-- Itens da lista serão inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- ===== 3.3 ABA: PLANEJAMENTO (ORÇAMENTO) ===== -->
+            <div id="tabContentPlanning" class="hidden">
+                <section>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Definir Orçamento Mensal</h3>
+                        <p class="text-gray-600 mb-6">Defina seus limites de gastos mensais por categoria. As alterações são salvas automaticamente.</p>
+                        <form id="budgetForm" class="space-y-4">
+                            <!-- Inputs do orçamento serão inseridos pelo JS -->
+                        </form>
+                    </div>
+                </section>
+            </div>
+
+        </div> <!-- Fim do Container das Abas -->
+    </div>
+
+    <!-- ===== 3.5 ELEMENTO TOAST/NOTIFICAÇÃO ===== -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-all duration-300 translate-x-[200%] hidden z-50">
+        <!-- O conteúdo e a cor (bg-green-500 ou bg-red-500) serão definidos pelo JS -->
+    </div>
+
+    <!-- ===== 4. SCRIPT PRINCIPAL DA APLICAÇÃO ===== -->
     <script type="module">
-        // --- Imports Firebase ---
+        // Importa as funções necessárias do Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, writeBatch, query, setDoc, getDoc, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            collection, 
+            addDoc, 
+            deleteDoc, 
+            onSnapshot, 
+            query,
+            where,
+            orderBy,
+            setDoc,
+            updateDoc,
+            collectionGroup,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Configuração Firebase ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'financas-pro-plus-local';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyCYfw1s61o3OgK_sXuR3lklm6GkPTr4XYo",
-            authDomain: "meu-controle-financeiro-82dfe.firebaseapp.com",
-            projectId: "meu-controle-financeiro-82dfe",
-            storageBucket: "meu-controle-financeiro-82dfe.appspot.com", 
-            messagingSenderId: "588430087487",
-            appId: "1:588430087487:web:73632e879a49bcb2212f8a"
+        // --- Variáveis Globais ---
+        let db, auth, userId, appId, familyId;
+        let unsubscribeTransactions = null; // Listener para transações
+        let unsubscribeFamilySettings = null; // Listener para as configurações da família
+        let unsubscribeBudget = null; // Listener para o orçamento
+        
+        let currentEditId = null; // Para rastrear a transação em modo de edição
+        let partnerNames = { partner1: 'Parceiro 1', partner2: 'Parceiro 2' }; // Nomes padrão
+        let monthlyBudget = {}; // Armazena os limites do orçamento
+        let parsedCsvData = []; // Armazena os dados do CSV/Planilha lido
+        let allTransactions = []; // Cache local de todas as transações
+        let today = new Date().toISOString().split('T')[0]; // Data de hoje em YYYY-MM-DD
+
+        // Lista de categorias padrão (ATUALIZADA)
+        const categories = [
+            'Moradia', 
+            'Alimentação', 
+            'Transporte', 
+            'Lazer', 
+            'Saúde', 
+            'Conta de Energia', 
+            'Conta de Água', 
+            'Internet', 
+            'Salário', 
+            'Outros'
+        ];
+        
+        // Mapeamento de cores (ATUALIZADO)
+        const categoryColors = {
+            'Moradia': '#3b82f6', // blue-500
+            'Alimentação': '#22c55e', // green-500
+            'Transporte': '#eab308', // yellow-500
+            'Lazer': '#ec4899', // pink-500
+            'Saúde': '#8b5cf6', // violet-500
+            'Conta de Energia': '#f59e0b', // amber-500
+            'Conta de Água': '#06b6d4', // cyan-500
+            'Internet': '#4f46e5', // indigo-600
+            'Salário': '#14b8a6', // teal-500
+            'Outros': '#6b7280', // gray-500
         };
-        
-        console.log("[INIT] Using Firebase Config:", JSON.stringify(firebaseConfig)); 
+        const categoryColorClasses = {
+            'Moradia': 'bg-blue-500',
+            'Alimentação': 'bg-green-500',
+            'Transporte': 'bg-yellow-500',
+            'Lazer': 'bg-pink-500',
+            'Saúde': 'bg-violet-500',
+            'Conta de Energia': 'bg-amber-500',
+            'Conta de Água': 'bg-cyan-500',
+            'Internet': 'bg-indigo-600',
+            'Salário': 'bg-teal-500',
+            'Outros': 'bg-gray-500',
+        };
 
-        let app; 
-        try {
-            app = initializeApp(firebaseConfig);
-            console.log("[INIT] Firebase App initialized successfully.");
-        } catch (e) { 
-             console.error("[INIT] Firebase initialization failed:", e);
-             const loadingIndicatorEl = document.getElementById('loading-indicator'); 
-             if (loadingIndicatorEl) {
-                 loadingIndicatorEl.innerHTML = `<p class='text-red-500'>Falha crítica na inicialização (${e.message}). Verifique a configuração.</p>`;
-             } else {
-                 document.body.innerHTML = "<p style='color:red; padding: 20px;'>Falha crítica na inicialização do Firebase. Verifique a configuração no console.</p>";
-             }
-             throw new Error("Firebase init failed"); 
+        // --- Elementos do DOM ---
+        const familyModal = document.getElementById('familyModal');
+        const createFamilyBtn = document.getElementById('createFamilyBtn');
+        const joinFamilyBtn = document.getElementById('joinFamilyBtn');
+        const familyIdInput = document.getElementById('familyIdInput');
+        const newFamilyIdSection = document.getElementById('newFamilyIdSection');
+        const familyIdDisplay = document.getElementById('familyIdDisplay');
+        const copyFamilyIdBtn = document.getElementById('copyFamilyIdBtn');
+        const startAppBtn = document.getElementById('startAppBtn');
+
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const appContent = document.getElementById('appContent');
+        
+        const currentFamilyIdEl = document.getElementById('currentFamilyId');
+        const copyIdBtn = document.getElementById('copyIdBtn');
+        
+        // Elementos do Modal de Configurações
+        const settingsModal = document.getElementById('settingsModal');
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const settingsForm = document.getElementById('settingsForm');
+        const partner1NameInput = document.getElementById('partner1NameInput');
+        const partner2NameInput = document.getElementById('partner2NameInput');
+
+        // Elementos do Modal de Importação
+        const importCsvBtn = document.getElementById('importCsvBtn');
+        const csvFileInput = document.getElementById('csvFileInput');
+        const importModal = document.getElementById('importModal');
+        const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+        const cancelImportBtn = document.getElementById('cancelImportBtn');
+        const confirmImportBtn = document.getElementById('confirmImportBtn');
+        const importPaidBySelect = document.getElementById('importPaidBy');
+        const csvPreviewHead = document.getElementById('csvPreviewHead');
+        const csvPreviewBody = document.getElementById('csvPreviewBody');
+        const importReviewStep = document.getElementById('importReviewStep');
+        const importLoadingStep = document.getElementById('importLoadingStep');
+
+        // Elemento Toast
+        const toastNotification = document.getElementById('toastNotification');
+
+        // Abas e Conteúdos
+        const tabBtnDashboard = document.getElementById('tabBtnDashboard');
+        const tabBtnPending = document.getElementById('tabBtnPending');
+        const tabBtnPlanning = document.getElementById('tabBtnPlanning');
+        const tabContentDashboard = document.getElementById('tabContentDashboard');
+        const tabContentPending = document.getElementById('tabContentPending');
+        const tabContentPlanning = document.getElementById('tabContentPlanning');
+
+        // Painel Principal
+        const totalBalanceEl = document.getElementById('totalBalance');
+        const totalIncomeEl = document.getElementById('totalIncome');
+        const totalExpenseEl = document.getElementById('totalExpense');
+        const budgetProgressContainer = document.getElementById('budgetProgressContainer');
+        const transactionList = document.getElementById('transactionList');
+        const emptyState = document.getElementById('emptyState');
+        const overdueList = document.getElementById('overdueList'); // Lista de Atrasadas
+        const emptyStateOverdue = document.getElementById('emptyStateOverdue'); // Estado Vazio Atrasadas
+        const totalOverdueAmountEl = document.getElementById('totalOverdueAmount'); // Elemento para mostrar o total atrasado
+
+        // Contas a Pagar
+        const pendingList = document.getElementById('pendingList');
+        const emptyStatePending = document.getElementById('emptyStatePending');
+
+        // Planejamento
+        const budgetForm = document.getElementById('budgetForm');
+
+        // Formulário de Transação
+        const transactionForm = document.getElementById('transactionForm');
+        const categorySelect = document.getElementById('category');
+        const paidBySelect = document.getElementById('paidBy');
+        const dueDateInput = document.getElementById('dueDate');
+        const paymentDateInput = document.getElementById('paymentDate');
+        const statusSelect = document.getElementById('status');
+        const submitBtn = transactionForm.querySelector('button[type="submit"]');
+
+        // --- Funções Auxiliares ---
+
+        /** Formata um número para a moeda BRL */
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { 
+                style: 'currency', 
+                currency: 'BRL' 
+            }).format(value);
         }
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        // setLogLevel('debug'); 
-
-        // --- Referências Coleções ---
-        let transactionsCol, categoriesCol, paymentTypesCol, budgetsCol, accountsCol;
-        let unsubscribeListeners = []; 
-
-        // ==================================================================
-        // INÍCIO DA CORREÇÃO (Passo 1: Declarar com 'let')
-        // ==================================================================
         
-        // --- DOM Elements --- (Declarados no topo, antes das funções)
-        let mainAppContainer;
-        let pages;
-        let navButtons;
-        let navButtonLinks;
-        let loadingIndicator;
-        let loadingMessage;
-        let appContent;
-        let userIdDisplay;
-        let openTransactionModalBtn;
-        let sidebar;
-        let sidebarBackdrop;
-        let menuToggle;
-        let balanceDisplay;
-        let incomeDisplay;
-        let expensesPaidDisplay;
-        let monthBalanceDisplay;
-        let remindersList;
-        let financialDiagnosisContainer;
-        let dashboardAccountsList;
-        let transactionList;
-        let filter;
-        let filterCategory;
-        let configTabs;
-        let tabContents;
-        let accountForm;
-        let accountNameInput;
-        let accountTypeSelect;
-        let accountInitialBalanceInput;
-        let accountLimitSection;
-        let accountLimitInput;
-        let accountsList;
-        let accountsPageList;
-        let categoryForm;
-        let categoryNameInput;
-        let categoriesList;
-        let suggestCategoriesBtn;
-        let paymentTypeForm;
-        let paymentTypeNameInput;
-        let paymentTypesList;
-        let budgetsListContainer;
-        let generateReportBtn;
-        let reportResultsSection;
-        let reportResultsList;
-        let reportFilteredTotal;
-        let exportButtonsContainer;
-        let exportExcelBtn;
-        let exportPdfBtn;
-        let xlsxFileInput;
-        let importLoader;
-        let importPreviewSection;
-        let importPreviewList;
-        let importCount;
-        let confirmImportBtn;
-        let cancelImportBtn;
-        let expenseChart, incomeExpenseChart, balanceEvolutionChart;
-        let biTotalExpenses;
-        let biAvgDailyExpense;
-        let biTopCategory;
-        let transactionModal;
-        let transactionModalTitle;
-        let transactionForm;
-        let transactionIdInput;
-        let descriptionInput;
-        let amountInput;
-        let dueDateInput;
-        let dueDateSection;
-        let notesInput;
-        let categorySelect;
-        let categorySection;
-        let accountSelect;
-        let accountSection;
-        let isRecurringInput;
-        let recurringPaymentSection;
-        let statusSection;
-        let isPaidInput;
-        let paymentModal;
-        let paymentModalDescription;
-        let paymentModalAccountSelect;
-        let paymentModalTypeSelect;
-        let paymentModalDateInput;
-        let payCcBillModal;
-        let payCcBillDescription;
-        let payCcBillAccountIdInput;
-        let payCcBillFromAccountSelect;
-        let payCcBillAmountInput;
-        let payCcBillDateInput;
-        let alertModal;
-        let alertModalTitle;
-        let alertModalMessage;
-        let confirmModal;
-        let confirmModalTitle;
-        let confirmModalMessage;
-        let inputModal;
-        let inputModalTitle;
-        let inputModalLabel;
-        let inputModalField;
-        let themeToggleBtn, themeToggleDarkIcon, themeToggleLightIcon, themeToggleText;
-
-        // ==================================================================
-        // FIM DA CORREÇÃO (Passo 1)
-        // ==================================================================
-
-
-        // --- Estado da Aplicação ---
-        let localTransactions = []; let localPaymentTypes = []; let localCategories = []; 
-        let localBudgets = []; let localAccounts = []; let transactionToPay = null; 
-        let transactionsToImport = []; let transactionToEditId = null; 
-        let selectThisCategoryId = null; let filteredReportData = []; let currentUser = null; 
-        let confirmResolve = null; let inputResolve = null; 
-        let appInitialized = false; // Flag para UI principal
-        let listenersAttached = false; // Flag para listeners do Firestore
-        let initialLoadTimeout = null; // Referência para timeout
-         // CORREÇÃO: Variável dataReady movida para escopo global
-         let dataReady = { accounts: false, categories: false, paymentTypes: false, transactions: false, budgets: false };
+        /** Formata data YYYY-MM-DD para DD/MM/YYYY */
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
         
-        const SUGGESTED_CATEGORIES = [ 'Não especificado', 'Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Vestuário', 'Cuidados Pessoais', 'Dívidas', 'Investimentos', 'Impostos', 'Doações', 'Assinaturas e Serviços', 'Pets', 'Outros' ]; // Adicionado 'Não especificado'
-
-        // --- DEFINIÇÃO DE TODAS AS FUNÇÕES ---
-        const formatCurrency = (number) => number != null ? number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
-        const formatDate = (dateString) => { if (!dateString) return ''; try { const date = dateString.includes('T') ? new Date(dateString) : new Date(dateString + "T12:00:00Z"); if (isNaN(date)) return ''; return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' }); } catch (e) { console.warn("Erro ao formatar data:", dateString, e); return ''; } };
-        const getTodayDateString = () => new Date().toISOString().split('T')[0];
-        
-        function showAlert(message, title = "Aviso") { /* ... (inalterada) ... */ }
-        function closeAlertModal() { /* ... (inalterada) ... */ }
-        function showConfirm(message, title = "Atenção") { /* ... (inalterada) ... */ }
-        function handleConfirm(confirmed) { /* ... (inalterada) ... */ }
-        function showInput(label, title = "Entrada", defaultValue = "") { /* ... (inalterada) ... */ }
-        function handleInputConfirm() { /* ... (inalterada) ... */ }
-        function handleInputCancel() { /* ... (inalterada) ... */ }
-        function updateTheme(isDark) { /* ... (inalterada) ... */ }
-        function unsubscribeAllListeners() { /* ... (inalterada) ... */ }
-        
-        // Configura os listeners do Firestore (OTIMIZADO v3 - Prioriza Contas)
-        function setupFirestoreListeners() { 
-             if (!currentUser) { console.warn("[LISTENER] Attempted setup without user."); return; }
-             if (listenersAttached) { console.log("[LISTENER] Listeners already attached, skipping setup."); return; }
+        /** Converte vários formatos de data (Excel, DD/MM/YYYY, YYYY-MM-DD) para um objeto Date */
+        function parseDateFromSheet(dateValue) {
+            if (dateValue instanceof Date) {
+                return dateValue; // Já é um objeto Date (SheetJS cellDates:true)
+            }
+            if (typeof dateValue === 'string') {
+                if (dateValue.includes('/')) {
+                    // Formato DD/MM/YYYY
+                    const parts = dateValue.split('/');
+                    if (parts.length === 3) {
+                        // Atenção ao mês (0-indexado)
+                        return new Date(parts[2], parseInt(parts[1], 10) - 1, parts[0]);
+                    }
+                } else if (dateValue.includes('-')) {
+                    // Formato YYYY-MM-DD
+                    return new Date(dateValue + 'T00:00:00'); // Adiciona T00:00:00 para tratar como local
+                }
+            }
+            // Tenta converter diretamente (último recurso)
+            const dateObj = new Date(dateValue);
+            if (dateObj && !isNaN(dateObj.getTime())) {
+                return dateObj;
+            }
             
-             console.log("[LISTENER] Attaching Firestore listeners for user:", currentUser.uid);
-             if(loadingIndicator) loadingIndicator.style.display = 'block'; 
-             if(loadingMessage) loadingMessage.textContent = 'Carregando dados essenciais...'; 
-
-             // Reinicia o estado de carregamento para esta nova tentativa
-             // CORREÇÃO: Usa a variável global dataReady
-             dataReady = { accounts: false, categories: false, paymentTypes: false, transactions: false, budgets: false };
-             let initialAccountLoadComplete = false; // Flag SÓ para contas
-             
-             clearTimeout(initialLoadTimeout); 
-             initialLoadTimeout = setTimeout(() => {
-                 if (!appInitialized) { 
-                     console.error("[INIT] Timeout: Initial data load took longer than 60 seconds.");
-                     const loadedCount = Object.values(dataReady).filter(Boolean).length;
-                     const totalCount = Object.keys(dataReady).length;
-                      console.log("[INIT] Timeout state:", JSON.stringify(dataReady));
-                      if(loadingMessage) loadingMessage.innerHTML = `<span class='text-orange-500'>Carregamento demorando (${loadedCount}/${totalCount} concluídos). Verifique sua conexão ou <a href='javascript:location.reload();' class='underline font-semibold'>recarregue</a>.</span>`;
-                      if(loadingIndicator) loadingIndicator.style.display = 'block'; 
-                 } else {
-                      console.log("[INIT] Timeout triggered but UI already initialized. Ignoring.");
-                 }
-             }, 60000); 
-
-             // Função chamada após CADA listener receber o primeiro snapshot
-             const checkInitialLoad = (collectionName) => {
-                 // Só marca como pronto se ainda não estava pronto
-                 if (!dataReady[collectionName]) { 
-                     dataReady[collectionName] = true; 
-                     console.log(`[LISTENER] Initial data received for: ${collectionName}. Status updated:`, JSON.stringify(dataReady));
-                 } else {
-                     // Log para atualizações subsequentes (pode ajudar a debugar loops)
-                     console.log(`[LISTENER] Subsequent data update for: ${collectionName}. Status:`, JSON.stringify(dataReady));
-                 }
-                
-                  console.log(`[INIT] Checking accounts: accounts=${dataReady.accounts}, !initialAccountLoadComplete=${!initialAccountLoadComplete}`);
-                 // CORREÇÃO: Inicializa a UI assim que 'accounts' carregar (prioridade máxima)
-                 if (!initialAccountLoadComplete && dataReady.accounts) {
-                      console.log("[INIT] Essential data (Accounts) loaded! Initializing UI...");
-                      initialAccountLoadComplete = true; 
-                      if (!appInitialized) { 
-                           console.log("[INIT] Calling initApp()...");
-                           initApp(); 
-                      } else {
-                           console.log("[INIT] UI already initialized after accounts loaded, skipping initApp but calling renderAll.");
-                           renderAll(); 
-                      }
-                 } 
-                 
-                  // Limpa o timeout SE TUDO já carregou
-                  if (Object.values(dataReady).every(status => status === true)) {
-                      console.log("[LISTENER] All collections loaded. Clearing timeout.");
-                      clearTimeout(initialLoadTimeout); 
-                  } 
-                 // Atualiza a mensagem de loading ENQUANTO a UI não foi inicializada
-                 else if (!appInitialized && loadingMessage) { 
-                     const loadedCount = Object.values(dataReady).filter(Boolean).length;
-                     const totalCount = Object.keys(dataReady).length;
-                     loadingMessage.textContent = `Carregando dados (${loadedCount}/${totalCount})...`;
-                 }
-             };
-
-
-              const handleListenerError = (error, collectionName) => { 
-                  console.error(`[LISTENER] Error loading ${collectionName}:`, error);
-                  // Erro Crítico se contas falharem antes da UI iniciar
-                  if (collectionName === 'contas' && !appInitialized && loadingIndicator) {
-                       loadingIndicator.innerHTML = `<p class='text-red-500'>Erro crítico ao carregar contas (${error.code || 'sem código'}). <a href='javascript:location.reload();' class='underline font-semibold'>Recarregar</a>.</p>`;
-                       clearTimeout(initialLoadTimeout); 
-                       unsubscribeAllListeners();
-                  } 
-                  // Erro não crítico se outras coleções falharem, ou se UI já iniciou
-                  else if (!appInitialized && loadingIndicator) { 
-                      // Se outra coleção falhar antes de iniciar, ainda tenta iniciar só com contas (mas avisa)
-                      loadingMessage.innerHTML = `<span class='text-orange-500'>Erro ao carregar ${collectionName}. Tentando continuar...</span>`;
-                       // Força a verificação para iniciar o app se as contas já carregaram
-                       if(dataReady.accounts && !appInitialized) {
-                           console.warn(`[INIT] Error loading ${collectionName}, but accounts are ready. Force calling initApp()`);
-                           initApp();
-                       }
-                  } else if (appInitialized) {
-                      showAlert(`Erro ao atualizar ${collectionName}. Alguns dados podem estar desatualizados.`, "Erro de Sincronização");
-                  }
-              };
-
-             // Anexa os listeners
-             console.log("[LISTENER] Attaching: accounts");
-             unsubscribeListeners.push(onSnapshot(query(accountsCol), (snapshot) => { console.log(`[DATA] Accounts: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localAccounts = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt?.toDate() })); checkInitialLoad('accounts'); renderAccountsList(); populateAccountSelects(); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'contas')));
-             
-             console.log("[LISTENER] Attaching: categories");
-             unsubscribeListeners.push(onSnapshot(query(categoriesCol), (snapshot) => { 
-                 console.log(`[DATA] Categories: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); 
-                 localCategories = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); 
-                 checkInitialLoad('categories'); // Marca como pronto imediatamente
-                 renderCategoriesList(); 
-                 populateCategorySelects(); 
-                 populateCategoryFilter(); 
-                 if (appInitialized) {
-                     renderAll(); 
-                      ensureDefaultCategoriesExist(); // Chama a verificação aqui, APÓS app iniciar e categorias carregarem
-                 }
-             }, (error) => handleListenerError(error, 'categorias')));
-
-             console.log("[LISTENER] Attaching: paymentTypes");
-             unsubscribeListeners.push(onSnapshot(query(paymentTypesCol), (snapshot) => { console.log(`[DATA] Payment Types: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localPaymentTypes = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); checkInitialLoad('paymentTypes'); renderPaymentTypesList(); populatePaymentTypeSelects(); }, (error) => handleListenerError(error, 'tipos de pagamento')));
-
-             console.log("[LISTENER] Attaching: transactions");
-             unsubscribeListeners.push(onSnapshot(query(transactionsCol), (snapshot) => { console.log(`[DATA] Transactions: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); checkInitialLoad('transactions'); if (appInitialized) renderAll(); }, (error) => handleListenerError(error, 'transações')));
-
-             console.log("[LISTENER] Attaching: budgets");
-             unsubscribeListeners.push(onSnapshot(query(budgetsCol), (snapshot) => { console.log(`[DATA] Budgets: ${snapshot.docs.length} docs (cache: ${snapshot.metadata.fromCache})`); localBudgets = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })); checkInitialLoad('budgets'); if (appInitialized) renderBudgets(); }, (error) => handleListenerError(error, 'orçamentos')));
-             
-             listenersAttached = true; // Marca que foram anexados
-             console.log("[LISTENER] All listener attachments initiated.");
+            return null; // Formato desconhecido ou inválido
         }
 
-        // Função para garantir que categorias padrão existam (chamada DEPOIS de initApp)
-        async function ensureDefaultCategoriesExist() {
-             // CORREÇÃO: Acessa a variável global dataReady
-              if (!dataReady || !dataReady.categories) {
-                   console.log("[INIT] Skipping ensureDefaultCategoriesExist as categories not loaded yet (checked global state).");
-                   return;
-              }
-             console.log("[INIT] Ensuring default categories exist...");
-             const hasUnspecified = localCategories.some(c => c.name.toLowerCase() === 'não especificado');
-             // Só adiciona sugestões se a lista estiver realmente vazia (sem contar 'Não especificado')
-             const needsSuggested = localCategories.filter(c => c.name.toLowerCase() !== 'não especificado').length === 0; 
-
-             // Condição para adicionar: Ou falta 'Não especificado', OU a lista está vazia (exceto por 'Não especificado')
-             if (!hasUnspecified || needsSuggested) {
-                  console.log(`[INIT] Needs defaults: hasUnspecified=${hasUnspecified}, needsSuggested=${needsSuggested}. Calling addSuggestedCategories.`);
-                   try {
-                       await addSuggestedCategories(true); // true = silencioso
-                        console.log("[INIT] addSuggestedCategories completed (called from ensureDefault).");
-                   } catch(e) {
-                        console.error("[INIT] Error ensuring default categories:", e);
-                   }
-             } else {
-                  console.log("[INIT] Default categories already exist or list is populated.");
-             }
+        /** Mostra um elemento */
+        function showElement(el) {
+            el.classList.remove('hidden');
         }
 
-        function initApp() { 
-             if (appInitialized) { console.log("[INIT] UI already initialized, skipping."); return; }
-             console.log("[INIT] Initializing App UI...");
-             if(loadingIndicator) loadingIndicator.style.display = 'none'; // Esconde o loader
-             if(appContent) appContent.classList.remove('hidden'); // Mostra o conteúdo principal
-             if(openTransactionModalBtn) openTransactionModalBtn.classList.remove('hidden'); // Mostra o botão '+'
-             appInitialized = true; // Marca como inicializado ANTES do primeiro render
-             renderAll(); // Renderiza todos os componentes
-             lucide.createIcons(); 
-             console.log("[INIT] App UI Initialized and first render complete.");
+        /** Esconde um elemento */
+        function hideElement(el) {
+            el.classList.add('hidden');
         }
-        function switchPage(pageKey, tabKey = null) { /* ... (inalterada - logs já adicionados) ... */ }
-        function switchConfigTab(tabKey) { /* ... (inalterada) ... */ }
-        function toggleSidebar(forceOpen) { /* ... (inalterada) ... */ }
-        function renderAll() { /* ... (inalterada) ... */ } 
-        async function handleAccountFormSubmit(e) { /* ... (inalterada) ... */ }
-        async function removeAccount(id) { /* ... (inalterada) ... */ }
-        function calculateAccountBalance(accountId) { /* ... (inalterada) ... */ }
-        function calculateAvailableCredit(accountId) { /* ... (inalterada) ... */ }
-        function updateAccountBalances() { /* ... (inalterada) ... */ }
-        function renderAccountsList() { /* ... (inalterada) ... */ }
-        function updateMainKPIs() { /* ... (inalterada) ... */ }
-        function renderFinancialDiagnosis() { /* ... (inalterada) ... */ }
-        function openTransactionModal(id = null) { /* ... (inalterada) ... */ }
-        function closeTransactionModal() { /* ... (inalterada) ... */ }
-        async function handleFormSubmit(e) { /* ... (inalterada) ... */ }
-        async function removeTransaction(id) { /* ... (inalterada) ... */ }
-        function toggleTransactionFormVisibility() { /* ... (inalterada) ... */ }
-        function openPaymentModal(id) { /* ... (inalterada) ... */ }
-        async function confirmPayment() { /* ... (inalterada) ... */ }
-        function closePaymentModal() { /* ... (inalterada) ... */ } 
-        function openPayCcBillModal(accountId) { /* ... (inalterada) ... */ }
-        async function confirmPayCcBill() { /* ... (inalterada) ... */ }
-        function closePayCcBillModal() { /* ... (inalterada) ... */ } 
-        async function createNextRecurring(transaction) { /* ... (inalterada) ... */ }
-        function renderTransactionList(transactionsToRender, targetListElement) { /* ... (inalterada) ... */ }
-        function renderReminders() { /* ... (inalterada) ... */ }
-        function renderCategoriesList() { /* ... (inalterada) ... */ }
-        function renderPaymentTypesList() { /* ... (inalterada) ... */ }
-        function populateCategorySelects() { /* ... (inalterada) ... */ }
-        function populateCategoryFilter() { /* ... (inalterada) ... */ }
-        function populatePaymentTypeSelects() { /* ... (inalterada) ... */ }
-        function populateAccountSelects(includeCreditCards = true, filterType = null, targetSelect = null) { /* ... (inalterada) ... */ }
-        async function handleCategoryChange(event) { /* ... (inalterada) ... */ } 
-        async function addCategory(e) { /* ... (inalterada) ... */ }
-        async function removeCategory(id) { /* ... (inalterada) ... */ }
-        async function addPaymentType(e) { /* ... (inalterada) ... */ }
-        async function removePaymentType(id) { /* ... (inalterada) ... */ }
-        async function addSuggestedCategories(isSilent = false) { /* ... (inalterada) ... */ }
-        function renderBudgets() { /* ... (inalterada) ... */ } 
-        async function handleBudgetChange(event) { /* ... (inalterada) ... */ }
-        function getChartOptions() { /* ... (inalterada) ... */ }
-        function renderBIDashboard() { /* ... (inalterada) ... */ } 
-        function renderExpenseDoughnutChart(expenseData) { /* ... (inalterada) ... */ }
-        function renderIncomeVsExpenseChart() { /* ... (inalterada) ... */ }
-        function renderBalanceEvolutionChart() { /* ... (inalterada) ... */ }
-        function generateReport() { /* ... (inalterada) ... */ }
-        function exportToExcel() { /* ... (inalterada) ... */ }
-        function exportToPDF() { /* ... (inalterada) ... */ }
-        function handleFileSelect(event) { /* ... (inalterada) ... */ }
-        function parseDateFromBR(dateString) { /* ... (inalterada) ... */ }
-        function processExportedFile(data) { /* ... (inalterada) ... */ }
-        function renderImportPreview() { /* ... (inalterada) ... */ }
-        async function confirmImport() { /* ... (inalterada) ... */ }
-        function resetImportState() { /* ... (inalterada) ... */ }
 
-        // --- Autenticação Simplificada --- (Movida para após definições de funções)
-        onAuthStateChanged(auth, async (user) => {
-             console.log(`[AUTH] State changed. User: ${user ? user.uid : 'null'}`);
-             clearTimeout(initialLoadTimeout); 
-             unsubscribeAllListeners(); 
+        /** Copia um texto para a área de transferência */
+        function copyToClipboard(text, button) {
+            // Usa execCommand como fallback para ambientes restritos (iframes)
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                if (button) {
+                    const originalText = button.innerHTML;
+                    button.innerHTML = 'Copiado!';
+                    button.classList.add('bg-green-600', 'text-white');
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('bg-green-600', 'text-white');
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Falha ao copiar:', err);
+            }
+            document.body.removeChild(textarea);
+        }
 
-             if (user) {
-                 currentUser = user;
-                 console.log("[AUTH] User authenticated:", currentUser.uid);
-                
-                 if(loadingIndicator) loadingIndicator.style.display = 'block'; 
-                 if(loadingMessage) loadingMessage.textContent = 'Carregando dados...'; 
-                 if(appContent) appContent.classList.add('hidden'); 
-                 
-                 if(userIdDisplay) {
-                     userIdDisplay.textContent = `ID: ${user.uid.substring(0,8)}...`;
-                     userIdDisplay.classList.remove('hidden');
-                 }
+        /** Mostra uma notificação toast */
+        function showToast(message, isError = false) {
+            toastNotification.textContent = message;
+            if (isError) {
+                toastNotification.classList.remove('bg-green-600');
+                toastNotification.classList.add('bg-red-600');
+            } else {
+                toastNotification.classList.remove('bg-red-600');
+                toastNotification.classList.add('bg-green-600');
+            }
+            toastNotification.classList.remove('hidden', 'translate-x-[200%]');
+            toastNotification.classList.add('translate-x-0');
 
-                  const basePath = `artifacts/${appId}/users/${currentUser.uid}`;
-                 transactionsCol = collection(db, basePath, 'transactions');
-                 categoriesCol = collection(db, basePath, 'categories');
-                 paymentTypesCol = collection(db, basePath, 'paymentTypes');
-                 budgetsCol = collection(db, basePath, 'budgets');
-                 accountsCol = collection(db, basePath, 'accounts');
-                 console.log("[INIT] Firestore collections defined:", basePath);
-                 
-                 setupFirestoreListeners(); 
+            setTimeout(() => {
+                toastNotification.classList.remove('translate-x-0');
+                toastNotification.classList.add('translate-x-[200%]');
+                setTimeout(() => toastNotification.classList.add('hidden'), 300);
+            }, 3000);
+        }
 
-             } else {
-                 currentUser = null; listenersAttached = false; appInitialized = false; 
-                 console.log("[AUTH] No user found. Attempting initial sign-in...");
-                 
-                 if(loadingIndicator) loadingIndicator.style.display = 'block'; 
-                 if(loadingMessage) loadingMessage.textContent = 'Autenticando...'; 
-                 if(appContent) appContent.classList.add('hidden');
-                 if(userIdDisplay) userIdDisplay.classList.add('hidden');
+        /** Obtém um ícone SVG para uma categoria (ATUALIZADO) */
+        function getCategoryIcon(category) {
+            const icons = {
+                'Moradia': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" /></svg>`,
+                'Alimentação': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M12 14.5v-5" /></svg>`,
+                'Transporte': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75c-2.4 0-4.5-2.03-4.5-4.5s2.1-4.5 4.5-4.5 4.5 2.03 4.5 4.5-2.1 4.5-4.5 4.5zM12 4.5v2.25m-6.364 1.909l1.591 1.591m-3.282 3.282h2.25m1.909 6.364l1.591-1.591m3.282 3.282v-2.25m6.364-1.909l-1.591-1.591m3.282-3.282h-2.25m-1.909-6.364l-1.591 1.591" /></svg>`,
+                'Lazer': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
+                'Saúde': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m-3-3V8m0 4h.01M12 16h.01" /></svg>`,
+                'Conta de Energia': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3c-3.866 0-7 3.134-7 7 0 3.402 2.103 6.26 5 6.87V21h4v-4.13c2.897-.61 5-3.468 5-6.87 0-3.866-3.134-7-7-7z" /></svg>`,
+                'Conta de Água': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-1.7-9.7C13.4 9.1 12.3 9 11 9c-2.4 0-4.6.9-6.2 2.3A4 4 0 003 15zM12 19v2M8 19v2m8-2v2" /></svg>`,
+                'Internet': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.5a4 4 0 015.778 0M5 13.414a8 8 0 0114 0M1.889 10.328a12 12 0 0120.222 0" /></svg>`,
+                'Salário': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 10.5v3m-6.495-6.495l-2.122 2.122m-5.656 5.656l-2.122 2.122m12.728-2.122l2.122 2.122M4.75 10.5v3M12 21V3" /></svg>`,
+                'Outros': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5M8.25 12h7.5m-7.5 5.25h7.5M3 12a9 9 0 1118 0 9 9 0 01-18 0z" /></svg>`
+            };
+            return icons[category] || icons['Outros'];
+        }
 
-                 try {
-                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                         console.log("[AUTH] Attempting sign in with custom token...");
-                         await signInWithCustomToken(auth, __initial_auth_token);
-                     } else {
-                         console.log("[AUTH] Attempting sign in anonymously...");
-                         await signInAnonymously(auth);
-                     }
-                      console.log("[AUTH] Sign-in initiated. Waiting for next auth state change.");
-                 } catch (error) {
-                     console.error("[AUTH] CRITICAL: Initial sign-in failed:", error);
-                      if (loadingIndicator) loadingIndicator.innerHTML = `<p class='text-red-500'>Falha crítica na autenticação (${error.code || 'sem código'}). Verifique sua conexão e configuração. Recarregue a página.</p>`;
-                 }
-             }
-        });
-        
-        // --- Event Listeners Globais ---
-        document.addEventListener('DOMContentLoaded', () => {
-             console.log("[INIT] DOMContentLoaded event fired.");
+        // --- Funções de UI (Nomes, Formulário, Abas) ---
 
-            // ==================================================================
-            // INÍCIO DA CORREÇÃO (Passo 2: Atribuir os valores)
-            // ==================================================================
+        /** Popula os seletores de categoria */
+        function populateCategorySelect() {
+            categorySelect.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+        }
+
+        /** Atualiza um dropdown "Pago Por" com os nomes personalizados */
+        function updatePaidByDropdown(selectElement) {
+            if (!selectElement) return;
+            const currentValue = selectElement.value;
             
-             // --- ATRIBUIÇÃO DOS ELEMENTOS DO DOM ---
-            mainAppContainer = document.getElementById('main-app-container');
-            pages = { 
-                dashboard: document.getElementById('page-dashboard'), 
-                accounts: document.getElementById('page-accounts'), 
-                bi: document.getElementById('page-bi'), 
-                manage: document.getElementById('page-manage'), 
-                config: document.getElementById('page-config'), 
-                reports: document.getElementById('page-reports'), 
-                import: document.getElementById('page-import'), 
-                budgets: document.getElementById('page-budgets') 
+            selectElement.innerHTML = `
+                <option>${partnerNames.partner1}</option>
+                <option>${partnerNames.partner2}</option>
+                <option>Conta Conjunta</option>
+            `;
+
+            if ([partnerNames.partner1, partnerNames.partner2, 'Conta Conjunta'].includes(currentValue)) {
+                 selectElement.value = currentValue;
+            }
+        }
+
+        /** Atualiza os inputs do modal de configurações */
+        function updateSettingsModalInputs() {
+            partner1NameInput.value = partnerNames.partner1;
+            partner2NameInput.value = partnerNames.partner2;
+        }
+
+        /** Reseta o formulário para o modo "Adicionar" */
+        function resetFormState() {
+            currentEditId = null;
+            transactionForm.reset();
+            dueDateInput.value = today; // Define a data de vencimento padrão
+            paymentDateInput.value = today; // Define a data de pagamento padrão
+            statusSelect.value = "Pago"; // Define status padrão
+            togglePaymentDateVisibility(); // Garante que a data de pagamento está visível
+            
+            submitBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Adicionar Transação
+            `;
+            submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        }
+
+        /** Alterna a visibilidade da Data de Pagamento baseada no Status */
+        function togglePaymentDateVisibility() {
+            const status = statusSelect.value;
+            if (status === 'A Pagar') {
+                paymentDateInput.parentElement.classList.add('hidden'); // Esconde o div pai
+                paymentDateInput.value = ''; // Limpa o valor
+            } else {
+                paymentDateInput.parentElement.classList.remove('hidden'); // Mostra o div pai
+                if (!paymentDateInput.value) {
+                    paymentDateInput.value = today; // Define hoje como padrão se estiver vazio
+                }
+            }
+        }
+
+        /** Gerencia a troca de abas */
+        function switchTab(targetTab) {
+            // Esconde todos os conteúdos
+            tabContentDashboard.classList.add('hidden');
+            tabContentPending.classList.add('hidden');
+            tabContentPlanning.classList.add('hidden');
+            // Remove classe ativa de todos os botões
+            tabBtnDashboard.classList.remove('active');
+            tabBtnPending.classList.remove('active');
+            tabBtnPlanning.classList.remove('active');
+
+            // Mostra o conteúdo e ativa o botão da aba alvo
+            if (targetTab === 'dashboard') {
+                tabContentDashboard.classList.remove('hidden');
+                tabBtnDashboard.classList.add('active');
+            } else if (targetTab === 'pending') {
+                tabContentPending.classList.remove('hidden');
+                tabBtnPending.classList.add('active');
+            } else if (targetTab === 'planning') {
+                tabContentPlanning.classList.remove('hidden');
+                tabBtnPlanning.classList.add('active');
+            }
+        }
+
+        // --- Funções Principais da Aplicação ---
+
+        /** Inicializa o Firebase e autentica o usuário */
+        async function initializeAndAuth(configJson, token) {
+            // Esta função agora recebe a config, não a lê de variáveis globais
+            try {
+                const firebaseConfig = JSON.parse(configJson);
+                const initialAuthToken = token;
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Pega o appId da configuração para usar nos caminhos do Firestore
+                appId = firebaseConfig.appId || 'default-app-id';
+                
+                return new Promise((resolve, reject) => {
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            resolve();
+                        } else if (initialAuthToken) {
+                            try {
+                                const userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                                userId = userCredential.user.uid;
+                                resolve();
+                            } catch (error) {
+                                reject(new Error(`Erro ao autenticar com token: ${error.message}`));
+                            }
+                        } else {
+                            try {
+                                const userCredential = await signInAnonymously(auth);
+                                userId = userCredential.user.uid;
+                                resolve();
+                            } catch (error) {
+                                reject(new Error(`Erro ao autenticar anonimamente: ${error.message}`));
+                            }
+                        }
+                    });
+                });
+            } catch (error) {
+                // Pega erros de JSON.parse ou initializeApp
+                throw new Error(`Falha na inicialização do Firebase: ${error.message}`);
+            }
+        }
+
+        /** Verifica se o usuário tem um familyId salvo */
+        function checkFamilyId() {
+            const storedFamilyId = localStorage.getItem('familyAppId');
+            if (storedFamilyId) {
+                initApp(storedFamilyId);
+            } else {
+                hideElement(loadingIndicator); // Esconde o loading para mostrar o modal
+                showElement(familyModal);
+            }
+        }
+
+        /** Ação para criar uma nova família */
+        function handleCreateFamily() {
+            const newFamilyId = crypto.randomUUID();
+            familyIdDisplay.textContent = newFamilyId;
+            showElement(newFamilyIdSection);
+            createFamilyBtn.disabled = true;
+            joinFamilyBtn.disabled = true;
+        }
+
+        /** Ação para confirmar e salvar o ID da nova família */
+        function handleStartApp() {
+            const newFamilyId = familyIdDisplay.textContent;
+            localStorage.setItem('familyAppId', newFamilyId);
+            initApp(newFamilyId);
+        }
+
+        /** Ação para entrar em uma família existente */
+        function handleJoinFamily() {
+            const joinedFamilyId = familyIdInput.value.trim();
+            if (joinedFamilyId) {
+                localStorage.setItem('familyAppId', joinedFamilyId);
+                initApp(joinedFamilyId);
+            } else {
+                showToast("Por favor, insira um ID de Família válido.", true);
+            }
+        }
+
+        /** Inicializa a aplicação principal com o familyId */
+        function initApp(currentFamilyId) {
+            familyId = currentFamilyId;
+            
+            // Esconde o modal e mostra o carregamento
+            hideElement(familyModal);
+            showElement(loadingIndicator); // Mostra o loading enquanto busca dados
+            hideElement(appContent);
+
+            currentFamilyIdEl.textContent = familyId;
+
+            // Configura os listeners
+            setupTransactionListener();
+            setupFamilySettingsListener();
+            setupBudgetListener();
+            
+            // Popula os selects estáticos
+            populateCategorySelect();
+            initBudgetForm();
+        }
+
+        // --- Funções de Leitura (Listeners do Firestore) ---
+
+        /** Retorna a referência do documento da família (para configurações) */
+        function getFamilyDocRef() {
+            return doc(db, 'artifacts', appId, 'public', 'data', 'families', familyId);
+        }
+
+        /** Retorna a referência da coleção de transações da família */
+        function getTransactionsCollectionRef() {
+            return collection(getFamilyDocRef(), 'transactions');
+        }
+
+        /** Retorna a referência do documento de orçamento mensal */
+        function getBudgetDocRef() {
+            // Salva em /.../families/{familyId}/budgets/monthly
+            return doc(db, 'artifacts', appId, 'public', 'data', 'families', familyId, 'budgets', 'monthly');
+        }
+
+        /** Configura o 'listener' onSnapshot para as Configurações da Família */
+        function setupFamilySettingsListener() {
+            if (unsubscribeFamilySettings) unsubscribeFamilySettings();
+            
+            const familyDocRef = getFamilyDocRef();
+            unsubscribeFamilySettings = onSnapshot(familyDocRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().names) {
+                    partnerNames = docSnap.data().names;
+                } else {
+                    partnerNames = { partner1: 'Parceiro 1', partner2: 'Parceiro 2' };
+                    if (!docSnap.exists()) {
+                        setDoc(familyDocRef, { names: partnerNames }, { merge: true })
+                            .catch(e => console.error("Erro ao criar doc da família:", e));
+                    }
+                }
+                
+                localStorage.setItem('partner1Name', partnerNames.partner1);
+                localStorage.setItem('partner2Name', partnerNames.partner2);
+
+                updatePaidByDropdown(paidBySelect);
+                updatePaidByDropdown(importPaidBySelect);
+                updateSettingsModalInputs();
+            }, (error) => {
+                console.error("Erro ao ouvir configurações da família:", error);
+            });
+        }
+
+        /** Configura o 'listener' onSnapshot para Transações */
+        function setupTransactionListener() {
+            if (unsubscribeTransactions) unsubscribeTransactions();
+
+            const transCollectionRef = getTransactionsCollectionRef();
+            // Ordena por data de vencimento
+            const q = query(transCollectionRef, orderBy("dueDate", "desc"));
+            
+            unsubscribeTransactions = onSnapshot(q, (snapshot) => {
+                allTransactions = [];
+                snapshot.forEach(doc => {
+                    allTransactions.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Atualiza toda a interface com os novos dados
+                updateAllUI(allTransactions);
+                
+                hideElement(loadingIndicator);
+                showElement(appContent);
+
+            }, (error) => {
+                console.error("Erro ao ouvir transações:", error);
+                hideElement(loadingIndicator);
+                showToast("Erro ao carregar dados. Verifique o console.", true);
+            });
+        }
+
+        /** Configura o 'listener' onSnapshot para o Orçamento */
+        function setupBudgetListener() {
+            if (unsubscribeBudget) unsubscribeBudget();
+
+            const budgetDocRef = getBudgetDocRef();
+            unsubscribeBudget = onSnapshot(budgetDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    monthlyBudget = docSnap.data();
+                } else {
+                    monthlyBudget = {}; // Nenhum orçamento definido
+                }
+                // Atualiza o formulário de orçamento E o painel principal
+                updateBudgetFormInputs();
+                updateAllUI(allTransactions); // Re-renderiza o painel com o novo orçamento
+            }, (error) => {
+                console.error("Erro ao ouvir orçamento:", error);
+            });
+        }
+
+
+        // --- Funções de Escrita (Ações no Firestore) ---
+
+        /** Manipulador para ADICIONAR ou ATUALIZAR uma transação */
+        async function handleTransactionSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(transactionForm);
+            const amount = parseFloat(formData.get('amount'));
+            
+            if (isNaN(amount) || amount <= 0) {
+                showToast("Por favor, insira um valor válido.", true);
+                return;
+            }
+
+            const transactionData = {
+                description: formData.get('description'),
+                amount: amount,
+                type: formData.get('type'),
+                category: formData.get('category'),
+                paidBy: formData.get('paidBy'),
+                status: formData.get('status'),
+                dueDate: formData.get('dueDate'), // Data de Vencimento
+                paymentDate: formData.get('paymentDate') || '', // Data de Pagamento
             };
-            navButtons = document.querySelectorAll('.nav-button');
-            navButtonLinks = document.querySelectorAll('.nav-button-link');
-            loadingIndicator = document.getElementById('loading-indicator');
-            loadingMessage = document.getElementById('loading-message');
-            appContent = document.getElementById('app-content');
-            userIdDisplay = document.getElementById('user-id-display');
-            openTransactionModalBtn = document.getElementById('open-transaction-modal-btn');
-            sidebar = document.getElementById('sidebar');
-            sidebarBackdrop = document.getElementById('sidebar-backdrop');
-            menuToggle = document.getElementById('menu-toggle');
-            balanceDisplay = document.getElementById('total-balance');
-            incomeDisplay = document.getElementById('total-income');
-            expensesPaidDisplay = document.getElementById('total-expenses-paid');
-            monthBalanceDisplay = document.getElementById('month-balance');
-            remindersList = document.getElementById('reminders-list');
-            financialDiagnosisContainer = document.getElementById('financial-diagnosis');
-            dashboardAccountsList = document.getElementById('dashboard-accounts-list');
-            transactionList = document.getElementById('transaction-list');
-            filter = document.getElementById('filter');
-            filterCategory = document.getElementById('filter-category');
-            configTabs = document.getElementById('config-tabs');
-            tabContents = { 
-                accounts: document.getElementById('tab-content-accounts'), 
-                categories: document.getElementById('tab-content-categories'), 
-                paymentTypes: document.getElementById('tab-content-payment-types') 
-            };
-            accountForm = document.getElementById('account-form');
-            accountNameInput = document.getElementById('account-name');
-            accountTypeSelect = document.getElementById('account-type');
-            accountInitialBalanceInput = document.getElementById('account-initial-balance');
-            accountLimitSection = document.getElementById('account-limit-section');
-            accountLimitInput = document.getElementById('account-limit');
-            accountsList = document.getElementById('accounts-list');
-            accountsPageList = document.getElementById('accounts-page-list');
-            categoryForm = document.getElementById('category-form');
-            categoryNameInput = document.getElementById('category-name');
-            categoriesList = document.getElementById('categories-list');
-            suggestCategoriesBtn = document.getElementById('suggest-categories-btn');
-            paymentTypeForm = document.getElementById('payment-type-form');
-            paymentTypeNameInput = document.getElementById('payment-type-name');
-            paymentTypesList = document.getElementById('payment-types-list');
-            budgetsListContainer = document.getElementById('budgets-list');
-            generateReportBtn = document.getElementById('generate-report-btn');
-            reportResultsSection = document.getElementById('report-results-section');
-            reportResultsList = document.getElementById('report-results-list');
-            reportFilteredTotal = document.getElementById('report-filtered-total');
-            exportButtonsContainer = document.getElementById('export-buttons');
-            exportExcelBtn = document.getElementById('export-excel-btn');
-            exportPdfBtn = document.getElementById('export-pdf-btn');
-            xlsxFileInput = document.getElementById('xlsx-file-input');
-            importLoader = document.getElementById('import-loader');
-            importPreviewSection = document.getElementById('import-preview-section');
-            importPreviewList = document.getElementById('import-preview-list');
-            importCount = document.getElementById('import-count');
-            confirmImportBtn = document.getElementById('confirm-import-btn');
-            cancelImportBtn = document.getElementById('cancel-import-btn');
-            biTotalExpenses = document.getElementById('bi-total-expenses');
-            biAvgDailyExpense = document.getElementById('bi-avg-daily-expense');
-            biTopCategory = document.getElementById('bi-top-category');
-            transactionModal = document.getElementById('transaction-modal');
-            transactionModalTitle = document.getElementById('transaction-modal-title');
-            transactionForm = document.getElementById('transaction-form');
-            transactionIdInput = document.getElementById('transaction-id');
-            descriptionInput = document.getElementById('description');
-            amountInput = document.getElementById('amount');
-            dueDateInput = document.getElementById('due-date');
-            dueDateSection = document.getElementById('due-date-section');
-            notesInput = document.getElementById('notes');
-            categorySelect = document.getElementById('category-select');
-            categorySection = document.getElementById('category-section');
-            accountSelect = document.getElementById('account-select');
-            accountSection = document.getElementById('account-section');
-            isRecurringInput = document.getElementById('is-recurring');
-            recurringPaymentSection = document.getElementById('recurring-payment-section');
-            statusSection = document.getElementById('status-section');
-            isPaidInput = document.getElementById('is-paid');
-            paymentModal = document.getElementById('payment-modal');
-            paymentModalDescription = document.getElementById('payment-modal-description');
-            paymentModalAccountSelect = document.getElementById('payment-modal-account');
-            paymentModalTypeSelect = document.getElementById('payment-modal-type');
-            paymentModalDateInput = document.getElementById('payment-modal-date');
-            payCcBillModal = document.getElementById('pay-cc-bill-modal');
-            payCcBillDescription = document.getElementById('pay-cc-bill-description');
-            payCcBillAccountIdInput = document.getElementById('pay-cc-bill-account-id');
-            payCcBillFromAccountSelect = document.getElementById('pay-cc-bill-from-account');
-            payCcBillAmountInput = document.getElementById('pay-cc-bill-amount');
-            payCcBillDateInput = document.getElementById('pay-cc-bill-date');
-            alertModal = document.getElementById('alert-modal');
-            alertModalTitle = document.getElementById('alert-modal-title');
-            alertModalMessage = document.getElementById('alert-modal-message');
-            confirmModal = document.getElementById('confirm-modal');
-            confirmModalTitle = document.getElementById('confirm-modal-title');
-            confirmModalMessage = document.getElementById('confirm-modal-message');
-            inputModal = document.getElementById('input-modal');
-            inputModalTitle = document.getElementById('input-modal-title');
-            inputModalLabel = document.getElementById('input-modal-label');
-            inputModalField = document.getElementById('input-modal-field');
 
-            // ==================================================================
-            // FIM DA CORREÇÃO (Passo 2)
-            // ==================================================================
+            // Regra: Se "Pago" e sem data, usa hoje. Se "A Pagar", limpa data.
+            if (transactionData.status === 'Pago' && !transactionData.paymentDate) {
+                transactionData.paymentDate = today;
+            } else if (transactionData.status === 'A Pagar') {
+                transactionData.paymentDate = '';
+            }
+            
+            // Regra: Se for Receita, sempre considera "Pago"
+            if (transactionData.type === 'Receita') {
+                transactionData.status = 'Pago';
+                if (!transactionData.paymentDate) {
+                    transactionData.paymentDate = transactionData.dueDate; // Receita paga no vencimento (ou hoje)
+                }
+            }
 
+            try {
+                if (currentEditId) {
+                    // --- MODO DE ATUALIZAÇÃO ---
+                    const docRef = doc(getTransactionsCollectionRef(), currentEditId);
+                    await updateDoc(docRef, transactionData);
+                    showToast("Transação atualizada!");
+                } else {
+                    // --- MODO DE ADIÇÃO ---
+                    transactionData.createdAt = new Date().toISOString();
+                    await addDoc(getTransactionsCollectionRef(), transactionData);
+                    showToast("Transação adicionada!");
+                }
+                resetFormState();
+            } catch (error) {
+                console.error("Erro ao salvar transação:", error);
+                showToast("Erro ao salvar transação.", true);
+            }
+        }
 
-             // Define variáveis de tema
-             themeToggleBtn = document.getElementById('theme-toggle');
-             themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-             themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-             themeToggleText = document.getElementById('theme-toggle-text');
-             
-             const isDark = localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-             updateTheme(isDark); 
-             
-             lucide.createIcons(); 
+        /** Manipulador para excluir uma transação */
+        async function handleDeleteTransaction(id) {
+            // Em um app real, usaríamos um modal de confirmação
+            try {
+                const docRef = doc(getTransactionsCollectionRef(), id);
+                await deleteDoc(docRef);
+                showToast("Transação excluída!");
+            } catch (error) {
+                console.error("Erro ao excluir transação:", error);
+                showToast("Não foi possível excluir a transação.", true);
+            }
+        }
 
-             // Listener do botão de tema principal
-             const themeClickHandler = () => updateTheme(!document.documentElement.classList.contains('dark'));
-             if(themeToggleBtn) { themeToggleBtn.addEventListener('click', themeClickHandler); } 
-             else { console.warn("Theme toggle button (main) not found."); }
-             
-             console.log("[INIT] DOMContentLoaded setup complete. Adding event listeners...");
+        /** Prepara o formulário para editar uma transação */
+        function handleEditTransaction(transaction) {
+            currentEditId = transaction.id;
 
-              // Listeners dos elementos da UI principal (adicionados aqui para garantir que todas as funções estejam definidas)
-              if(menuToggle) menuToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
-              if(sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
-              
-              // CORREÇÃO: Adiciona listeners aos botões da sidebar
-              navButtons.forEach(button => {
-                   button.addEventListener('click', (e) => { 
-                       e.preventDefault(); 
-                       const pageKey = e.currentTarget.dataset.page;
-                       console.log(`[NAV] Clicked sidebar button: ${pageKey}`); // Log Adicionado
-                       switchPage(pageKey); 
-                   });
-              });
+            // Preenche o formulário
+            transactionForm.description.value = transaction.description;
+            transactionForm.amount.value = transaction.amount;
+            transactionForm.type.value = transaction.type;
+            transactionForm.category.value = transaction.category;
+            transactionForm.paidBy.value = transaction.paidBy;
+            transactionForm.status.value = transaction.status;
+            transactionForm.dueDate.value = transaction.dueDate;
+            transactionForm.paymentDate.value = transaction.paymentDate;
 
-              navButtonLinks.forEach(button => button.addEventListener('click', (e) => { e.preventDefault(); console.log(`[NAV] Clicked link: ${e.currentTarget.dataset.page}, tab: ${e.currentTarget.dataset.configTab}`); switchPage(e.currentTarget.dataset.page, e.currentTarget.dataset.configTab); })); // Log Adicionado
-              if(configTabs) configTabs.addEventListener('click', (e) => { const button = e.target.closest('.tab-button'); if (button) { console.log(`[NAV] Clicked config tab: ${button.dataset.tab}`); switchConfigTab(button.dataset.tab); } }); // Log Adicionado
-              document.body.addEventListener('click', (e) => { const button = e.target.closest('button'); if (!button) return; const { action, id } = button.dataset; switch (action) { case 'delete-transaction': removeTransaction(id); break; case 'edit-transaction': openTransactionModal(id); break; case 'pay-transaction': openPaymentModal(id); break; case 'delete-category': removeCategory(id); break; case 'delete-payment-type': removePaymentType(id); break; case 'delete-account': removeAccount(id); break; case 'pay-cc-bill': openPayCcBillModal(id); break; } });
-              if(openTransactionModalBtn) openTransactionModalBtn.addEventListener('click', () => openTransactionModal(null));
-              if(alertModal) alertModal.addEventListener('click', (e) => { if (e.target === alertModal) closeAlertModal(); }); 
-              document.getElementById('alert-modal-ok')?.addEventListener('click', closeAlertModal);
-              if(confirmModal) confirmModal.addEventListener('click', (e) => { if(e.target === confirmModal) handleConfirm(false); }); 
-              document.getElementById('confirm-modal-cancel')?.addEventListener('click', () => handleConfirm(false));
-              document.getElementById('confirm-modal-confirm')?.addEventListener('click', () => handleConfirm(true));
-              if(inputModal) inputModal.addEventListener('click', (e) => { if(e.target === inputModal) handleInputCancel(); }); 
-              document.getElementById('input-modal-confirm')?.addEventListener('click', handleInputConfirm); 
-              document.getElementById('input-modal-cancel')?.addEventListener('click', handleInputCancel); 
-              if(transactionForm) transactionForm.addEventListener('submit', handleFormSubmit);
-              document.querySelectorAll('input[name="type"]').forEach(radio => radio.addEventListener('change', toggleTransactionFormVisibility));
-              if(isPaidInput) isPaidInput.addEventListener('change', toggleTransactionFormVisibility);
-              if(categorySelect) categorySelect.addEventListener('change', handleCategoryChange); 
-              document.getElementById('payment-modal-confirm')?.addEventListener('click', confirmPayment);
-              document.getElementById('payment-modal-cancel')?.addEventListener('click', closePaymentModal); 
-              document.getElementById('pay-cc-bill-confirm')?.addEventListener('click', confirmPayCcBill);
-              document.getElementById('pay-cc-bill-cancel')?.addEventListener('click', closePayCcBillModal); 
-              if(filter) filter.addEventListener('change', renderAll); 
-              if(filterCategory) filterCategory.addEventListener('change', renderAll);
-              if(accountForm) accountForm.addEventListener('submit', handleAccountFormSubmit);
-              if(accountTypeSelect) accountTypeSelect.addEventListener('change', () => { if(accountLimitSection) accountLimitSection.classList.toggle('hidden', accountTypeSelect.value !== 'credit'); }); 
-              if(categoryForm) categoryForm.addEventListener('submit', addCategory);
-              if(suggestCategoriesBtn) suggestCategoriesBtn.addEventListener('click', () => addSuggestedCategories(false));
-              if(paymentTypeForm) paymentTypeForm.addEventListener('submit', addPaymentType);
-              if(budgetsListContainer) budgetsListContainer.addEventListener('change', handleBudgetChange);
-              if(generateReportBtn) generateReportBtn.addEventListener('click', generateReport);
-              if(exportExcelBtn) exportExcelBtn.addEventListener('click', exportToExcel);
-              if(exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPDF);
-              if(xlsxFileInput) xlsxFileInput.addEventListener('change', handleFileSelect);
-              if(confirmImportBtn) confirmImportBtn.addEventListener('click', confirmImport); 
-              if(cancelImportBtn) cancelImportBtn.addEventListener('click', resetImportState);
-              
-              console.log("[INIT] All event listeners attached.");
-        });
+            // Altera o botão
+            submitBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Atualizar Transação
+            `;
+            submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            
+            togglePaymentDateVisibility(); // Ajusta a visibilidade da data de pagamento
+            
+            // *** CORREÇÃO: Muda para a aba do painel principal ***
+            switchTab('dashboard'); 
+            
+            // Foca o formulário
+            transactionForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
         
+        /** Marca uma conta como paga */
+        async function handleMarkAsPaid(id) {
+            try {
+                const docRef = doc(getTransactionsCollectionRef(), id);
+                await updateDoc(docRef, {
+                    status: "Pago",
+                    paymentDate: today // Define a data de pagamento como hoje
+                });
+                showToast("Conta marcada como paga!");
+            } catch (error) {
+                console.error("Erro ao marcar como pago:", error);
+                showToast("Erro ao atualizar conta.", true);
+            }
+        }
+
+        /** Manipulador para salvar as configurações de nomes */
+        async function handleSaveSettings(e) {
+            e.preventDefault();
+            const name1 = partner1NameInput.value.trim() || 'Parceiro 1';
+            const name2 = partner2NameInput.value.trim() || 'Parceiro 2';
+            const newNames = { partner1: name1, partner2: name2 };
+
+            try {
+                await setDoc(getFamilyDocRef(), { names: newNames }, { merge: true });
+                localStorage.setItem('partner1Name', name1);
+                localStorage.setItem('partner2Name', name2);
+                hideElement(settingsModal);
+                showToast("Nomes salvos!");
+            } catch (error) {
+                console.error("Erro ao salvar nomes:", error);
+                showToast("Erro ao salvar nomes.", true);
+            }
+        }
+        
+        /** Inicializa o formulário de orçamento na aba Planejamento */
+        function initBudgetForm() {
+            budgetForm.innerHTML = ''; // Limpa o formulário
+            const expenseCategories = categories.filter(c => c !== 'Salário'); // Orçamento é para despesas
+            
+            expenseCategories.forEach(category => {
+                const div = document.createElement('div');
+                div.className = "grid grid-cols-3 gap-4 items-center";
+                
+                const colorClass = categoryColorClasses[category] || categoryColorClasses['Outros'];
+                
+                div.innerHTML = `
+                    <label for="budget-${category}" class="col-span-1 text-sm font-medium text-gray-700 flex items-center">
+                        <span class="w-3 h-3 rounded-full mr-2 ${colorClass}"></span>
+                        ${category}
+                    </label>
+                    <div class="col-span-2 relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                        <input type="number" step="0.01" min="0" 
+                               id="budget-${category}" 
+                               data-category="${category}"
+                               placeholder="0,00"
+                               class="budget-input pl-10 pr-4 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                `;
+                budgetForm.appendChild(div);
+            });
+            
+            // Adiciona listeners para salvar automaticamente
+            budgetForm.querySelectorAll('.budget-input').forEach(input => {
+                input.addEventListener('change', handleBudgetChange);
+            });
+            
+            updateBudgetFormInputs();
+        }
+        
+        /** Atualiza os valores nos inputs do formulário de orçamento */
+        function updateBudgetFormInputs() {
+            budgetForm.querySelectorAll('.budget-input').forEach(input => {
+                const category = input.dataset.category;
+                input.value = monthlyBudget[category] || '';
+            });
+        }
+        
+        /** Salva o valor do orçamento quando o input muda */
+        async function handleBudgetChange(e) {
+            const category = e.target.dataset.category;
+            const amount = parseFloat(e.target.value) || 0; // Salva 0 se limpar
+
+            try {
+                // Usa notação de ponto para atualizar um campo específico no documento
+                const budgetUpdate = {};
+                budgetUpdate[category] = amount;
+                
+                await setDoc(getBudgetDocRef(), budgetUpdate, { merge: true });
+                showToast(`Orçamento de ${category} salvo!`);
+            } catch (error) {
+                console.error("Erro ao salvar orçamento:", error);
+                showToast("Erro ao salvar orçamento.", true);
+            }
+        }
+
+
+        // --- Funções de Importação ---
+
+        /** Manipula a seleção do arquivo (Excel ou CSV) */
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            csvFileInput.value = null; // Reseta o input
+
+            // Colunas obrigatórias (com os novos campos)
+            const requiredCols = ['Descrição', 'Valor', 'Tipo', 'Vencimento', 'Categoria'];
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary', cellDates: true });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { cellDates: true });
+
+                    if (jsonData.length === 0) {
+                        showToast("Arquivo vazio ou planilha sem dados.", true);
+                        return;
+                    }
+
+                    const headers = Object.keys(jsonData[0]);
+                    const missingCols = requiredCols.filter(col => !headers.includes(col));
+                    
+                    if (missingCols.length > 0) {
+                        showToast(`Arquivo inválido. Colunas faltando: ${missingCols.join(', ')}`, true);
+                        return;
+                    }
+
+                    parsedCsvData = jsonData;
+                    showReviewModal(parsedCsvData);
+
+                } catch (error) {
+                    console.error("Erro ao ler o arquivo (SheetJS):", error);
+                    showToast("Erro ao ler o arquivo. Verifique o formato.", true);
+                }
+            };
+            reader.onerror = (error) => showToast("Não foi possível ler o arquivo.", true);
+            reader.readAsBinaryString(file);
+        }
+
+        /** Mostra o modal de revisão com os dados */
+        function showReviewModal(data) {
+            updatePaidByDropdown(importPaidBySelect); // Popula o dropdown "Pago Por"
+
+            const headers = Object.keys(data[0]);
+            csvPreviewHead.innerHTML = `
+                <tr>
+                    ${headers.map(h => `<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${h}</th>`).join('')}
+                </tr>
+            `;
+
+            const previewData = data.slice(0, 5);
+            csvPreviewBody.innerHTML = previewData.map(row => `
+                <tr>
+                    ${headers.map(h => {
+                        let val = row[h] || '';
+                        // Formata datas se forem objetos Date
+                        if (val instanceof Date) {
+                            val = val.toLocaleDateString('pt-BR');
+                        }
+                        return `<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${val}</td>`
+                    }).join('')}
+                </tr>
+            `).join('');
+
+            showElement(importReviewStep);
+            hideElement(importLoadingStep);
+            showElement(importModal);
+        }
+
+        /** Processa e importa os dados para o Firestore */
+        async function processImport() {
+            if (parsedCsvData.length === 0) return;
+
+            const defaultPaidBy = importPaidBySelect.value;
+            showElement(importLoadingStep);
+            hideElement(importReviewStep);
+
+            const importPromises = [];
+            let processedCount = 0;
+
+            for (const row of parsedCsvData) {
+                // Lógica de valor robusta
+                let amount;
+                if (typeof row.Valor === 'number') {
+                    amount = row.Valor;
+                } else {
+                    let amountStr = String(row.Valor).replace(/R\$|\s/g, '');
+                    if (amountStr.includes(',') && amountStr.includes('.')) {
+                        amountStr = amountStr.replace(/\./g, '');
+                    }
+                    amountStr = amountStr.replace(',', '.');
+                    amount = parseFloat(amountStr);
+                }
+
+                const type = row.Tipo;
+                
+                // Mapeia novas colunas de data e status (com parse robusto)
+                const dueDateValue = row['Vencimento'];
+                const paymentDateValue = row['Data Pagamento'] || ''; // Opcional
+                
+                const dueDate = parseDateFromSheet(dueDateValue);
+                
+                // Validação da Data de Vencimento (Obrigatória)
+                if (!dueDate || isNaN(dueDate.getTime())) {
+                    console.warn("Linha pulada (Data de Vencimento inválida):", row);
+                    continue; // Pula esta linha do loop
+                }
+                
+                let paymentDate = '';
+                if (paymentDateValue) {
+                    const pd = parseDateFromSheet(paymentDateValue);
+                    // Validação da Data de Pagamento (Opcional)
+                    if (pd && !isNaN(pd.getTime())) {
+                        paymentDate = pd.toISOString().split('T')[0];
+                    }
+                }
+                
+                const statusValue = row['Status'] || (paymentDate ? 'Pago' : 'A Pagar'); // Infere status
+
+                const category = (row.Categoria === 'N/A' || !row.Categoria) ? 'Outros' : row.Categoria;
+
+                if (!row.Descrição || isNaN(amount) || amount <= 0 || !type) {
+                    console.warn("Linha pulada (dados inválidos):", row);
+                    continue;
+                }
+
+                const newTransaction = {
+                    description: row.Descrição,
+                    amount: amount,
+                    dueDate: dueDate.toISOString().split('T')[0],
+                    paymentDate: paymentDate,
+                    status: statusValue,
+                    type: type,
+                    category: category,
+                    paidBy: defaultPaidBy,
+                    createdAt: new Date().toISOString()
+                };
+
+                importPromises.push(addDoc(getTransactionsCollectionRef(), newTransaction));
+                processedCount++;
+            }
+
+            try {
+                await Promise.all(importPromises);
+                showToast(`Sucesso! ${processedCount} transações importadas.`);
+            } catch (error) {
+                console.error("Erro durante a importação:", error);
+                showToast("Erro ao importar transações.", true);
+            } finally {
+                hideElement(importModal);
+                parsedCsvData = [];
+                csvFileInput.value = null;
+            }
+        }
+
+
+        // --- Funções de Renderização (Atualização da UI) ---
+
+        /** Função principal para atualizar toda a UI com novos dados */
+        function updateAllUI(transactions) {
+            // Filtros de data
+            const firstDayOfMonth = new Date(today.split('-')[0], today.split('-')[1] - 1, 1);
+            
+            // Transações do mês corrente (para o Painel Principal)
+            const monthTransactions = transactions.filter(t => {
+                // Filtra pelo vencimento OU pagamento no mês corrente
+                const dateToCompare = t.paymentDate || t.dueDate;
+                try {
+                    const transactionDate = new Date(dateToCompare + 'T00:00:00'); // Garante que é local
+                    return transactionDate >= firstDayOfMonth;
+                } catch(e) {
+                    console.warn("Data inválida encontrada:", t);
+                    return false;
+                }
+            });
+            
+            // Transações a pagar (para a Aba "Contas a Pagar")
+            const pendingTransactions = transactions.filter(t => t.status === 'A Pagar');
+
+            // Transações atrasadas (para o novo card)
+            const overdueTransactions = transactions.filter(t => t.status === 'A Pagar' && t.dueDate < today);
+            
+            // Calcula o total atrasado
+            const totalOverdue = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
+
+            // 1. Renderiza o Painel Principal
+            renderDashboard(monthTransactions);
+            renderTransactionList(monthTransactions);
+            renderBudgetProgress(monthTransactions);
+            renderOverdueList(overdueTransactions, totalOverdue); // Passa o total para a função
+            
+            // 2. Renderiza a Aba "Contas a Pagar"
+            renderPendingList(pendingTransactions);
+        }
+
+        /** Renderiza os cards do Dashboard */
+        function renderDashboard(monthTransactions) {
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            // Filtra apenas transações PAGAS ou RECEITAS do mês
+            monthTransactions.forEach(t => {
+                if (t.type === 'Receita' && t.status === 'Pago') { // Receitas recebidas
+                    totalIncome += t.amount;
+                } else if (t.type === 'Despesa' && t.status === 'Pago') { // Despesas pagas
+                    totalExpense += t.amount;
+                }
+            });
+
+            const totalBalance = totalIncome - totalExpense;
+
+            totalBalanceEl.textContent = formatCurrency(totalBalance);
+            totalBalanceEl.classList.toggle('text-red-600', totalBalance < 0);
+            totalBalanceEl.classList.toggle('text-gray-900', totalBalance >= 0);
+            
+            totalIncomeEl.textContent = formatCurrency(totalIncome);
+            totalExpenseEl.textContent = formatCurrency(totalExpense);
+        }
+        
+        /** Renderiza o progresso do orçamento no Painel Principal */
+        function renderBudgetProgress(monthTransactions) {
+            budgetProgressContainer.innerHTML = ''; // Limpa
+            
+            // 1. Calcula gastos PAGOS por categoria
+            const expensesByCategory = {};
+            monthTransactions
+                .filter(t => t.type === 'Despesa' && t.status === 'Pago')
+                .forEach(t => {
+                    expensesByCategory[t.category] = (expensesByCategory[t.category] || 0) + t.amount;
+                });
+            
+            // 2. Compara com o orçamento
+            if (Object.keys(monthlyBudget).length === 0 && Object.keys(expensesByCategory).length === 0) {
+                budgetProgressContainer.innerHTML = '<p class="text-sm text-gray-500 text-center">Defina seus orçamentos na aba "Planejamento" para começar.</p>';
+                return;
+            }
+
+            // Combina categorias (orçadas + gastas) para exibir todas
+            const allBudgetCategories = new Set([...Object.keys(monthlyBudget), ...Object.keys(expensesByCategory)]);
+            
+            allBudgetCategories.forEach(category => {
+                if (category === 'Salário') return; // Não orçamenta salário
+                
+                const spent = expensesByCategory[category] || 0;
+                const limit = monthlyBudget[category] || 0;
+                const percent = (limit > 0) ? (spent / limit) * 100 : 0;
+                const remaining = limit - spent;
+                
+                let progressBarClass = 'bg-blue-500'; // Normal
+                let remainingText = `${formatCurrency(remaining)} restantes`;
+                
+                if (spent > limit && limit > 0) {
+                    progressBarClass = 'bg-red-500'; // Estourou
+                    remainingText = `${formatCurrency(Math.abs(remaining))} acima`;
+                } else if (percent > 85 && limit > 0) {
+                    progressBarClass = 'bg-yellow-500'; // Quase lá
+                } else if (limit === 0 && spent > 0) {
+                    progressBarClass = 'bg-gray-400'; // Gasto sem orçamento
+                    remainingText = 'Sem limite definido';
+                } else if (limit > 0 && spent === 0) {
+                     remainingText = `Limite de ${formatCurrency(limit)}`;
+                }
+
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium text-gray-700">${category}</span>
+                        <span class="text-sm font-semibold ${spent > limit && limit > 0 ? 'text-red-600' : 'text-gray-800'}">
+                            ${formatCurrency(spent)} / ${limit > 0 ? formatCurrency(limit) : '...'}
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="${progressBarClass} h-2.5 rounded-full" style="width: ${Math.min(percent, 100)}%"></div>
+                    </div>
+                    <p class="text-xs text-right text-gray-500 mt-1">${remainingText}</p>
+                `;
+                budgetProgressContainer.appendChild(div);
+            });
+        }
+
+        /** Renderiza uma lista de transações (para Painel, Contas a Pagar, Atrasadas) */
+        function renderGenericTransactionList(element, transactions, showEmptyStateEl) {
+            element.innerHTML = ''; // Limpa a lista
+            
+            if (transactions.length === 0) {
+                showElement(showEmptyStateEl);
+                return;
+            }
+            
+            hideElement(showEmptyStateEl);
+
+            transactions.forEach(t => {
+                const li = document.createElement('li');
+                li.className = 'py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between';
+                
+                const amountColor = t.type === 'Receita' ? 'text-green-600' : 'text-red-600';
+                const amountSign = t.type === 'Receita' ? '+' : '-';
+                const iconColor = t.type === 'Receita' ? 'bg-green-100 text-green-700' : (
+                    t.status === 'Pago' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                );
+                
+                // Destaque para contas vencidas e não pagas
+                const isOverdue = t.dueDate < today && t.status === 'A Pagar';
+                
+                li.innerHTML = `
+                    <div class="flex items-center mb-2 sm:mb-0 flex-grow mr-4">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full ${iconColor} flex items-center justify-center mr-3">
+                            ${getCategoryIcon(t.category)}
+                        </div>
+                        <div class="flex-1 min-w-0"> <!-- Adicionado min-w-0 para truncar texto -->
+                            <p class="text-base font-medium text-gray-900 truncate ${isOverdue ? 'text-red-600 font-bold' : ''}">
+                                ${t.description}
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                ${t.status === 'Pago' ? `Pago em ${formatDate(t.paymentDate)}` : `Vence em ${formatDate(t.dueDate)}`}
+                                 · ${t.category} · ${t.paidBy}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end mt-2 sm:mt-0 flex-shrink-0">
+                        <span class="text-lg font-semibold ${amountColor} sm:mr-4">
+                            ${amountSign} ${formatCurrency(t.amount)}
+                        </span>
+                        
+                        <!-- Botão Marcar como Pago (se A Pagar) -->
+                        ${t.status === 'A Pagar' ? `
+                        <button title="Marcar como Pago" class="pay-btn p-2 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded-full transition duration-300" data-id="${t.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        ` : ''}
+                        
+                        <!-- Botão de Editar -->
+                        <button title="Editar" class="edit-btn p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-full transition duration-300" data-id="${t.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <!-- Botão de Excluir -->
+                        <button title="Excluir" class="delete-btn p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-full transition duration-300" data-id="${t.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                // Adiciona listeners para os botões
+                li.querySelector('.delete-btn')?.addEventListener('click', () => handleDeleteTransaction(t.id));
+                li.querySelector('.edit-btn')?.addEventListener('click', () => handleEditTransaction(t));
+                li.querySelector('.pay-btn')?.addEventListener('click', () => handleMarkAsPaid(t.id));
+
+                element.appendChild(li);
+            });
+        }
+
+        /** Renderiza a lista de transações do Painel Principal (Mês Corrente) */
+        function renderTransactionList(monthTransactions) {
+            renderGenericTransactionList(transactionList, monthTransactions, emptyState);
+        }
+
+        /** Renderiza a lista de Contas a Pagar (Todas) */
+        function renderPendingList(pendingTransactions) {
+            // Ordena por vencimento (mais próximo primeiro)
+            pendingTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            renderGenericTransactionList(pendingList, pendingTransactions, emptyStatePending);
+        }
+
+        /** Renderiza a lista de Contas Atrasadas no Painel Principal */
+        function renderOverdueList(overdueTransactions, totalOverdue) {
+             // Ordena por vencimento (mais antiga primeiro)
+            overdueTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            renderGenericTransactionList(overdueList, overdueTransactions, emptyStateOverdue);
+            // Atualiza o total
+            if(totalOverdue > 0) {
+                 totalOverdueAmountEl.textContent = `Total Atrasado: ${formatCurrency(totalOverdue)}`;
+                 showElement(totalOverdueAmountEl);
+            } else {
+                 hideElement(totalOverdueAmountEl);
+            }
+        }
+
+
+        // --- Ponto de Entrada da Aplicação ---
+        window.onload = async () => {
+            try {
+                // Define as datas padrão nos formulários
+                today = new Date().toISOString().split('T')[0];
+                dueDateInput.value = today;
+                paymentDateInput.value = today;
+                
+                // Listeners estáticos (abas, modais, formulários)
+                tabBtnDashboard.addEventListener('click', () => switchTab('dashboard'));
+                tabBtnPending.addEventListener('click', () => switchTab('pending'));
+                tabBtnPlanning.addEventListener('click', () => switchTab('planning'));
+                
+                statusSelect.addEventListener('change', togglePaymentDateVisibility);
+
+                createFamilyBtn.addEventListener('click', handleCreateFamily);
+                joinFamilyBtn.addEventListener('click', handleJoinFamily);
+                copyFamilyIdBtn.addEventListener('click', () => copyToClipboard(familyIdDisplay.textContent, copyFamilyIdBtn));
+                startAppBtn.addEventListener('click', handleStartApp);
+                
+                copyIdBtn.addEventListener('click', () => copyToClipboard(familyId, copyIdBtn));
+
+                openSettingsBtn.addEventListener('click', () => showElement(settingsModal));
+                closeSettingsBtn.addEventListener('click', () => hideElement(settingsModal));
+                settingsForm.addEventListener('submit', handleSaveSettings);
+
+                transactionForm.addEventListener('submit', handleTransactionSubmit);
+
+                importCsvBtn.addEventListener('click', () => csvFileInput.click());
+                csvFileInput.addEventListener('change', handleFileSelect);
+                closeImportModalBtn.addEventListener('click', () => hideElement(importModal));
+                cancelImportBtn.addEventListener('click', () => hideElement(importModal));
+                confirmImportBtn.addEventListener('click', processImport);
+
+                // Carrega nomes do localStorage (carregamento otimista)
+                partnerNames.partner1 = localStorage.getItem('partner1Name') || 'Parceiro 1';
+                partnerNames.partner2 = localStorage.getItem('partner2Name') || 'Parceiro 2';
+                updatePaidByDropdown(paidBySelect);
+                updatePaidByDropdown(importPaidBySelect);
+                updateSettingsModalInputs();
+
+                // 1. Pega as configurações (CRÍTICO)
+                
+                // Bloco de código modificado para usar sua configuração local:
+                const firebaseConfigLocal = {
+                  apiKey: "AIzaSyCYfw1s61o3OgK_sXuR3lklm6GkPTr4XYo",
+                  authDomain: "meu-controle-financeiro-82dfe.firebaseapp.com",
+                  projectId: "meu-controle-financeiro-82dfe",
+                  storageBucket: "meu-controle-financeiro-82dfe.firebasestorage.app",
+                  messagingSenderId: "588430087487",
+                  appId: "1:588430087487:web:73632e879a49bcb2212f8a"
+                };
+                const configJson = JSON.stringify(firebaseConfigLocal);
+                const authToken = undefined; // Para login anônimo local
+
+                if (!configJson) {
+                    throw new Error("Configuração do Firebase não encontrada."); // Mensagem de fallback
+                }
+
+                // 2. Autentica o usuário
+                await initializeAndAuth(configJson, authToken);
+                
+                // 3. Verifica se o usuário já pertence a uma família
+                checkFamilyId();
+
+            } catch (error) {
+                // --- TRATAMENTO DE ERRO CRÍTICO ---
+                // Se algo falhar na inicialização, mostra o erro na tela
+                console.error("Erro crítico na inicialização:", error);
+                const loadingText = loadingIndicator.querySelector('p');
+                const spinner = loadingIndicator.querySelector('.spinner');
+                if (spinner) spinner.style.display = 'none'; // Esconde o spinner
+                if (loadingText) {
+                    loadingText.innerHTML = `
+                        <strong class="text-red-600">Erro Crítico na Inicialização</strong>
+                        <p class="text-sm mt-2">${error.message}</p>
+                        <p class="text-xs mt-4">Verifique se as variáveis de ambiente (__firebase_config) foram injetadas corretamente ou se você colou a configuração local corretamente e recarregue a página.</p>
+                    `;
+                }
+            }
+        };
+
     </script>
 </body>
 </html>
+
