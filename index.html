@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class=""> <!-- Adicionada class="" para o JS poder controlar o tema -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,26 +25,42 @@
             border-bottom-color: #3b82f6; /* blue-500 */
             color: #3b82f6;
         }
+        /* Ícones de Sol/Lua para o toggle de tema */
+        #theme-toggle-sun, #theme-toggle-moon {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .dark #theme-toggle-sun {
+            opacity: 0;
+            transform: rotate(90deg);
+        }
+        .dark #theme-toggle-moon {
+            opacity: 1;
+            transform: rotate(0deg);
+        }
+        #theme-toggle-moon {
+            opacity: 0;
+            transform: rotate(-90deg);
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased">
+<body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-300">
 
     <!-- ===== 1. MODAL DE SELEÇÃO DE FAMÍLIA ===== -->
     <div id="familyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Bem-vindo!</h2>
-            <p class="text-gray-600 mb-6">Como você gostaria de começar?</p>
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl text-center">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Bem-vindo!</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Como você gostaria de começar?</p>
             
             <div class="space-y-4">
                 <button id="createFamilyBtn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
                     Criar Nova Família
                 </button>
                 <div class="relative flex items-center justify-center">
-                    <span class="absolute bg-white px-2 text-gray-500 text-sm">ou</span>
-                    <div class="h-px bg-gray-300 w-full"></div>
+                    <span class="absolute bg-white dark:bg-gray-800 px-2 text-gray-500 text-sm">ou</span>
+                    <div class="h-px bg-gray-300 dark:bg-gray-600 w-full"></div>
                 </div>
                 <div class="space-y-3">
-                    <input type="text" id="familyIdInput" placeholder="Cole o ID da Família aqui" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="familyIdInput" placeholder="Cole o ID da Família aqui" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button id="joinFamilyBtn" class="w-full bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-gray-800 transition duration-300">
                         Juntar-se a uma Família
                     </button>
@@ -53,12 +69,12 @@
             
             <!-- Mostra o ID da nova família após a criação -->
             <div id="newFamilyIdSection" class="mt-6 hidden">
-                <p class="text-gray-700">Compartilhe este ID com seu parceiro:</p>
-                <div class="bg-gray-200 text-gray-800 font-mono text-lg p-3 my-2 rounded-lg break-words" id="familyIdDisplay"></div>
+                <p class="text-gray-700 dark:text-gray-300">Compartilhe este ID com seu parceiro:</p>
+                <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-mono text-lg p-3 my-2 rounded-lg break-words" id="familyIdDisplay"></div>
                 <button id="copyFamilyIdBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300">
                     Copiar ID
                 </button>
-                <button id="startAppBtn" class="mt-4 w-full text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-blue-100 transition duration-300">
+                <button id="startAppBtn" class="mt-4 w-full text-blue-600 dark:text-blue-400 font-semibold py-2 px-4 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 transition duration-300">
                     Começar a Usar
                 </button>
             </div>
@@ -66,29 +82,29 @@
     </div>
 
     <!-- ===== 2. INDICADOR DE CARREGAMENTO ===== -->
-    <div id="loadingIndicator" class="fixed inset-0 bg-gray-100 flex flex-col items-center justify-center z-40">
-        <div class="spinner w-12 h-12 border-4 border-gray-300 rounded-full"></div>
-        <p class="text-gray-600 mt-4 text-lg">Carregando finanças...</p>
+    <div id="loadingIndicator" class="fixed inset-0 bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center z-40">
+        <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full"></div>
+        <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Carregando finanças...</p>
         <!-- Mensagem de erro de inicialização será injetada aqui -->
     </div>
 
     <!-- ===== 2.5 MODAL DE CONFIGURAÇÕES ===== -->
     <div id="settingsModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl relative">
-            <button id="closeSettingsBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeSettingsBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Configurações da Família</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Configurações da Família</h2>
             <form id="settingsForm" class="space-y-4">
                 <div>
-                    <label for="partner1NameInput" class="block text-sm font-medium text-gray-700">Nome (Parceiro 1)</label>
-                    <input type="text" id="partner1NameInput" placeholder="Ex: João" class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="partner1NameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome (Parceiro 1)</label>
+                    <input type="text" id="partner1NameInput" placeholder="Ex: João" class="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label for="partner2NameInput" class="block text-sm font-medium text-gray-700">Nome (Parceiro 2)</label>
-                    <input type="text" id="partner2NameInput" placeholder="Ex: Maria" class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="partner2NameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome (Parceiro 2)</label>
+                    <input type="text" id="partner2NameInput" placeholder="Ex: Maria" class="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <button id="saveSettingsBtn" type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
                     Salvar Nomes
@@ -99,39 +115,39 @@
 
     <!-- ===== 2.6 MODAL DE IMPORTAÇÃO ===== -->
     <div id="importModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
-            <button id="closeImportModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeImportModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Importar Transações (Planilha)</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Importar Transações (Planilha)</h2>
             
             <!-- Passo de Revisão -->
             <div id="importReviewStep">
-                <p class="text-gray-600 mb-4">Por favor, revise os dados e defina um pagador padrão para todas as transações importadas.</p>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Por favor, revise os dados e defina um pagador padrão para todas as transações importadas.</p>
                 
                 <div class="mb-4">
-                    <label for="importPaidBy" class="block text-sm font-medium text-gray-700">Pagador Padrão (para todos os itens)</label>
-                    <select id="importPaidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <label for="importPaidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pagador Padrão (para todos os itens)</label>
+                    <select id="importPaidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <!-- Opções preenchidas pelo JS -->
                     </select>
                 </div>
                 
                 <div class="mb-6 overflow-x-auto">
-                    <p class="text-sm font-medium text-gray-700 mb-2">Prévia (primeiras 5 linhas):</p>
-                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
-                        <thead id="csvPreviewHead" class="bg-gray-50">
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Prévia (primeiras 5 linhas):</p>
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-300 dark:border-gray-700">
+                        <thead id="csvPreviewHead" class="bg-gray-50 dark:bg-gray-700">
                             <!-- Cabeçalho preenchido pelo JS -->
                         </thead>
-                        <tbody id="csvPreviewBody" class="bg-white divide-y divide-gray-200">
+                        <tbody id="csvPreviewBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             <!-- Linhas preenchidas pelo JS -->
                         </tbody>
                     </table>
                 </div>
 
                 <div class="flex justify-end space-x-4">
-                    <button id="cancelImportBtn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 transition duration-300">
+                    <button id="cancelImportBtn" class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
                         Cancelar
                     </button>
                     <button id="confirmImportBtn" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
@@ -142,8 +158,8 @@
 
             <!-- Passo de Carregamento -->
             <div id="importLoadingStep" class="text-center py-10 hidden">
-                <div class="spinner w-12 h-12 border-4 border-gray-300 rounded-full mx-auto"></div>
-                <p class="text-gray-600 mt-4 text-lg">Importando transações... Por favor, aguarde.</p>
+                <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full mx-auto"></div>
+                <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Importando transações... Por favor, aguarde.</p>
             </div>
         </div>
     </div>
@@ -154,36 +170,47 @@
         <!-- Cabeçalho -->
         <header class="mb-4 flex flex-col sm:flex-row justify-between items-center">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Meu Painel Financeiro</h1>
-                <p class="text-sm text-gray-500">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Meu Painel Financeiro</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
                     ID da Família: <span id="currentFamilyId" class="font-mono"></span>
                 </p>
             </div>
             <div class="flex items-center space-x-2 mt-2 sm:mt-0">
-                <button id="copyIdBtn" title="Copiar ID da Família" class="bg-white text-gray-600 p-2 rounded-lg shadow-sm border border-gray-300 hover:bg-gray-50 transition duration-300">
+                <button id="copyIdBtn" title="Copiar ID da Família" class="bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 p-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                 </button>
-                <button id="openSettingsBtn" title="Configurações da Família" class="bg-white text-gray-600 p-2 rounded-lg shadow-sm border border-gray-300 hover:bg-gray-50 transition duration-300">
+                <button id="openSettingsBtn" title="Configurações da Família" class="bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 p-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826 3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+                <!-- BOTÃO DE TEMA -->
+                <button id="themeToggleBtn" title="Alternar Tema" class="bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 p-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-300 relative w-10 h-10 flex items-center justify-center overflow-hidden">
+                    <!-- Ícone Sol -->
+                    <svg id="theme-toggle-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.05 19.95l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.05 4.05l-.707-.707" />
+                    </svg>
+                    <!-- Ícone Lua -->
+                    <svg id="theme-toggle-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
             </div>
         </header>
 
         <!-- Navegação por Abas -->
-        <nav class="mb-6 bg-white shadow-sm rounded-lg">
-            <div class="flex border-b border-gray-200">
-                <button id="tabBtnDashboard" class="tab-btn active text-gray-600 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500">
+        <nav class="mb-6 bg-white dark:bg-gray-800 shadow-sm rounded-lg">
+            <div class="flex border-b border-gray-200 dark:border-gray-700">
+                <button id="tabBtnDashboard" class="tab-btn active text-gray-600 dark:text-gray-300 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500 dark:hover:text-blue-400">
                     Painel Principal
                 </button>
-                <button id="tabBtnPending" class="tab-btn text-gray-600 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500">
+                <button id="tabBtnPending" class="tab-btn text-gray-600 dark:text-gray-300 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500 dark:hover:text-blue-400">
                     Contas a Pagar
                 </button>
-                <button id="tabBtnPlanning" class="tab-btn text-gray-600 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500">
+                <button id="tabBtnPlanning" class="tab-btn text-gray-600 dark:text-gray-300 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500 dark:hover:text-blue-400">
                     Planejamento
                 </button>
             </div>
@@ -198,60 +225,60 @@
                     <!-- Cards de Resumo -->
                     <div class="lg:col-span-1 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-6">
                         <!-- Balanço Total -->
-                        <div class="bg-white p-6 rounded-lg shadow-lg">
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Balanço do Mês (Pago)</h3>
-                            <p id="totalBalance" class="text-3xl font-bold text-gray-900 mt-2">R$ 0,00</p>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Balanço do Mês (Pago)</h3>
+                            <p id="totalBalance" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">R$ 0,00</p>
                         </div>
                         <!-- Receitas -->
-                        <div class="bg-white p-6 rounded-lg shadow-lg">
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Receitas (Mês)</h3>
-                            <p id="totalIncome" class="text-2xl font-semibold text-green-600 mt-2">R$ 0,00</p>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Receitas (Mês)</h3>
+                            <p id="totalIncome" class="text-2xl font-semibold text-green-600 dark:text-green-500 mt-2">R$ 0,00</p>
                         </div>
                         <!-- Despesas -->
-                        <div class="bg-white p-6 rounded-lg shadow-lg">
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase">Despesas (Mês - Pago)</h3>
-                            <p id="totalExpense" class="text-2xl font-semibold text-red-600 mt-2">R$ 0,00</p>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Despesas (Mês - Pago)</h3>
+                            <p id="totalExpense" class="text-2xl font-semibold text-red-600 dark:text-red-500 mt-2">R$ 0,00</p>
                         </div>
                     </div>
 
                     <!-- Progresso do Orçamento -->
-                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Progresso do Orçamento (Mês)</h3>
+                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Progresso do Orçamento (Mês)</h3>
                         <div id="budgetProgressContainer" class="space-y-4">
                             <!-- Barras de progresso serão inseridas pelo JS -->
                         </div>
                     </div>
 
-                    <!-- CARD: CONTAS ATRASADAS -->
-                    <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow-lg border-l-4 border-red-500">
-                         <h3 class="text-lg font-semibold text-red-700 mb-4 flex items-center">
+                    <!-- NOVO: CARD: CONTAS ATRASADAS (Req 2) -->
+                    <div class="lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
+                         <h3 class="text-lg font-semibold text-red-700 dark:text-red-500 mb-4 flex items-center">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                              </svg>
                              Contas Atrasadas
                          </h3>
                          <!-- Estado Vazio -->
-                         <div id="emptyStateOverdue" class="text-center text-gray-500 py-6 hidden">
+                         <div id="emptyStateOverdue" class="text-center text-gray-500 dark:text-gray-400 py-6 hidden">
                              <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                              </svg>
-                             <h4 class="mt-2 text-md font-semibold text-gray-700">Nenhuma conta atrasada!</h4>
+                             <h4 class="mt-2 text-md font-semibold text-gray-700 dark:text-gray-300">Nenhuma conta atrasada!</h4>
                          </div>
                          <!-- Lista de Contas Atrasadas -->
-                         <ul id="overdueList" class="divide-y divide-gray-200 max-h-60 overflow-y-auto">
+                         <ul id="overdueList" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-60 overflow-y-auto">
                              <!-- Itens da lista serão inseridos pelo JS -->
                          </ul>
                          <!-- Total Atrasado -->
-                         <p id="totalOverdueAmount" class="text-right font-semibold text-red-600 mt-4 pr-4"></p>
+                         <p id="totalOverdueAmount" class="text-right font-semibold text-red-600 dark:text-red-500 mt-4 pr-4"></p>
                     </div>
                 </section>
                 
                 <!-- Seção do Formulário de Transação -->
                 <section class="mb-6">
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
                         <!-- Cabeçalho da Seção com Botão de Importar -->
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800">Adicionar/Editar Transação</h3>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Adicionar/Editar Transação</h3>
                             <button id="importCsvBtn" class="mt-2 sm:mt-0 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -262,68 +289,85 @@
                         <!-- Input de arquivo (oculto) -->
                         <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
 
-                        <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                        <!-- NOVO: grid-cols-7 para acomodar novos campos -->
+                        <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
                             <!-- Descrição -->
                             <div class="md:col-span-2 lg:col-span-2">
-                                <label for="description" class="block text-sm font-medium text-gray-700">Descrição</label>
-                                <input type="text" id="description" name="description" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
+                                <input type="text" id="description" name="description" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
                             </div>
                             <!-- Valor -->
                             <div>
-                                <label for="amount" class="block text-sm font-medium text-gray-700">Valor (R$)</label>
-                                <input type="number" id="amount" name="amount" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor (R$)</label>
+                                <input type="number" id="amount" name="amount" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
                             </div>
                             <!-- Tipo (Receita/Despesa) -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
                                 <div class="mt-2 flex space-x-4">
                                     <label class="flex items-center">
-                                        <input type="radio" name="type" value="Receita" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" checked>
-                                        <span class="ml-2 text-sm text-gray-700">Receita</span>
+                                        <input type="radio" name="type" value="Receita" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Receita</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="radio" name="type" value="Despesa" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
-                                        <span class="ml-2 text-sm text-gray-700">Despesa</span>
+                                        <input type="radio" name="type" value="Despesa" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" checked>
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Despesa</span>
                                     </label>
                                 </div>
                             </div>
                             <!-- Categoria -->
                             <div>
-                                <label for="category" class="block text-sm font-medium text-gray-700">Categoria</label>
-                                <select id="category" name="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="category" name="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                     <!-- Opções preenchidas pelo JS -->
                                 </select>
                             </div>
                             <!-- Pago Por -->
                             <div>
-                                <label for="paidBy" class="block text-sm font-medium text-gray-700">Pago Por</label>
-                                <select id="paidBy" name="paidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <label for="paidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pago Por</label>
+                                <select id="paidBy" name="paidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                     <!-- Opções preenchidas pelo JS -->
                                 </select>
                             </div>
 
-                            <!-- NOVOS CAMPOS: Status, Vencimento, Pagamento -->
                             <!-- Status -->
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                                <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                     <option>Pago</option>
                                     <option>A Pagar</option>
                                 </select>
                             </div>
                             <!-- Data de Vencimento -->
                             <div>
-                                <label for="dueDate" class="block text-sm font-medium text-gray-700">Data Vencimento</label>
-                                <input type="date" id="dueDate" name="dueDate" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <label for="dueDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Vencimento</label>
+                                <input type="date" id="dueDate" name="dueDate" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
                             </div>
                             <!-- Data de Pagamento -->
                             <div>
-                                <label for="paymentDate" class="block text-sm font-medium text-gray-700">Data Pagamento</label>
-                                <input type="date" id="paymentDate" name="paymentDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <label for="paymentDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Pagamento</label>
+                                <input type="date" id="paymentDate" name="paymentDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
                             </div>
                             
+                            <!-- NOVO: Tipo de Despesa (Req 4) -->
+                            <div id="expenseTypeContainer">
+                                <label for="expenseType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Despesa</label>
+                                <select id="expenseType" name="expenseType" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Variável</option>
+                                    <option>Fixa</option>
+                                </select>
+                            </div>
+                            
+                            <!-- NOVO: Recorrente (Req 5) -->
+                            <div class="flex items-end pb-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="isRecurring" name="isRecurring" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
+                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Recorrente (Mensal)</span>
+                                </label>
+                            </div>
+
                             <!-- Botão Adicionar / Atualizar -->
-                            <div class="md:col-span-2 lg:col-span-6">
+                            <div class="lg:col-span-7">
                                 <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                       <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
@@ -337,18 +381,46 @@
 
                 <!-- Seção da Lista de Transações (Mês Corrente) -->
                 <section>
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Histórico de Transações (Mês Corrente)</h3>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Histórico de Transações</h3>
+                        
+                        <!-- NOVO: Formulário de Filtro (Req 3) -->
+                        <form id="filterForm" class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <div>
+                                <label for="filterStartDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Início</label>
+                                <input type="date" id="filterStartDate" name="filterStartDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="filterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Fim</label>
+                                <input type="date" id="filterEndDate" name="filterEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="filterCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="filterCategory" name="filterCategory" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Todas</option>
+                                    <!-- Preenchido por JS -->
+                                </select>
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit" class="w-full flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Filtrar
+                                </button>
+                                <button type="reset" id="clearFilterBtn" class="w-full flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+
                         <!-- Estado Vazio -->
-                        <div id="emptyState" class="text-center text-gray-500 py-10 hidden">
+                        <div id="emptyState" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
                             <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <h4 class="mt-2 text-lg font-semibold">Nenhuma transação este mês</h4>
-                            <p class="mt-1 text-sm">Adicione sua primeira transação no formulário acima.</p>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma transação encontrada</h4>
+                            <p class="mt-1 text-sm">Adicione uma transação ou ajuste seus filtros.</p>
                         </div>
                         <!-- Lista -->
-                        <ul id="transactionList" class="divide-y divide-gray-200">
+                        <ul id="transactionList" class="divide-y divide-gray-200 dark:divide-gray-700">
                             <!-- Itens da lista serão inseridos pelo JS -->
                         </ul>
                     </div>
@@ -358,20 +430,22 @@
             <!-- ===== 3.2 ABA: CONTAS A PAGAR ===== -->
             <div id="tabContentPending" class="hidden">
                 <section>
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Contas a Pagar (Todas)</h3>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Contas a Pagar (Todas)</h3>
                         <!-- Estado Vazio -->
-                        <div id="emptyStatePending" class="text-center text-gray-500 py-10 hidden">
+                        <div id="emptyStatePending" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
                             <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <h4 class="mt-2 text-lg font-semibold">Nenhuma conta a pagar</h4>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta a pagar</h4>
                             <p class="mt-1 text-sm">Você está em dia!</p>
                         </div>
                         <!-- Lista de Contas a Pagar -->
-                        <ul id="pendingList" class="divide-y divide-gray-200">
+                        <ul id="pendingList" class="divide-y divide-gray-200 dark:divide-gray-700">
                             <!-- Itens da lista serão inseridos pelo JS -->
                         </ul>
+                        <!-- NOVO: Total de Contas a Pagar (Req 1) -->
+                        <p id="pendingTotalAmount" class="text-right font-bold text-lg text-blue-600 dark:text-blue-400 mt-4 pr-4"></p>
                     </div>
                 </section>
             </div>
@@ -379,9 +453,9 @@
             <!-- ===== 3.3 ABA: PLANEJAMENTO (ORÇAMENTO) ===== -->
             <div id="tabContentPlanning" class="hidden">
                 <section>
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Definir Orçamento Mensal</h3>
-                        <p class="text-gray-600 mb-6">Defina seus limites de gastos mensais por categoria. As alterações são salvas automaticamente.</p>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Definir Orçamento Mensal</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Defina seus limites de gastos mensais por categoria. As alterações são salvas automaticamente.</p>
                         <form id="budgetForm" class="space-y-4">
                             <!-- Inputs do orçamento serão inseridos pelo JS -->
                         </form>
@@ -538,6 +612,7 @@
         // Contas a Pagar
         const pendingList = document.getElementById('pendingList');
         const emptyStatePending = document.getElementById('emptyStatePending');
+        const pendingTotalAmountEl = document.getElementById('pendingTotalAmount'); // NOVO: Total a Pagar (Req 1)
 
         // Planejamento
         const budgetForm = document.getElementById('budgetForm');
@@ -550,6 +625,20 @@
         const paymentDateInput = document.getElementById('paymentDate');
         const statusSelect = document.getElementById('status');
         const submitBtn = transactionForm.querySelector('button[type="submit"]');
+        const expenseTypeContainer = document.getElementById('expenseTypeContainer'); // NOVO: (Req 4)
+        const expenseTypeSelect = document.getElementById('expenseType'); // NOVO: (Req 4)
+        const isRecurringCheckbox = document.getElementById('isRecurring'); // NOVO: (Req 5)
+        const typeRadioButtons = document.querySelectorAll('input[name="type"]'); // NOVO: (Req 4)
+        
+        // NOVO: Formulário de Filtro (Req 3)
+        const filterForm = document.getElementById('filterForm');
+        const filterStartDate = document.getElementById('filterStartDate');
+        const filterEndDate = document.getElementById('filterEndDate');
+        const filterCategory = document.getElementById('filterCategory');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+
+        // Botão de Tema
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
 
         // --- Funções Auxiliares ---
 
@@ -597,12 +686,12 @@
 
         /** Mostra um elemento */
         function showElement(el) {
-            el.classList.remove('hidden');
+            if (el) el.classList.remove('hidden');
         }
 
         /** Esconde um elemento */
         function hideElement(el) {
-            el.classList.add('hidden');
+            if (el) el.classList.add('hidden');
         }
 
         /** Copia um texto para a área de transferência */
@@ -632,11 +721,10 @@
         /** Mostra uma notificação toast */
         function showToast(message, isError = false) {
             toastNotification.textContent = message;
+            toastNotification.classList.remove('bg-green-600', 'bg-red-600'); // Limpa cores anteriores
             if (isError) {
-                toastNotification.classList.remove('bg-green-600');
                 toastNotification.classList.add('bg-red-600');
             } else {
-                toastNotification.classList.remove('bg-red-600');
                 toastNotification.classList.add('bg-green-600');
             }
             toastNotification.classList.remove('hidden', 'translate-x-[200%]');
@@ -668,9 +756,13 @@
 
         // --- Funções de UI (Nomes, Formulário, Abas) ---
 
-        /** Popula os seletores de categoria */
-        function populateCategorySelect() {
-            categorySelect.innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+        /** Popula os seletores de categoria (e o novo filtro) */
+        function populateCategorySelects() {
+            const optionsHtml = categories.map(c => `<option>${c}</option>`).join('');
+            categorySelect.innerHTML = optionsHtml;
+            
+            // NOVO: Popula o filtro de categoria (Req 3)
+            filterCategory.innerHTML = `<option>Todas</option>` + optionsHtml;
         }
 
         /** Atualiza um dropdown "Pago Por" com os nomes personalizados */
@@ -702,7 +794,11 @@
             dueDateInput.value = today; // Define a data de vencimento padrão
             paymentDateInput.value = today; // Define a data de pagamento padrão
             statusSelect.value = "Pago"; // Define status padrão
-            togglePaymentDateVisibility(); // Garante que a data de pagamento está visível
+            expenseTypeSelect.value = "Variável"; // NOVO: (Req 4)
+            isRecurringCheckbox.checked = false; // NOVO: (Req 5)
+            
+            togglePaymentDateVisibility(); 
+            toggleExpenseTypeVisibility(); // NOVO: (Req 4)
             
             submitBtn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -718,13 +814,23 @@
         function togglePaymentDateVisibility() {
             const status = statusSelect.value;
             if (status === 'A Pagar') {
-                paymentDateInput.parentElement.classList.add('hidden'); // Esconde o div pai
+                hideElement(paymentDateInput.parentElement); // Esconde o div pai
                 paymentDateInput.value = ''; // Limpa o valor
             } else {
-                paymentDateInput.parentElement.classList.remove('hidden'); // Mostra o div pai
+                showElement(paymentDateInput.parentElement); // Mostra o div pai
                 if (!paymentDateInput.value) {
                     paymentDateInput.value = today; // Define hoje como padrão se estiver vazio
                 }
+            }
+        }
+        
+        // NOVO: Mostra/esconde o tipo de despesa (Req 4)
+        function toggleExpenseTypeVisibility() {
+            const type = transactionForm.elements['type'].value;
+            if (type === 'Despesa') {
+                showElement(expenseTypeContainer);
+            } else {
+                hideElement(expenseTypeContainer);
             }
         }
 
@@ -749,6 +855,43 @@
             } else if (targetTab === 'planning') {
                 tabContentPlanning.classList.remove('hidden');
                 tabBtnPlanning.classList.add('active');
+            }
+        }
+
+        /** Aplica o tema (dark ou light) */
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        /** Alterna o tema atual */
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme === 'dark') {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        }
+
+        /** Inicializa o tema ao carregar a página */
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark'); // Usa o tema do sistema
+            } else {
+                setTheme('light');
+            }
+            // Adiciona o listener para o botão
+            if(themeToggleBtn) { // Adiciona verificação se o botão existe
+                themeToggleBtn.addEventListener('click', toggleTheme);
             }
         }
 
@@ -853,7 +996,7 @@
             setupBudgetListener();
             
             // Popula os selects estáticos
-            populateCategorySelect();
+            populateCategorySelects();
             initBudgetForm();
         }
 
@@ -950,6 +1093,42 @@
 
 
         // --- Funções de Escrita (Ações no Firestore) ---
+        
+        // NOVO: Lógica de Recorrência (Req 5)
+        /** Cria a próxima instância de uma transação recorrente */
+        async function createNextRecurringTransaction(oldTransaction) {
+            try {
+                // Copia a transação antiga, removendo o ID
+                const newTransaction = { ...oldTransaction };
+                delete newTransaction.id; 
+
+                // Calcula o próximo vencimento (adiciona 1 mês)
+                const currentDueDate = new Date(oldTransaction.dueDate + 'T00:00:00'); // Trata como data local
+                const nextDueDate = new Date(currentDueDate.setMonth(currentDueDate.getMonth() + 1));
+                
+                // Trata o caso de pular meses (ex: 31 de Jan -> 2 de Mar)
+                // Se o dia mudou, volta para o último dia do mês anterior
+                if (nextDueDate.getDate() !== currentDueDate.getDate()) {
+                    nextDueDate.setDate(0); // Volta para o último dia do mês anterior (Fev)
+                }
+                
+                newTransaction.dueDate = nextDueDate.toISOString().split('T')[0];
+                
+                // Reseta o status para "A Pagar"
+                newTransaction.status = "A Pagar";
+                newTransaction.paymentDate = "";
+                newTransaction.createdAt = new Date().toISOString();
+                
+                // Salva a nova transação no Firestore
+                await addDoc(getTransactionsCollectionRef(), newTransaction);
+                showToast(`Conta recorrente "${newTransaction.description}" criada para o próximo mês!`);
+                
+            } catch (error) {
+                console.error("Erro ao criar conta recorrente:", error);
+                showToast("Erro ao gerar conta recorrente.", true);
+            }
+        }
+
 
         /** Manipulador para ADICIONAR ou ATUALIZAR uma transação */
         async function handleTransactionSubmit(e) {
@@ -972,6 +1151,9 @@
                 status: formData.get('status'),
                 dueDate: formData.get('dueDate'), // Data de Vencimento
                 paymentDate: formData.get('paymentDate') || '', // Data de Pagamento
+                // NOVO: (Req 4 & 5)
+                expenseType: formData.get('type') === 'Despesa' ? formData.get('expenseType') : '',
+                isRecurring: formData.get('isRecurring') === 'on' // Checkbox retorna 'on'
             };
 
             // Regra: Se "Pago" e sem data, usa hoje. Se "A Pagar", limpa data.
@@ -987,6 +1169,7 @@
                 if (!transactionData.paymentDate) {
                     transactionData.paymentDate = transactionData.dueDate; // Receita paga no vencimento (ou hoje)
                 }
+                transactionData.expenseType = ''; // Receita não é despesa
             }
 
             try {
@@ -1034,6 +1217,10 @@
             transactionForm.status.value = transaction.status;
             transactionForm.dueDate.value = transaction.dueDate;
             transactionForm.paymentDate.value = transaction.paymentDate;
+            // NOVO: (Req 4 & 5)
+            transactionForm.expenseType.value = transaction.expenseType || 'Variável';
+            transactionForm.isRecurring.checked = transaction.isRecurring || false;
+
 
             // Altera o botão
             submitBtn.innerHTML = `
@@ -1046,8 +1233,9 @@
             submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
             
             togglePaymentDateVisibility(); // Ajusta a visibilidade da data de pagamento
+            toggleExpenseTypeVisibility(); // Ajusta a visibilidade do tipo de despesa
             
-            // *** CORREÇÃO: Muda para a aba do painel principal ***
+            // Muda para a aba do painel principal
             switchTab('dashboard'); 
             
             // Foca o formulário
@@ -1057,12 +1245,20 @@
         /** Marca uma conta como paga */
         async function handleMarkAsPaid(id) {
             try {
+                // NOVO: Lógica de Recorrência (Req 5)
+                const transactionToPay = allTransactions.find(t => t.id === id);
+                if (transactionToPay && transactionToPay.isRecurring) {
+                    await createNextRecurringTransaction(transactionToPay);
+                }
+                
+                // Marca a transação atual como paga
                 const docRef = doc(getTransactionsCollectionRef(), id);
                 await updateDoc(docRef, {
                     status: "Pago",
                     paymentDate: today // Define a data de pagamento como hoje
                 });
                 showToast("Conta marcada como paga!");
+                
             } catch (error) {
                 console.error("Erro ao marcar como pago:", error);
                 showToast("Erro ao atualizar conta.", true);
@@ -1100,7 +1296,7 @@
                 const colorClass = categoryColorClasses[category] || categoryColorClasses['Outros'];
                 
                 div.innerHTML = `
-                    <label for="budget-${category}" class="col-span-1 text-sm font-medium text-gray-700 flex items-center">
+                    <label for="budget-${category}" class="col-span-1 text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
                         <span class="w-3 h-3 rounded-full mr-2 ${colorClass}"></span>
                         ${category}
                     </label>
@@ -1110,7 +1306,7 @@
                                id="budget-${category}" 
                                data-category="${category}"
                                placeholder="0,00"
-                               class="budget-input pl-10 pr-4 py-2 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                               class="budget-input pl-10 pr-4 py-2 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 `;
                 budgetForm.appendChild(div);
@@ -1160,7 +1356,7 @@
 
             csvFileInput.value = null; // Reseta o input
 
-            // Colunas obrigatórias (com os novos campos)
+            // Colunas obrigatórias
             const requiredCols = ['Descrição', 'Valor', 'Tipo', 'Vencimento', 'Categoria'];
 
             const reader = new FileReader();
@@ -1204,7 +1400,7 @@
             const headers = Object.keys(data[0]);
             csvPreviewHead.innerHTML = `
                 <tr>
-                    ${headers.map(h => `<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${h}</th>`).join('')}
+                    ${headers.map(h => `<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">${h}</th>`).join('')}
                 </tr>
             `;
 
@@ -1217,7 +1413,7 @@
                         if (val instanceof Date) {
                             val = val.toLocaleDateString('pt-BR');
                         }
-                        return `<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${val}</td>`
+                        return `<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${val}</td>`
                     }).join('')}
                 </tr>
             `).join('');
@@ -1278,6 +1474,10 @@
                 const statusValue = row['Status'] || (paymentDate ? 'Pago' : 'A Pagar'); // Infere status
 
                 const category = (row.Categoria === 'N/A' || !row.Categoria) ? 'Outros' : row.Categoria;
+                
+                // NOVO: (Req 4 & 5)
+                const expenseType = row['Tipo de Despesa'] === 'Fixa' ? 'Fixa' : 'Variável';
+                const isRecurring = row['Recorrente'] === true || row['Recorrente'] === 'Sim';
 
                 if (!row.Descrição || isNaN(amount) || amount <= 0 || !type) {
                     console.warn("Linha pulada (dados inválidos):", row);
@@ -1293,6 +1493,8 @@
                     type: type,
                     category: category,
                     paidBy: defaultPaidBy,
+                    expenseType: (type === 'Despesa') ? expenseType : '',
+                    isRecurring: isRecurring,
                     createdAt: new Date().toISOString()
                 };
 
@@ -1323,7 +1525,6 @@
             
             // Transações do mês corrente (para o Painel Principal)
             const monthTransactions = transactions.filter(t => {
-                // Filtra pelo vencimento OU pagamento no mês corrente
                 const dateToCompare = t.paymentDate || t.dueDate;
                 try {
                     const transactionDate = new Date(dateToCompare + 'T00:00:00'); // Garante que é local
@@ -1336,21 +1537,26 @@
             
             // Transações a pagar (para a Aba "Contas a Pagar")
             const pendingTransactions = transactions.filter(t => t.status === 'A Pagar');
+            
+            // NOVO: Total de Contas a Pagar (Req 1)
+            const totalPending = pendingTransactions.reduce((sum, t) => sum + t.amount, 0);
 
-            // Transações atrasadas (para o novo card)
+            // Transações atrasadas (para o novo card) (Req 2)
             const overdueTransactions = transactions.filter(t => t.status === 'A Pagar' && t.dueDate < today);
             
-            // Calcula o total atrasado
+            // NOVO: Total de Contas Atrasadas (Req 2)
             const totalOverdue = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
 
             // 1. Renderiza o Painel Principal
             renderDashboard(monthTransactions);
-            renderTransactionList(monthTransactions);
             renderBudgetProgress(monthTransactions);
-            renderOverdueList(overdueTransactions, totalOverdue); // Passa o total para a função
+            renderOverdueList(overdueTransactions, totalOverdue); // Renderiza card de atrasadas
             
             // 2. Renderiza a Aba "Contas a Pagar"
-            renderPendingList(pendingTransactions);
+            renderPendingList(pendingTransactions, totalPending);
+            
+            // 3. Renderiza o Histórico (com filtros aplicados)
+            renderTransactionList(transactions); // Passa *todas* as transações, o filtro é aplicado dentro
         }
 
         /** Renderiza os cards do Dashboard */
@@ -1371,6 +1577,7 @@
 
             totalBalanceEl.textContent = formatCurrency(totalBalance);
             totalBalanceEl.classList.toggle('text-red-600', totalBalance < 0);
+            totalBalanceEl.classList.toggle('dark:text-gray-100', totalBalance >= 0); // Ajuste dark mode
             totalBalanceEl.classList.toggle('text-gray-900', totalBalance >= 0);
             
             totalIncomeEl.textContent = formatCurrency(totalIncome);
@@ -1391,7 +1598,7 @@
             
             // 2. Compara com o orçamento
             if (Object.keys(monthlyBudget).length === 0 && Object.keys(expensesByCategory).length === 0) {
-                budgetProgressContainer.innerHTML = '<p class="text-sm text-gray-500 text-center">Defina seus orçamentos na aba "Planejamento" para começar.</p>';
+                budgetProgressContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center">Defina seus orçamentos na aba "Planejamento" para começar.</p>';
                 return;
             }
 
@@ -1424,15 +1631,15 @@
                 const div = document.createElement('div');
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium text-gray-700">${category}</span>
-                        <span class="text-sm font-semibold ${spent > limit && limit > 0 ? 'text-red-600' : 'text-gray-800'}">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${category}</span>
+                        <span class="text-sm font-semibold ${spent > limit && limit > 0 ? 'text-red-600 dark:text-red-500' : 'text-gray-800 dark:text-gray-200'}">
                             ${formatCurrency(spent)} / ${limit > 0 ? formatCurrency(limit) : '...'}
                         </span>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                         <div class="${progressBarClass} h-2.5 rounded-full" style="width: ${Math.min(percent, 100)}%"></div>
                     </div>
-                    <p class="text-xs text-right text-gray-500 mt-1">${remainingText}</p>
+                    <p class="text-xs text-right text-gray-500 dark:text-gray-400 mt-1">${remainingText}</p>
                 `;
                 budgetProgressContainer.appendChild(div);
             });
@@ -1453,10 +1660,10 @@
                 const li = document.createElement('li');
                 li.className = 'py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between';
                 
-                const amountColor = t.type === 'Receita' ? 'text-green-600' : 'text-red-600';
+                const amountColor = t.type === 'Receita' ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500';
                 const amountSign = t.type === 'Receita' ? '+' : '-';
-                const iconColor = t.type === 'Receita' ? 'bg-green-100 text-green-700' : (
-                    t.status === 'Pago' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                const iconColor = t.type === 'Receita' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : (
+                    t.status === 'Pago' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                 );
                 
                 // Destaque para contas vencidas e não pagas
@@ -1467,13 +1674,15 @@
                         <div class="flex-shrink-0 h-10 w-10 rounded-full ${iconColor} flex items-center justify-center mr-3">
                             ${getCategoryIcon(t.category)}
                         </div>
-                        <div class="flex-1 min-w-0"> <!-- Adicionado min-w-0 para truncar texto -->
-                            <p class="text-base font-medium text-gray-900 truncate ${isOverdue ? 'text-red-600 font-bold' : ''}">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-base font-medium text-gray-900 dark:text-gray-100 truncate ${isOverdue ? 'text-red-600 dark:text-red-400 font-bold' : ''}">
                                 ${t.description}
+                                ${t.isRecurring ? `<span class="text-xs text-blue-500 ml-1">(Recorrente)</span>` : ''} <!-- NOVO: (Req 5) -->
                             </p>
-                            <p class="text-sm text-gray-500">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
                                 ${t.status === 'Pago' ? `Pago em ${formatDate(t.paymentDate)}` : `Vence em ${formatDate(t.dueDate)}`}
-                                 · ${t.category} · ${t.paidBy}
+                                 · ${t.category}
+                                 ${t.expenseType ? `· ${t.expenseType}` : ''} <!-- NOVO: (Req 4) -->
                             </p>
                         </div>
                     </div>
@@ -1484,7 +1693,7 @@
                         
                         <!-- Botão Marcar como Pago (se A Pagar) -->
                         ${t.status === 'A Pagar' ? `
-                        <button title="Marcar como Pago" class="pay-btn p-2 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded-full transition duration-300" data-id="${t.id}">
+                        <button title="Marcar como Pago" class="pay-btn p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                             </svg>
@@ -1492,13 +1701,13 @@
                         ` : ''}
                         
                         <!-- Botão de Editar -->
-                        <button title="Editar" class="edit-btn p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-full transition duration-300" data-id="${t.id}">
+                        <button title="Editar" class="edit-btn p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </button>
                         <!-- Botão de Excluir -->
-                        <button title="Excluir" class="delete-btn p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-full transition duration-300" data-id="${t.id}">
+                        <button title="Excluir" class="delete-btn p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
@@ -1515,16 +1724,47 @@
             });
         }
 
-        /** Renderiza a lista de transações do Painel Principal (Mês Corrente) */
-        function renderTransactionList(monthTransactions) {
-            renderGenericTransactionList(transactionList, monthTransactions, emptyState);
+        /** NOVO: Renderiza a lista de histórico COM FILTROS (Req 3) */
+        function renderTransactionList(allTransactions) {
+            
+            // 1. Pega os valores do filtro
+            const startDate = filterStartDate.value;
+            const endDate = filterEndDate.value;
+            const category = filterCategory.value;
+
+            // 2. Aplica filtros
+            let filteredTransactions = allTransactions.filter(t => t.status === 'Pago' || t.type === 'Receita'); // Histórico é só de pagos/recebidos
+            
+            if (startDate) {
+                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) >= startDate);
+            }
+            if (endDate) {
+                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) <= endDate);
+            }
+            if (category && category !== 'Todas') {
+                filteredTransactions = filteredTransactions.filter(t => t.category === category);
+            }
+            
+            // Ordena por data (mais recente primeiro)
+            filteredTransactions.sort((a, b) => new Date(b.paymentDate || b.dueDate) - new Date(a.paymentDate || a.dueDate));
+            
+            // 3. Renderiza
+            renderGenericTransactionList(transactionList, filteredTransactions, emptyState);
         }
 
         /** Renderiza a lista de Contas a Pagar (Todas) */
-        function renderPendingList(pendingTransactions) {
+        function renderPendingList(pendingTransactions, totalPending) {
             // Ordena por vencimento (mais próximo primeiro)
             pendingTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
             renderGenericTransactionList(pendingList, pendingTransactions, emptyStatePending);
+            
+            // NOVO: Atualiza o total a pagar (Req 1)
+            if (totalPending > 0) {
+                pendingTotalAmountEl.textContent = `Total a Pagar: ${formatCurrency(totalPending)}`;
+                showElement(pendingTotalAmountEl);
+            } else {
+                hideElement(pendingTotalAmountEl);
+            }
         }
 
         /** Renderiza a lista de Contas Atrasadas no Painel Principal */
@@ -1532,6 +1772,7 @@
              // Ordena por vencimento (mais antiga primeiro)
             overdueTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
             renderGenericTransactionList(overdueList, overdueTransactions, emptyStateOverdue);
+            
             // Atualiza o total
             if(totalOverdue > 0) {
                  totalOverdueAmountEl.textContent = `Total Atrasado: ${formatCurrency(totalOverdue)}`;
@@ -1539,6 +1780,18 @@
             } else {
                  hideElement(totalOverdueAmountEl);
             }
+        }
+        
+        // NOVO: Função para lidar com a submissão do filtro (Req 3)
+        function handleFilterSubmit(e) {
+            e.preventDefault();
+            updateAllUI(allTransactions); // A renderTransactionList vai pegar os valores do filtro
+        }
+        
+        // NOVO: Função para limpar os filtros (Req 3)
+        function handleFilterClear() {
+            filterForm.reset();
+            updateAllUI(allTransactions);
         }
 
 
@@ -1549,6 +1802,9 @@
                 today = new Date().toISOString().split('T')[0];
                 dueDateInput.value = today;
                 paymentDateInput.value = today;
+
+                // Inicializa o Tema
+                initializeTheme();
                 
                 // Listeners estáticos (abas, modais, formulários)
                 tabBtnDashboard.addEventListener('click', () => switchTab('dashboard'));
@@ -1556,6 +1812,10 @@
                 tabBtnPlanning.addEventListener('click', () => switchTab('planning'));
                 
                 statusSelect.addEventListener('change', togglePaymentDateVisibility);
+                
+                // NOVO: Listener para mostrar/esconder tipo de despesa (Req 4)
+                typeRadioButtons.forEach(radio => radio.addEventListener('change', toggleExpenseTypeVisibility));
+                toggleExpenseTypeVisibility(); // Chama uma vez para setar o estado inicial
 
                 createFamilyBtn.addEventListener('click', handleCreateFamily);
                 joinFamilyBtn.addEventListener('click', handleJoinFamily);
@@ -1569,6 +1829,10 @@
                 settingsForm.addEventListener('submit', handleSaveSettings);
 
                 transactionForm.addEventListener('submit', handleTransactionSubmit);
+                
+                // NOVO: Listeners do Filtro (Req 3)
+                filterForm.addEventListener('submit', handleFilterSubmit);
+                clearFilterBtn.addEventListener('click', handleFilterClear);
 
                 importCsvBtn.addEventListener('click', () => csvFileInput.click());
                 csvFileInput.addEventListener('change', handleFileSelect);
@@ -1616,9 +1880,9 @@
                 if (spinner) spinner.style.display = 'none'; // Esconde o spinner
                 if (loadingText) {
                     loadingText.innerHTML = `
-                        <strong class="text-red-600">Erro Crítico na Inicialização</strong>
-                        <p class="text-sm mt-2">${error.message}</p>
-                        <p class="text-xs mt-4">Verifique se as variáveis de ambiente (__firebase_config) foram injetadas corretamente ou se você colou a configuração local corretamente e recarregue a página.</p>
+                        <strong class="text-red-600 dark:text-red-400">Erro Crítico na Inicialização</strong>
+                        <p class="text-sm mt-2 dark:text-gray-400">${error.message}</p>
+                        <p class="text-xs mt-4 dark:text-gray-500">Verifique se as variáveis de ambiente (__firebase_config) foram injetadas corretamente ou se você colou a configuração local corretamente e recarregue a página.</p>
                     `;
                 }
             }
