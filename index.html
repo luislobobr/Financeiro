@@ -17,14 +17,21 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        /* Estilos para abas ativas e inativas */
-        .tab-btn {
+        
+        /* NOVO: Estilos da Sidebar (Req 2) */
+        .sidebar-link {
             transition: all 0.3s ease;
         }
-        .tab-btn.active {
-            border-bottom-color: #3b82f6; /* blue-500 */
-            color: #3b82f6;
+        .sidebar-link.active {
+            background-color: #eef2ff; /* indigo-100 */
+            color: #4f46e5; /* indigo-600 */
+            font-weight: 600;
         }
+        .dark .sidebar-link.active {
+            background-color: #3730a3; /* indigo-800 */
+            color: #e0e7ff; /* indigo-100 */
+        }
+        
         /* Ícones de Sol/Lua para o toggle de tema */
         #theme-toggle-sun, #theme-toggle-moon {
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -163,84 +170,190 @@
             </div>
         </div>
     </div>
+    
+    <!-- NOVO: MODAL DE TRANSAÇÃO (Req 3) -->
+    <!-- Este modal agora centraliza o formulário de Adicionar e Editar -->
+    <div id="transactionModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-4xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeTransactionModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 id="transactionModalTitle" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Adicionar Transação</h2>
+            
+            <!-- Formulário de Transação (Movido para cá) -->
+            <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Descrição -->
+                <div class="md:col-span-2 lg:col-span-3">
+                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
+                    <input type="text" id="description" name="description" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
+                </div>
+                <!-- Valor -->
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor (R$)</label>
+                    <input type="number" id="amount" name="amount" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
+                </div>
+                <!-- Tipo (Receita/Despesa) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+                    <div class="mt-2 flex space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="type" value="Receita" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Receita</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="type" value="Despesa" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" checked>
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Despesa</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- Categoria -->
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                    <select id="category" name="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Opções preenchidas pelo JS -->
+                    </select>
+                </div>
+                <!-- Pago Por -->
+                <div>
+                    <label for="paidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pago Por</label>
+                    <select id="paidBy" name="paidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Opções preenchidas pelo JS -->
+                    </select>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option>Pago</option>
+                        <option>A Pagar</option>
+                    </select>
+                </div>
+                <!-- Data de Vencimento -->
+                <div>
+                    <label for="dueDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Vencimento</label>
+                    <input type="date" id="dueDate" name="dueDate" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                </div>
+                <!-- Data de Pagamento -->
+                <div>
+                    <label for="paymentDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Pagamento</label>
+                    <input type="date" id="paymentDate" name="paymentDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                </div>
+                
+                <!-- Tipo de Despesa (Req 4) -->
+                <div id="expenseTypeContainer">
+                    <label for="expenseType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Despesa</label>
+                    <select id="expenseType" name="expenseType" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option>Variável</option>
+                        <option>Fixa</option>
+                    </select>
+                </div>
+                
+                <!-- Recorrente (Req 5) -->
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="isRecurring" name="isRecurring" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Recorrente (Mensal)</span>
+                    </label>
+                </div>
+
+                <!-- Botão Adicionar / Atualizar -->
+                <div class="md:col-span-2 lg:col-span-3">
+                    <button id="transactionSubmitBtn" type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
+                        <!-- O texto será "Adicionar" ou "Atualizar" via JS -->
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <!-- ===== 3. CONTEÚDO PRINCIPAL DA APLICAÇÃO ===== -->
-    <div id="appContent" class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 hidden">
-        
-        <!-- Cabeçalho -->
-        <header class="mb-4 flex flex-col sm:flex-row justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Meu Painel Financeiro</h1>
+    <!-- NOVO: Layout com Sidebar (Req 2) -->
+    <div id="appContainer" class="lg:flex min-h-screen hidden">
+
+        <!-- NOVO: Sidebar (Req 2) -->
+        <aside id="sidebar" class="w-full lg:w-64 bg-white dark:bg-gray-800 shadow-lg lg:fixed lg:h-screen lg:flex lg:flex-col">
+            <!-- Cabeçalho da Sidebar -->
+            <header class="p-6 border-b dark:border-gray-700">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Meu Painel</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                    ID da Família: <span id="currentFamilyId" class="font-mono"></span>
+                    ID: <span id="currentFamilyId" class="font-mono"></span>
                 </p>
-            </div>
-            <div class="flex items-center space-x-2 mt-2 sm:mt-0">
-                <button id="copyIdBtn" title="Copiar ID da Família" class="bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 p-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
+                <button id="copyIdBtn" title="Copiar ID da Família" class="mt-2 w-full text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                    Copiar ID da Família
                 </button>
-                <button id="openSettingsBtn" title="Configurações da Família" class="bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 p-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            </header>
+
+            <!-- Menu de Navegação -->
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" id="navBtnDashboard" class="sidebar-link active flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    Painel Principal
+                </a>
+                <a href="#" id="navBtnPending" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Contas a Pagar
+                </a>
+                <!-- NOVO: Link Histórico (Req 1/3) -->
+                <a href="#" id="navBtnHistory" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    Contas Pagas
+                </a>
+                <!-- NOVO: Link Entradas (Req 4) -->
+                <a href="#" id="navBtnIncome" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    Entradas
+                </a>
+                <a href="#" id="navBtnPlanning" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    Planejamento
+                </a>
+            </nav>
+
+            <!-- Controles da Sidebar (Config, Tema) -->
+            <div class="p-4 border-t dark:border-gray-700 flex items-center justify-between">
+                <button id="openSettingsBtn" title="Configurações da Família" class="flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826 3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
+                    Config.
                 </button>
-                <!-- BOTÃO DE TEMA -->
-                <button id="themeToggleBtn" title="Alternar Tema" class="bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 p-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-300 relative w-10 h-10 flex items-center justify-center overflow-hidden">
-                    <!-- Ícone Sol -->
-                    <svg id="theme-toggle-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.05 19.95l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.05 4.05l-.707-.707" />
-                    </svg>
-                    <!-- Ícone Lua -->
-                    <svg id="theme-toggle-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
+                <button id="themeToggleBtn" title="Alternar Tema" class="text-gray-600 dark:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative w-10 h-10 flex items-center justify-center overflow-hidden">
+                    <svg id="theme-toggle-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.05 19.95l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.05 4.05l-.707-.707" /></svg>
+                    <svg id="theme-toggle-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                 </button>
             </div>
-        </header>
+        </aside>
 
-        <!-- Navegação por Abas -->
-        <nav class="mb-6 bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-            <div class="flex border-b border-gray-200 dark:border-gray-700">
-                <button id="tabBtnDashboard" class="tab-btn active text-gray-600 dark:text-gray-300 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500 dark:hover:text-blue-400">
-                    Painel Principal
-                </button>
-                <button id="tabBtnPending" class="tab-btn text-gray-600 dark:text-gray-300 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500 dark:hover:text-blue-400">
-                    Contas a Pagar
-                </button>
-                <button id="tabBtnPlanning" class="tab-btn text-gray-600 dark:text-gray-300 font-semibold py-4 px-6 border-b-2 border-transparent hover:text-blue-500 dark:hover:text-blue-400">
-                    Planejamento
-                </button>
-            </div>
-        </nav>
-
-        <!-- Container das Abas -->
-        <div>
-            <!-- ===== 3.1 ABA: PAINEL PRINCIPAL ===== -->
-            <div id="tabContentDashboard">
-                <!-- Seção do Dashboard -->
-                <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Cards de Resumo -->
-                    <div class="lg:col-span-1 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-6">
-                        <!-- Balanço Total -->
+        <!-- NOVO: Conteúdo Principal (à direita da Sidebar) -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64"> <!-- ml-64 para compensar a sidebar no desktop -->
+            
+            <!-- ===== PÁGINA 1: PAINEL PRINCIPAL ===== -->
+            <div id="page-dashboard">
+                <!-- NOVO: Balancete Geral do Mês (Req 5) -->
+                <section class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Balancete do Mês</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Balanço do Mês (Pago)</h3>
+                            <h3 class="text-sm font-semibold text-green-500 uppercase">Total de Entradas</h3>
+                            <p id="totalIncome" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-2">R$ 0,00</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-red-500 uppercase">Total de Saídas (Pagas)</h3>
+                            <p id="totalExpense" class="text-3xl font-bold text-red-600 dark:text-red-500 mt-2">R$ 0,00</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Saldo (Entradas - Saídas)</h3>
                             <p id="totalBalance" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">R$ 0,00</p>
                         </div>
-                        <!-- Receitas -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Receitas (Mês)</h3>
-                            <p id="totalIncome" class="text-2xl font-semibold text-green-600 dark:text-green-500 mt-2">R$ 0,00</p>
-                        </div>
-                        <!-- Despesas -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Despesas (Mês - Pago)</h3>
-                            <p id="totalExpense" class="text-2xl font-semibold text-red-600 dark:text-red-500 mt-2">R$ 0,00</p>
-                        </div>
                     </div>
-
+                </section>
+                
+                <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Progresso do Orçamento -->
                     <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Progresso do Orçamento (Mês)</h3>
@@ -249,8 +362,8 @@
                         </div>
                     </div>
 
-                    <!-- NOVO: CARD: CONTAS ATRASADAS (Req 2) -->
-                    <div class="lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
+                    <!-- CARD: CONTAS ATRASADAS (Req 2) -->
+                    <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
                          <h3 class="text-lg font-semibold text-red-700 dark:text-red-500 mb-4 flex items-center">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -273,118 +386,81 @@
                     </div>
                 </section>
                 
-                <!-- Seção do Formulário de Transação -->
-                <section class="mb-6">
+                <!-- Formulário de Transação foi MOVIDO PARA O MODAL (Req 3) -->
+            </div>
+
+            <!-- ===== PÁGINA 2: CONTAS A PAGAR ===== -->
+            <div id="page-pending" class="hidden">
+                <section>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <!-- Cabeçalho da Seção com Botão de Importar -->
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Contas a Pagar</h2>
+                        
+                        <!-- Filtro (Req 1) -->
+                        <form id="pendingFilterForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <div>
+                                <label for="pendingFilterStartDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vencimento Início</label>
+                                <input type="date" id="pendingFilterStartDate" name="pendingFilterStartDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="pendingFilterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vencimento Fim</label>
+                                <input type="date" id="pendingFilterEndDate" name="pendingFilterEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit" class="w-full flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Filtrar
+                                </button>
+                                <button type="reset" id="pendingClearFilterBtn" class="w-full flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Totais de Contas a Pagar (Req 1 e Req 6) - MOVIDO PARA O TOPO -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total a Pagar (Filtrado)</h4>
+                                <p id="pendingTotalAmount" class="text-2xl font-bold text-blue-600 dark:text-blue-400">R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Despesas Fixas (Filtrado)</h4>
+                                <p id="pendingTotalFixedAmount" class="text-2xl font-bold text-gray-700 dark:text-gray-300">R$ 0,00</p>
+                            </div>
+                        </div>
+
+                        <!-- Estado Vazio -->
+                        <div id="emptyStatePending" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta a pagar</h4>
+                            <p class="mt-1 text-sm">Você está em dia ou os filtros não retornaram resultados!</p>
+                        </div>
+                        <!-- Lista de Contas a Pagar -->
+                        <ul id="pendingList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Itens da lista serão inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- NOVO: PÁGINA 3: HISTÓRICO DE CONTAS PAGAS (Req 1 e 3) -->
+            <div id="page-history" class="hidden">
+                 <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        
+                        <!-- CORREÇÃO: Botão de Importar movido para cá -->
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Adicionar/Editar Transação</h3>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Histórico de Contas Pagas</h2>
                             <button id="importCsvBtn" class="mt-2 sm:mt-0 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
                                 Importar Planilha
                             </button>
+                            <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
                         </div>
-                        <!-- Input de arquivo (oculto) -->
-                        <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
 
-                        <!-- NOVO: grid-cols-7 para acomodar novos campos -->
-                        <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
-                            <!-- Descrição -->
-                            <div class="md:col-span-2 lg:col-span-2">
-                                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
-                                <input type="text" id="description" name="description" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
-                            </div>
-                            <!-- Valor -->
-                            <div>
-                                <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor (R$)</label>
-                                <input type="number" id="amount" name="amount" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
-                            </div>
-                            <!-- Tipo (Receita/Despesa) -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
-                                <div class="mt-2 flex space-x-4">
-                                    <label class="flex items-center">
-                                        <input type="radio" name="type" value="Receita" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700">
-                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Receita</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="radio" name="type" value="Despesa" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700" checked>
-                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Despesa</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <!-- Categoria -->
-                            <div>
-                                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
-                                <select id="category" name="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <!-- Opções preenchidas pelo JS -->
-                                </select>
-                            </div>
-                            <!-- Pago Por -->
-                            <div>
-                                <label for="paidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pago Por</label>
-                                <select id="paidBy" name="paidBy" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <!-- Opções preenchidas pelo JS -->
-                                </select>
-                            </div>
-
-                            <!-- Status -->
-                            <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                <select id="status" name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <option>Pago</option>
-                                    <option>A Pagar</option>
-                                </select>
-                            </div>
-                            <!-- Data de Vencimento -->
-                            <div>
-                                <label for="dueDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Vencimento</label>
-                                <input type="date" id="dueDate" name="dueDate" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
-                            </div>
-                            <!-- Data de Pagamento -->
-                            <div>
-                                <label for="paymentDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Pagamento</label>
-                                <input type="date" id="paymentDate" name="paymentDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
-                            </div>
-                            
-                            <!-- NOVO: Tipo de Despesa (Req 4) -->
-                            <div id="expenseTypeContainer">
-                                <label for="expenseType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Despesa</label>
-                                <select id="expenseType" name="expenseType" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <option>Variável</option>
-                                    <option>Fixa</option>
-                                </select>
-                            </div>
-                            
-                            <!-- NOVO: Recorrente (Req 5) -->
-                            <div class="flex items-end pb-2">
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="isRecurring" name="isRecurring" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
-                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Recorrente (Mensal)</span>
-                                </label>
-                            </div>
-
-                            <!-- Botão Adicionar / Atualizar -->
-                            <div class="lg:col-span-7">
-                                <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                      <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                                    </svg>
-                                    Adicionar Transação
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </section>
-
-                <!-- Seção da Lista de Transações (Mês Corrente) -->
-                <section>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Histórico de Transações</h3>
-                        
-                        <!-- NOVO: Formulário de Filtro (Req 3) -->
+                        <!-- Formulário de Filtro (Req 4) -->
                         <form id="filterForm" class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
                             <div>
                                 <label for="filterStartDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Início</label>
@@ -411,13 +487,18 @@
                             </div>
                         </form>
 
+                        <!-- Total Pago (Filtrado) (Req 6) -->
+                        <div class="mb-4">
+                             <p id="historyTotalAmount" class="text-right text-xl font-bold text-gray-700 dark:text-gray-200 pr-4"></p>
+                        </div>
+
                         <!-- Estado Vazio -->
                         <div id="emptyState" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
                             <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma transação encontrada</h4>
-                            <p class="mt-1 text-sm">Adicione uma transação ou ajuste seus filtros.</p>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta paga encontrada</h4>
+                            <p class="mt-1 text-sm">Ajuste seus filtros ou marque uma conta como paga.</p>
                         </div>
                         <!-- Lista -->
                         <ul id="transactionList" class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -426,35 +507,66 @@
                     </div>
                 </section>
             </div>
-
-            <!-- ===== 3.2 ABA: CONTAS A PAGAR ===== -->
-            <div id="tabContentPending" class="hidden">
-                <section>
+            
+            <!-- NOVO: PÁGINA 4: ENTRADAS (Req 4) -->
+            <div id="page-income" class="hidden">
+                 <section>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Contas a Pagar (Todas)</h3>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Histórico de Entradas (Receitas)</h2>
+                        
+                        <!-- Formulário de Filtro (Duplicado para esta seção) -->
+                        <form id="incomeFilterForm" class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <div>
+                                <label for="incomeFilterStartDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Início</label>
+                                <input type="date" id="incomeFilterStartDate" name="incomeFilterStartDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="incomeFilterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Fim</label>
+                                <input type="date" id="incomeFilterEndDate" name="incomeFilterEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="incomeFilterCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="incomeFilterCategory" name="incomeFilterCategory" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Todas</option>
+                                    <!-- Preenchido por JS (apenas categorias de receita) -->
+                                </select>
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit" class="w-full flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Filtrar
+                                </button>
+                                <button type="reset" id="incomeClearFilterBtn" class="w-full flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Total Recebido (Filtrado) -->
+                        <div class="mb-4">
+                             <p id="incomeTotalAmount" class="text-right text-xl font-bold text-green-600 dark:text-green-500 pr-4"></p>
+                        </div>
+
                         <!-- Estado Vazio -->
-                        <div id="emptyStatePending" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                        <div id="emptyStateIncome" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
                             <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta a pagar</h4>
-                            <p class="mt-1 text-sm">Você está em dia!</p>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma entrada encontrada</h4>
+                            <p class="mt-1 text-sm">Adicione uma receita ou ajuste seus filtros.</p>
                         </div>
-                        <!-- Lista de Contas a Pagar -->
-                        <ul id="pendingList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Lista -->
+                        <ul id="incomeList" class="divide-y divide-gray-200 dark:divide-gray-700">
                             <!-- Itens da lista serão inseridos pelo JS -->
                         </ul>
-                        <!-- NOVO: Total de Contas a Pagar (Req 1) -->
-                        <p id="pendingTotalAmount" class="text-right font-bold text-lg text-blue-600 dark:text-blue-400 mt-4 pr-4"></p>
                     </div>
                 </section>
             </div>
-            
-            <!-- ===== 3.3 ABA: PLANEJAMENTO (ORÇAMENTO) ===== -->
-            <div id="tabContentPlanning" class="hidden">
+
+            <!-- ===== PÁGINA 5: PLANEJAMENTO ===== -->
+            <div id="page-planning" class="hidden">
                 <section>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Definir Orçamento Mensal</h3>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Definir Orçamento Mensal</h2>
                         <p class="text-gray-600 dark:text-gray-400 mb-6">Defina seus limites de gastos mensais por categoria. As alterações são salvas automaticamente.</p>
                         <form id="budgetForm" class="space-y-4">
                             <!-- Inputs do orçamento serão inseridos pelo JS -->
@@ -463,8 +575,16 @@
                 </section>
             </div>
 
-        </div> <!-- Fim do Container das Abas -->
+        </main> <!-- Fim do Conteúdo Principal -->
     </div>
+
+    <!-- NOVO: Botão Flutuante (FAB) para Adicionar Transação (Req 3) -->
+    <button id="addTransactionBtn" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform hover:scale-110">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+
 
     <!-- ===== 3.5 ELEMENTO TOAST/NOTIFICAÇÃO ===== -->
     <div id="toastNotification" class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-all duration-300 translate-x-[200%] hidden z-50">
@@ -561,7 +681,8 @@
         const startAppBtn = document.getElementById('startAppBtn');
 
         const loadingIndicator = document.getElementById('loadingIndicator');
-        const appContent = document.getElementById('appContent');
+        // NOVO: appContainer substitui appContent para o layout da sidebar
+        const appContainer = document.getElementById('appContainer');
         
         const currentFamilyIdEl = document.getElementById('currentFamilyId');
         const copyIdBtn = document.getElementById('copyIdBtn');
@@ -575,8 +696,8 @@
         const partner2NameInput = document.getElementById('partner2NameInput');
 
         // Elementos do Modal de Importação
-        const importCsvBtn = document.getElementById('importCsvBtn');
-        const csvFileInput = document.getElementById('csvFileInput');
+        const importCsvBtn = document.getElementById('importCsvBtn'); // CORREÇÃO: Este ID agora existe
+        const csvFileInput = document.getElementById('csvFileInput'); // CORREÇÃO: Este ID agora existe
         const importModal = document.getElementById('importModal');
         const closeImportModalBtn = document.getElementById('closeImportModalBtn');
         const cancelImportBtn = document.getElementById('cancelImportBtn');
@@ -590,21 +711,27 @@
         // Elemento Toast
         const toastNotification = document.getElementById('toastNotification');
 
-        // Abas e Conteúdos
-        const tabBtnDashboard = document.getElementById('tabBtnDashboard');
-        const tabBtnPending = document.getElementById('tabBtnPending');
-        const tabBtnPlanning = document.getElementById('tabBtnPlanning');
-        const tabContentDashboard = document.getElementById('tabContentDashboard');
-        const tabContentPending = document.getElementById('tabContentPending');
-        const tabContentPlanning = document.getElementById('tabContentPlanning');
+        // NOVO: Botões de Navegação da Sidebar (Req 2)
+        const navBtnDashboard = document.getElementById('navBtnDashboard');
+        const navBtnPending = document.getElementById('navBtnPending');
+        const navBtnHistory = document.getElementById('navBtnHistory');
+        const navBtnIncome = document.getElementById('navBtnIncome');
+        const navBtnPlanning = document.getElementById('navBtnPlanning');
+        
+        // NOVO: Páginas de Conteúdo (Req 2)
+        const pageDashboard = document.getElementById('page-dashboard');
+        const pagePending = document.getElementById('page-pending');
+        const pageHistory = document.getElementById('page-history');
+        const pageIncome = document.getElementById('page-income');
+        const pagePlanning = document.getElementById('page-planning');
+        const allPages = [pageDashboard, pagePending, pageHistory, pageIncome, pagePlanning];
+        const allNavBtns = [navBtnDashboard, navBtnPending, navBtnHistory, navBtnIncome, navBtnPlanning];
 
         // Painel Principal
         const totalBalanceEl = document.getElementById('totalBalance');
         const totalIncomeEl = document.getElementById('totalIncome');
         const totalExpenseEl = document.getElementById('totalExpense');
         const budgetProgressContainer = document.getElementById('budgetProgressContainer');
-        const transactionList = document.getElementById('transactionList');
-        const emptyState = document.getElementById('emptyState');
         const overdueList = document.getElementById('overdueList'); // Lista de Atrasadas
         const emptyStateOverdue = document.getElementById('emptyStateOverdue'); // Estado Vazio Atrasadas
         const totalOverdueAmountEl = document.getElementById('totalOverdueAmount'); // Elemento para mostrar o total atrasado
@@ -612,31 +739,55 @@
         // Contas a Pagar
         const pendingList = document.getElementById('pendingList');
         const emptyStatePending = document.getElementById('emptyStatePending');
-        const pendingTotalAmountEl = document.getElementById('pendingTotalAmount'); // NOVO: Total a Pagar (Req 1)
+        const pendingTotalAmountEl = document.getElementById('pendingTotalAmount'); // Total a Pagar (Filtrado)
+        const pendingTotalFixedAmountEl = document.getElementById('pendingTotalFixedAmount'); // Total Fixas (Filtrado)
+        const pendingFilterForm = document.getElementById('pendingFilterForm');
+        const pendingFilterStartDate = document.getElementById('pendingFilterStartDate');
+        const pendingFilterEndDate = document.getElementById('pendingFilterEndDate');
+        const pendingClearFilterBtn = document.getElementById('pendingClearFilterBtn');
+
+        // NOVO: Elementos da Página de Histórico (Req 1/3)
+        const transactionList = document.getElementById('transactionList');
+        const emptyState = document.getElementById('emptyState');
+        const filterForm = document.getElementById('filterForm');
+        const filterStartDate = document.getElementById('filterStartDate');
+        const filterEndDate = document.getElementById('filterEndDate');
+        const filterCategory = document.getElementById('filterCategory');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        const historyTotalAmountEl = document.getElementById('historyTotalAmount'); // (Req 6)
+
+        // NOVO: Elementos da Página de Entradas (Req 4)
+        const incomeList = document.getElementById('incomeList');
+        const emptyStateIncome = document.getElementById('emptyStateIncome');
+        const incomeFilterForm = document.getElementById('incomeFilterForm');
+        const incomeFilterStartDate = document.getElementById('incomeFilterStartDate');
+        const incomeFilterEndDate = document.getElementById('incomeFilterEndDate');
+        const incomeFilterCategory = document.getElementById('incomeFilterCategory');
+        const incomeClearFilterBtn = document.getElementById('incomeClearFilterBtn');
+        const incomeTotalAmountEl = document.getElementById('incomeTotalAmount');
 
         // Planejamento
         const budgetForm = document.getElementById('budgetForm');
 
-        // Formulário de Transação
+        // NOVO: Modal de Transação (Req 3)
+        const transactionModal = document.getElementById('transactionModal');
+        const transactionModalTitle = document.getElementById('transactionModalTitle');
+        const closeTransactionModalBtn = document.getElementById('closeTransactionModalBtn');
+        const addTransactionBtn = document.getElementById('addTransactionBtn'); // FAB
+
+        // Formulário de Transação (dentro do modal)
         const transactionForm = document.getElementById('transactionForm');
         const categorySelect = document.getElementById('category');
         const paidBySelect = document.getElementById('paidBy');
         const dueDateInput = document.getElementById('dueDate');
         const paymentDateInput = document.getElementById('paymentDate');
         const statusSelect = document.getElementById('status');
-        const submitBtn = transactionForm.querySelector('button[type="submit"]');
-        const expenseTypeContainer = document.getElementById('expenseTypeContainer'); // NOVO: (Req 4)
-        const expenseTypeSelect = document.getElementById('expenseType'); // NOVO: (Req 4)
-        const isRecurringCheckbox = document.getElementById('isRecurring'); // NOVO: (Req 5)
-        const typeRadioButtons = document.querySelectorAll('input[name="type"]'); // NOVO: (Req 4)
+        const transactionSubmitBtn = document.getElementById('transactionSubmitBtn'); // Botão do modal
+        const expenseTypeContainer = document.getElementById('expenseTypeContainer'); // (Req 4)
+        const expenseTypeSelect = document.getElementById('expenseType'); // (Req 4)
+        const isRecurringCheckbox = document.getElementById('isRecurring'); // (Req 5)
+        const typeRadioButtons = document.querySelectorAll('input[name="type"]'); // (Req 4)
         
-        // NOVO: Formulário de Filtro (Req 3)
-        const filterForm = document.getElementById('filterForm');
-        const filterStartDate = document.getElementById('filterStartDate');
-        const filterEndDate = document.getElementById('filterEndDate');
-        const filterCategory = document.getElementById('filterCategory');
-        const clearFilterBtn = document.getElementById('clearFilterBtn');
-
         // Botão de Tema
         const themeToggleBtn = document.getElementById('themeToggleBtn');
 
@@ -719,6 +870,7 @@
         }
 
         /** Mostra uma notificação toast */
+        // CORREÇÃO: Removida a declaração duplicada que existia aqui.
         function showToast(message, isError = false) {
             toastNotification.textContent = message;
             toastNotification.classList.remove('bg-green-600', 'bg-red-600'); // Limpa cores anteriores
@@ -761,8 +913,12 @@
             const optionsHtml = categories.map(c => `<option>${c}</option>`).join('');
             categorySelect.innerHTML = optionsHtml;
             
-            // NOVO: Popula o filtro de categoria (Req 3)
+            // Popula o filtro de categoria (Req 3 / Req 4)
             filterCategory.innerHTML = `<option>Todas</option>` + optionsHtml;
+            
+            // NOVO: Popula o filtro de categoria de Entradas (Req 4)
+            const incomeCategories = categories.filter(c => c === 'Salário' || c === 'Outros'); // Exemplo
+            incomeFilterCategory.innerHTML = `<option>Todas</option>` + incomeCategories.map(c => `<option>${c}</option>`).join('');
         }
 
         /** Atualiza um dropdown "Pago Por" com os nomes personalizados */
@@ -787,6 +943,40 @@
             partner2NameInput.value = partnerNames.partner2;
         }
 
+        // NOVO: Funções do Modal de Transação (Req 3)
+        /** Abre o modal de transação, opcionalmente em modo de edição */
+        function openTransactionModal(isEdit = false) {
+            if (isEdit) {
+                transactionModalTitle.textContent = "Editar Transação";
+                transactionSubmitBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Atualizar Transação
+                `;
+                transactionSubmitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                transactionSubmitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                resetFormState(); // Garante que o formulário está limpo para adicionar
+                transactionModalTitle.textContent = "Adicionar Transação";
+                transactionSubmitBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Adicionar Transação
+                `;
+                transactionSubmitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                transactionSubmitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+            showElement(transactionModal);
+        }
+
+        /** Fecha o modal de transação e reseta o formulário */
+        function closeTransactionModal() {
+            hideElement(transactionModal);
+            resetFormState(); // Reseta o formulário após fechar
+        }
+
         /** Reseta o formulário para o modo "Adicionar" */
         function resetFormState() {
             currentEditId = null;
@@ -794,20 +984,11 @@
             dueDateInput.value = today; // Define a data de vencimento padrão
             paymentDateInput.value = today; // Define a data de pagamento padrão
             statusSelect.value = "Pago"; // Define status padrão
-            expenseTypeSelect.value = "Variável"; // NOVO: (Req 4)
-            isRecurringCheckbox.checked = false; // NOVO: (Req 5)
+            expenseTypeSelect.value = "Variável"; // (Req 4)
+            isRecurringCheckbox.checked = false; // (Req 5)
             
             togglePaymentDateVisibility(); 
-            toggleExpenseTypeVisibility(); // NOVO: (Req 4)
-            
-            submitBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                </svg>
-                Adicionar Transação
-            `;
-            submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-            submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            toggleExpenseTypeVisibility(); // (Req 4)
         }
 
         /** Alterna a visibilidade da Data de Pagamento baseada no Status */
@@ -824,7 +1005,7 @@
             }
         }
         
-        // NOVO: Mostra/esconde o tipo de despesa (Req 4)
+        // Mostra/esconde o tipo de despesa (Req 4)
         function toggleExpenseTypeVisibility() {
             const type = transactionForm.elements['type'].value;
             if (type === 'Despesa') {
@@ -834,28 +1015,19 @@
             }
         }
 
-        /** Gerencia a troca de abas */
-        function switchTab(targetTab) {
-            // Esconde todos os conteúdos
-            tabContentDashboard.classList.add('hidden');
-            tabContentPending.classList.add('hidden');
-            tabContentPlanning.classList.add('hidden');
+        // NOVO: Gerencia a troca de Páginas (Req 2)
+        function switchPage(targetPageId) {
+            // Esconde todas as páginas
+            allPages.forEach(page => hideElement(page));
             // Remove classe ativa de todos os botões
-            tabBtnDashboard.classList.remove('active');
-            tabBtnPending.classList.remove('active');
-            tabBtnPlanning.classList.remove('active');
+            allNavBtns.forEach(btn => btn.classList.remove('active'));
 
-            // Mostra o conteúdo e ativa o botão da aba alvo
-            if (targetTab === 'dashboard') {
-                tabContentDashboard.classList.remove('hidden');
-                tabBtnDashboard.classList.add('active');
-            } else if (targetTab === 'pending') {
-                tabContentPending.classList.remove('hidden');
-                tabBtnPending.classList.add('active');
-            } else if (targetTab === 'planning') {
-                tabContentPlanning.classList.remove('hidden');
-                tabBtnPlanning.classList.add('active');
-            }
+            // Mostra a página alvo e ativa o botão
+            const pageToShow = document.getElementById(targetPageId);
+            const btnToActivate = document.getElementById(targetPageId.replace('page-', 'navBtn'));
+            
+            if (pageToShow) showElement(pageToShow);
+            if (btnToActivate) btnToActivate.classList.add('active');
         }
 
         /** Aplica o tema (dark ou light) */
@@ -889,8 +1061,7 @@
             } else {
                 setTheme('light');
             }
-            // Adiciona o listener para o botão
-            if(themeToggleBtn) { // Adiciona verificação se o botão existe
+            if(themeToggleBtn) {
                 themeToggleBtn.addEventListener('click', toggleTheme);
             }
         }
@@ -899,7 +1070,6 @@
 
         /** Inicializa o Firebase e autentica o usuário */
         async function initializeAndAuth(configJson, token) {
-            // Esta função agora recebe a config, não a lê de variáveis globais
             try {
                 const firebaseConfig = JSON.parse(configJson);
                 const initialAuthToken = token;
@@ -907,8 +1077,6 @@
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
-
-                // Pega o appId da configuração para usar nos caminhos do Firestore
                 appId = firebaseConfig.appId || 'default-app-id';
                 
                 return new Promise((resolve, reject) => {
@@ -936,7 +1104,6 @@
                     });
                 });
             } catch (error) {
-                // Pega erros de JSON.parse ou initializeApp
                 throw new Error(`Falha na inicialização do Firebase: ${error.message}`);
             }
         }
@@ -947,7 +1114,7 @@
             if (storedFamilyId) {
                 initApp(storedFamilyId);
             } else {
-                hideElement(loadingIndicator); // Esconde o loading para mostrar o modal
+                hideElement(loadingIndicator); 
                 showElement(familyModal);
             }
         }
@@ -983,10 +1150,9 @@
         function initApp(currentFamilyId) {
             familyId = currentFamilyId;
             
-            // Esconde o modal e mostra o carregamento
             hideElement(familyModal);
-            showElement(loadingIndicator); // Mostra o loading enquanto busca dados
-            hideElement(appContent);
+            showElement(loadingIndicator); 
+            hideElement(appContainer); // Esconde o container principal da app
 
             currentFamilyIdEl.textContent = familyId;
 
@@ -1014,7 +1180,6 @@
 
         /** Retorna a referência do documento de orçamento mensal */
         function getBudgetDocRef() {
-            // Salva em /.../families/{familyId}/budgets/monthly
             return doc(db, 'artifacts', appId, 'public', 'data', 'families', familyId, 'budgets', 'monthly');
         }
 
@@ -1050,7 +1215,6 @@
             if (unsubscribeTransactions) unsubscribeTransactions();
 
             const transCollectionRef = getTransactionsCollectionRef();
-            // Ordena por data de vencimento
             const q = query(transCollectionRef, orderBy("dueDate", "desc"));
             
             unsubscribeTransactions = onSnapshot(q, (snapshot) => {
@@ -1063,7 +1227,7 @@
                 updateAllUI(allTransactions);
                 
                 hideElement(loadingIndicator);
-                showElement(appContent);
+                showElement(appContainer); // Mostra o container principal da app
 
             }, (error) => {
                 console.error("Erro ao ouvir transações:", error);
@@ -1081,11 +1245,10 @@
                 if (docSnap.exists()) {
                     monthlyBudget = docSnap.data();
                 } else {
-                    monthlyBudget = {}; // Nenhum orçamento definido
+                    monthlyBudget = {}; 
                 }
-                // Atualiza o formulário de orçamento E o painel principal
                 updateBudgetFormInputs();
-                updateAllUI(allTransactions); // Re-renderiza o painel com o novo orçamento
+                updateAllUI(allTransactions); 
             }, (error) => {
                 console.error("Erro ao ouvir orçamento:", error);
             });
@@ -1094,38 +1257,38 @@
 
         // --- Funções de Escrita (Ações no Firestore) ---
         
-        // NOVO: Lógica de Recorrência (Req 5)
-        /** Cria a próxima instância de uma transação recorrente */
-        async function createNextRecurringTransaction(oldTransaction) {
+        // NOVO: Lógica de Recorrência (Req 6)
+        /** Cria 12 instâncias futuras de uma transação recorrente */
+        async function createFutureRecurringTransactions(baseTransaction) {
             try {
-                // Copia a transação antiga, removendo o ID
-                const newTransaction = { ...oldTransaction };
-                delete newTransaction.id; 
+                const promises = [];
+                const originalDueDate = new Date(baseTransaction.dueDate + 'T00:00:00'); 
 
-                // Calcula o próximo vencimento (adiciona 1 mês)
-                const currentDueDate = new Date(oldTransaction.dueDate + 'T00:00:00'); // Trata como data local
-                const nextDueDate = new Date(currentDueDate.setMonth(currentDueDate.getMonth() + 1));
-                
-                // Trata o caso de pular meses (ex: 31 de Jan -> 2 de Mar)
-                // Se o dia mudou, volta para o último dia do mês anterior
-                if (nextDueDate.getDate() !== currentDueDate.getDate()) {
-                    nextDueDate.setDate(0); // Volta para o último dia do mês anterior (Fev)
+                for (let i = 1; i <= 12; i++) {
+                    const nextTransaction = { ...baseTransaction };
+                    delete nextTransaction.id; 
+                    
+                    const nextDueDate = new Date(originalDueDate.getFullYear(), originalDueDate.getMonth() + i, originalDueDate.getDate());
+                    
+                    if (nextDueDate.getDate() < originalDueDate.getDate()) {
+                        nextDueDate.setDate(0); 
+                    }
+                    
+                    nextTransaction.dueDate = nextDueDate.toISOString().split('T')[0];
+                    nextTransaction.status = "A Pagar";
+                    nextTransaction.paymentDate = "";
+                    // CORREÇÃO: Usar nextTransaction em vez de newTransaction
+                    nextTransaction.createdAt = new Date().toISOString(); 
+                    
+                    promises.push(addDoc(getTransactionsCollectionRef(), nextTransaction));
                 }
                 
-                newTransaction.dueDate = nextDueDate.toISOString().split('T')[0];
-                
-                // Reseta o status para "A Pagar"
-                newTransaction.status = "A Pagar";
-                newTransaction.paymentDate = "";
-                newTransaction.createdAt = new Date().toISOString();
-                
-                // Salva a nova transação no Firestore
-                await addDoc(getTransactionsCollectionRef(), newTransaction);
-                showToast(`Conta recorrente "${newTransaction.description}" criada para o próximo mês!`);
-                
+                await Promise.all(promises);
+                showToast("12 contas recorrentes futuras foram criadas!");
+
             } catch (error) {
-                console.error("Erro ao criar conta recorrente:", error);
-                showToast("Erro ao gerar conta recorrente.", true);
+                console.error("Erro ao criar contas recorrentes:", error);
+                showToast("Erro ao gerar contas recorrentes.", true);
             }
         }
 
@@ -1149,27 +1312,24 @@
                 category: formData.get('category'),
                 paidBy: formData.get('paidBy'),
                 status: formData.get('status'),
-                dueDate: formData.get('dueDate'), // Data de Vencimento
-                paymentDate: formData.get('paymentDate') || '', // Data de Pagamento
-                // NOVO: (Req 4 & 5)
+                dueDate: formData.get('dueDate'),
+                paymentDate: formData.get('paymentDate') || '',
                 expenseType: formData.get('type') === 'Despesa' ? formData.get('expenseType') : '',
-                isRecurring: formData.get('isRecurring') === 'on' // Checkbox retorna 'on'
+                isRecurring: formData.get('isRecurring') === 'on'
             };
 
-            // Regra: Se "Pago" e sem data, usa hoje. Se "A Pagar", limpa data.
             if (transactionData.status === 'Pago' && !transactionData.paymentDate) {
                 transactionData.paymentDate = today;
             } else if (transactionData.status === 'A Pagar') {
                 transactionData.paymentDate = '';
             }
             
-            // Regra: Se for Receita, sempre considera "Pago"
             if (transactionData.type === 'Receita') {
                 transactionData.status = 'Pago';
                 if (!transactionData.paymentDate) {
-                    transactionData.paymentDate = transactionData.dueDate; // Receita paga no vencimento (ou hoje)
+                    transactionData.paymentDate = transactionData.dueDate;
                 }
-                transactionData.expenseType = ''; // Receita não é despesa
+                transactionData.expenseType = '';
             }
 
             try {
@@ -1183,8 +1343,13 @@
                     transactionData.createdAt = new Date().toISOString();
                     await addDoc(getTransactionsCollectionRef(), transactionData);
                     showToast("Transação adicionada!");
+                    
+                    // NOVO: Lógica de Recorrência (Req 6)
+                    if (transactionData.isRecurring) {
+                        await createFutureRecurringTransactions(transactionData);
+                    }
                 }
-                resetFormState();
+                closeTransactionModal(); // NOVO: Fecha o modal (Req 3)
             } catch (error) {
                 console.error("Erro ao salvar transação:", error);
                 showToast("Erro ao salvar transação.", true);
@@ -1193,7 +1358,6 @@
 
         /** Manipulador para excluir uma transação */
         async function handleDeleteTransaction(id) {
-            // Em um app real, usaríamos um modal de confirmação
             try {
                 const docRef = doc(getTransactionsCollectionRef(), id);
                 await deleteDoc(docRef);
@@ -1217,45 +1381,26 @@
             transactionForm.status.value = transaction.status;
             transactionForm.dueDate.value = transaction.dueDate;
             transactionForm.paymentDate.value = transaction.paymentDate;
-            // NOVO: (Req 4 & 5)
             transactionForm.expenseType.value = transaction.expenseType || 'Variável';
             transactionForm.isRecurring.checked = transaction.isRecurring || false;
 
-
-            // Altera o botão
-            submitBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                Atualizar Transação
-            `;
-            submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-            submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            togglePaymentDateVisibility(); 
+            toggleExpenseTypeVisibility();
             
-            togglePaymentDateVisibility(); // Ajusta a visibilidade da data de pagamento
-            toggleExpenseTypeVisibility(); // Ajusta a visibilidade do tipo de despesa
-            
-            // Muda para a aba do painel principal
-            switchTab('dashboard'); 
-            
-            // Foca o formulário
-            transactionForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // NOVO: Abre o modal em modo de edição (Req 3)
+            openTransactionModal(true); 
         }
         
         /** Marca uma conta como paga */
         async function handleMarkAsPaid(id) {
             try {
-                // NOVO: Lógica de Recorrência (Req 5)
-                const transactionToPay = allTransactions.find(t => t.id === id);
-                if (transactionToPay && transactionToPay.isRecurring) {
-                    await createNextRecurringTransaction(transactionToPay);
-                }
+                // Lógica de recorrência foi MOVIDA para handleTransactionSubmit
                 
                 // Marca a transação atual como paga
                 const docRef = doc(getTransactionsCollectionRef(), id);
                 await updateDoc(docRef, {
                     status: "Pago",
-                    paymentDate: today // Define a data de pagamento como hoje
+                    paymentDate: today 
                 });
                 showToast("Conta marcada como paga!");
                 
@@ -1334,7 +1479,6 @@
             const amount = parseFloat(e.target.value) || 0; // Salva 0 se limpar
 
             try {
-                // Usa notação de ponto para atualizar um campo específico no documento
                 const budgetUpdate = {};
                 budgetUpdate[category] = amount;
                 
@@ -1354,9 +1498,8 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            csvFileInput.value = null; // Reseta o input
+            csvFileInput.value = null; 
 
-            // Colunas obrigatórias
             const requiredCols = ['Descrição', 'Valor', 'Tipo', 'Vencimento', 'Categoria'];
 
             const reader = new FileReader();
@@ -1395,7 +1538,7 @@
 
         /** Mostra o modal de revisão com os dados */
         function showReviewModal(data) {
-            updatePaidByDropdown(importPaidBySelect); // Popula o dropdown "Pago Por"
+            updatePaidByDropdown(importPaidBySelect); 
 
             const headers = Object.keys(data[0]);
             csvPreviewHead.innerHTML = `
@@ -1409,7 +1552,6 @@
                 <tr>
                     ${headers.map(h => {
                         let val = row[h] || '';
-                        // Formata datas se forem objetos Date
                         if (val instanceof Date) {
                             val = val.toLocaleDateString('pt-BR');
                         }
@@ -1435,7 +1577,6 @@
             let processedCount = 0;
 
             for (const row of parsedCsvData) {
-                // Lógica de valor robusta
                 let amount;
                 if (typeof row.Valor === 'number') {
                     amount = row.Valor;
@@ -1449,33 +1590,26 @@
                 }
 
                 const type = row.Tipo;
-                
-                // Mapeia novas colunas de data e status (com parse robusto)
                 const dueDateValue = row['Vencimento'];
-                const paymentDateValue = row['Data Pagamento'] || ''; // Opcional
+                const paymentDateValue = row['Data Pagamento'] || ''; 
                 
                 const dueDate = parseDateFromSheet(dueDateValue);
                 
-                // Validação da Data de Vencimento (Obrigatória)
                 if (!dueDate || isNaN(dueDate.getTime())) {
                     console.warn("Linha pulada (Data de Vencimento inválida):", row);
-                    continue; // Pula esta linha do loop
+                    continue; 
                 }
                 
                 let paymentDate = '';
                 if (paymentDateValue) {
                     const pd = parseDateFromSheet(paymentDateValue);
-                    // Validação da Data de Pagamento (Opcional)
                     if (pd && !isNaN(pd.getTime())) {
                         paymentDate = pd.toISOString().split('T')[0];
                     }
                 }
                 
-                const statusValue = row['Status'] || (paymentDate ? 'Pago' : 'A Pagar'); // Infere status
-
+                const statusValue = row['Status'] || (paymentDate ? 'Pago' : 'A Pagar'); 
                 const category = (row.Categoria === 'N/A' || !row.Categoria) ? 'Outros' : row.Categoria;
-                
-                // NOVO: (Req 4 & 5)
                 const expenseType = row['Tipo de Despesa'] === 'Fixa' ? 'Fixa' : 'Variável';
                 const isRecurring = row['Recorrente'] === true || row['Recorrente'] === 'Sim';
 
@@ -1535,40 +1669,36 @@
                 }
             });
             
-            // Transações a pagar (para a Aba "Contas a Pagar")
-            const pendingTransactions = transactions.filter(t => t.status === 'A Pagar');
-            
-            // NOVO: Total de Contas a Pagar (Req 1)
-            const totalPending = pendingTransactions.reduce((sum, t) => sum + t.amount, 0);
-
             // Transações atrasadas (para o novo card) (Req 2)
             const overdueTransactions = transactions.filter(t => t.status === 'A Pagar' && t.dueDate < today);
             
-            // NOVO: Total de Contas Atrasadas (Req 2)
+            // Total de Contas Atrasadas (Req 2)
             const totalOverdue = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
 
             // 1. Renderiza o Painel Principal
-            renderDashboard(monthTransactions);
+            renderDashboard(monthTransactions); // Req 5 (Balancete)
             renderBudgetProgress(monthTransactions);
-            renderOverdueList(overdueTransactions, totalOverdue); // Renderiza card de atrasadas
+            renderOverdueList(overdueTransactions, totalOverdue); // Req 2
             
             // 2. Renderiza a Aba "Contas a Pagar"
-            renderPendingList(pendingTransactions, totalPending);
+            renderPendingList(transactions); // Req 1 e 6
             
-            // 3. Renderiza o Histórico (com filtros aplicados)
-            renderTransactionList(transactions); // Passa *todas* as transações, o filtro é aplicado dentro
+            // 3. Renderiza o Histórico ("Contas Pagas")
+            renderHistoryList(transactions); // Req 1, 3, 4, 6
+            
+            // 4. Renderiza a Aba "Entradas"
+            renderIncomeList(transactions); // Req 4
         }
 
-        /** Renderiza os cards do Dashboard */
+        /** Renderiza os cards do Dashboard (Balancete Req 5) */
         function renderDashboard(monthTransactions) {
             let totalIncome = 0;
             let totalExpense = 0;
 
-            // Filtra apenas transações PAGAS ou RECEITAS do mês
             monthTransactions.forEach(t => {
-                if (t.type === 'Receita' && t.status === 'Pago') { // Receitas recebidas
+                if (t.type === 'Receita' && t.status === 'Pago') { 
                     totalIncome += t.amount;
-                } else if (t.type === 'Despesa' && t.status === 'Pago') { // Despesas pagas
+                } else if (t.type === 'Despesa' && t.status === 'Pago') { 
                     totalExpense += t.amount;
                 }
             });
@@ -1577,7 +1707,7 @@
 
             totalBalanceEl.textContent = formatCurrency(totalBalance);
             totalBalanceEl.classList.toggle('text-red-600', totalBalance < 0);
-            totalBalanceEl.classList.toggle('dark:text-gray-100', totalBalance >= 0); // Ajuste dark mode
+            totalBalanceEl.classList.toggle('dark:text-gray-100', totalBalance >= 0); 
             totalBalanceEl.classList.toggle('text-gray-900', totalBalance >= 0);
             
             totalIncomeEl.textContent = formatCurrency(totalIncome);
@@ -1586,9 +1716,8 @@
         
         /** Renderiza o progresso do orçamento no Painel Principal */
         function renderBudgetProgress(monthTransactions) {
-            budgetProgressContainer.innerHTML = ''; // Limpa
+            budgetProgressContainer.innerHTML = ''; 
             
-            // 1. Calcula gastos PAGOS por categoria
             const expensesByCategory = {};
             monthTransactions
                 .filter(t => t.type === 'Despesa' && t.status === 'Pago')
@@ -1596,33 +1725,31 @@
                     expensesByCategory[t.category] = (expensesByCategory[t.category] || 0) + t.amount;
                 });
             
-            // 2. Compara com o orçamento
             if (Object.keys(monthlyBudget).length === 0 && Object.keys(expensesByCategory).length === 0) {
                 budgetProgressContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center">Defina seus orçamentos na aba "Planejamento" para começar.</p>';
                 return;
             }
 
-            // Combina categorias (orçadas + gastas) para exibir todas
             const allBudgetCategories = new Set([...Object.keys(monthlyBudget), ...Object.keys(expensesByCategory)]);
             
             allBudgetCategories.forEach(category => {
-                if (category === 'Salário') return; // Não orçamenta salário
+                if (category === 'Salário') return; 
                 
                 const spent = expensesByCategory[category] || 0;
                 const limit = monthlyBudget[category] || 0;
                 const percent = (limit > 0) ? (spent / limit) * 100 : 0;
                 const remaining = limit - spent;
                 
-                let progressBarClass = 'bg-blue-500'; // Normal
+                let progressBarClass = 'bg-blue-500'; 
                 let remainingText = `${formatCurrency(remaining)} restantes`;
                 
                 if (spent > limit && limit > 0) {
-                    progressBarClass = 'bg-red-500'; // Estourou
+                    progressBarClass = 'bg-red-500'; 
                     remainingText = `${formatCurrency(Math.abs(remaining))} acima`;
                 } else if (percent > 85 && limit > 0) {
-                    progressBarClass = 'bg-yellow-500'; // Quase lá
+                    progressBarClass = 'bg-yellow-500'; 
                 } else if (limit === 0 && spent > 0) {
-                    progressBarClass = 'bg-gray-400'; // Gasto sem orçamento
+                    progressBarClass = 'bg-gray-400'; 
                     remainingText = 'Sem limite definido';
                 } else if (limit > 0 && spent === 0) {
                      remainingText = `Limite de ${formatCurrency(limit)}`;
@@ -1666,7 +1793,6 @@
                     t.status === 'Pago' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                 );
                 
-                // Destaque para contas vencidas e não pagas
                 const isOverdue = t.dueDate < today && t.status === 'A Pagar';
                 
                 li.innerHTML = `
@@ -1677,12 +1803,12 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-base font-medium text-gray-900 dark:text-gray-100 truncate ${isOverdue ? 'text-red-600 dark:text-red-400 font-bold' : ''}">
                                 ${t.description}
-                                ${t.isRecurring ? `<span class="text-xs text-blue-500 ml-1">(Recorrente)</span>` : ''} <!-- NOVO: (Req 5) -->
+                                ${t.isRecurring ? `<span class="text-xs text-blue-500 ml-1">(Recorrente)</span>` : ''} <!-- (Req 5) -->
                             </p>
                             <p class="text-sm text-gray-500 dark:text-gray-400">
                                 ${t.status === 'Pago' ? `Pago em ${formatDate(t.paymentDate)}` : `Vence em ${formatDate(t.dueDate)}`}
                                  · ${t.category}
-                                 ${t.expenseType ? `· ${t.expenseType}` : ''} <!-- NOVO: (Req 4) -->
+                                 ${t.expenseType ? `· ${t.expenseType}` : ''} <!-- (Req 4) -->
                             </p>
                         </div>
                     </div>
@@ -1691,7 +1817,6 @@
                             ${amountSign} ${formatCurrency(t.amount)}
                         </span>
                         
-                        <!-- Botão Marcar como Pago (se A Pagar) -->
                         ${t.status === 'A Pagar' ? `
                         <button title="Marcar como Pago" class="pay-btn p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -1700,13 +1825,11 @@
                         </button>
                         ` : ''}
                         
-                        <!-- Botão de Editar -->
                         <button title="Editar" class="edit-btn p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </button>
-                        <!-- Botão de Excluir -->
                         <button title="Excluir" class="delete-btn p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -1715,25 +1838,31 @@
                     </div>
                 `;
                 
-                // Adiciona listeners para os botões
+                const fullTransaction = allTransactions.find(trans => trans.id === t.id);
+                
                 li.querySelector('.delete-btn')?.addEventListener('click', () => handleDeleteTransaction(t.id));
-                li.querySelector('.edit-btn')?.addEventListener('click', () => handleEditTransaction(t));
+                li.querySelector('.edit-btn')?.addEventListener('click', () => {
+                    if (fullTransaction) {
+                        handleEditTransaction(fullTransaction);
+                    } else {
+                        console.error("Não foi possível encontrar a transação para editar.");
+                    }
+                });
                 li.querySelector('.pay-btn')?.addEventListener('click', () => handleMarkAsPaid(t.id));
 
                 element.appendChild(li);
             });
         }
 
-        /** NOVO: Renderiza a lista de histórico COM FILTROS (Req 3) */
-        function renderTransactionList(allTransactions) {
+        /** Renderiza a lista de histórico (Contas Pagas) COM FILTROS (Req 3 / Req 4) */
+        function renderHistoryList(allTransactions) {
             
-            // 1. Pega os valores do filtro
             const startDate = filterStartDate.value;
             const endDate = filterEndDate.value;
             const category = filterCategory.value;
 
-            // 2. Aplica filtros
-            let filteredTransactions = allTransactions.filter(t => t.status === 'Pago' || t.type === 'Receita'); // Histórico é só de pagos/recebidos
+            // Filtra apenas despesas pagas
+            let filteredTransactions = allTransactions.filter(t => t.status === 'Pago' && t.type === 'Despesa');
             
             if (startDate) {
                 filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) >= startDate);
@@ -1745,35 +1874,96 @@
                 filteredTransactions = filteredTransactions.filter(t => t.category === category);
             }
             
-            // Ordena por data (mais recente primeiro)
             filteredTransactions.sort((a, b) => new Date(b.paymentDate || b.dueDate) - new Date(a.paymentDate || a.dueDate));
             
-            // 3. Renderiza
+            // NOVO: Calcula total (Req 6)
+            const totalPaid = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+            if (totalPaid > 0) {
+                historyTotalAmountEl.textContent = `Total Pago (Filtrado): ${formatCurrency(totalPaid)}`;
+                showElement(historyTotalAmountEl);
+            } else {
+                hideElement(historyTotalAmountEl);
+            }
+
             renderGenericTransactionList(transactionList, filteredTransactions, emptyState);
+        }
+        
+        /** NOVO: Renderiza a lista de Entradas COM FILTROS (Req 4) */
+        function renderIncomeList(allTransactions) {
+            const startDate = incomeFilterStartDate.value;
+            const endDate = incomeFilterEndDate.value;
+            const category = incomeFilterCategory.value;
+
+            // Filtra apenas receitas
+            let filteredTransactions = allTransactions.filter(t => t.type === 'Receita');
+            
+            if (startDate) {
+                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) >= startDate);
+            }
+            if (endDate) {
+                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) <= endDate);
+            }
+            if (category && category !== 'Todas') {
+                filteredTransactions = filteredTransactions.filter(t => t.category === category);
+            }
+            
+            filteredTransactions.sort((a, b) => new Date(b.paymentDate || b.dueDate) - new Date(a.paymentDate || a.dueDate));
+            
+            // Calcula total
+            const totalIncome = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+            if (totalIncome > 0) {
+                incomeTotalAmountEl.textContent = `Total Recebido (Filtrado): ${formatCurrency(totalIncome)}`;
+                showElement(incomeTotalAmountEl);
+            } else {
+                hideElement(incomeTotalAmountEl);
+            }
+
+            renderGenericTransactionList(incomeList, filteredTransactions, emptyStateIncome);
         }
 
         /** Renderiza a lista de Contas a Pagar (Todas) */
-        function renderPendingList(pendingTransactions, totalPending) {
-            // Ordena por vencimento (mais próximo primeiro)
+        function renderPendingList(allTransactions) {
+            
+            const startDate = pendingFilterStartDate.value;
+            const endDate = pendingFilterEndDate.value;
+            
+            let pendingTransactions = allTransactions.filter(t => t.status === 'A Pagar');
+            
+            if (startDate) {
+                pendingTransactions = pendingTransactions.filter(t => t.dueDate >= startDate);
+            }
+            if (endDate) {
+                pendingTransactions = pendingTransactions.filter(t => t.dueDate <= endDate);
+            }
+            
+            // Calcula totais com base nos filtros (Req 1)
+            const totalPending = pendingTransactions.reduce((sum, t) => sum + t.amount, 0);
+            const totalFixed = pendingTransactions
+                .filter(t => t.expenseType === 'Fixa')
+                .reduce((sum, t) => sum + t.amount, 0);
+
             pendingTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
             renderGenericTransactionList(pendingList, pendingTransactions, emptyStatePending);
             
-            // NOVO: Atualiza o total a pagar (Req 1)
             if (totalPending > 0) {
-                pendingTotalAmountEl.textContent = `Total a Pagar: ${formatCurrency(totalPending)}`;
+                pendingTotalAmountEl.textContent = `Total (Filtrado): ${formatCurrency(totalPending)}`;
                 showElement(pendingTotalAmountEl);
             } else {
                 hideElement(pendingTotalAmountEl);
+            }
+            if (totalFixed > 0) {
+                pendingTotalFixedAmountEl.textContent = `Despesas Fixas (Filtrado): ${formatCurrency(totalFixed)}`;
+                showElement(pendingTotalFixedAmountEl);
+            } else {
+                hideElement(pendingTotalFixedAmountEl);
             }
         }
 
         /** Renderiza a lista de Contas Atrasadas no Painel Principal */
         function renderOverdueList(overdueTransactions, totalOverdue) {
-             // Ordena por vencimento (mais antiga primeiro)
             overdueTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
             renderGenericTransactionList(overdueList, overdueTransactions, emptyStateOverdue);
             
-            // Atualiza o total
             if(totalOverdue > 0) {
                  totalOverdueAmountEl.textContent = `Total Atrasado: ${formatCurrency(totalOverdue)}`;
                  showElement(totalOverdueAmountEl);
@@ -1782,15 +1972,33 @@
             }
         }
         
-        // NOVO: Função para lidar com a submissão do filtro (Req 3)
+        /** Lida com filtros de Histórico (Contas Pagas) */
         function handleFilterSubmit(e) {
             e.preventDefault();
-            updateAllUI(allTransactions); // A renderTransactionList vai pegar os valores do filtro
+            updateAllUI(allTransactions);
         }
-        
-        // NOVO: Função para limpar os filtros (Req 3)
         function handleFilterClear() {
             filterForm.reset();
+            updateAllUI(allTransactions);
+        }
+        
+        /** Lida com filtros de Entradas */
+        function handleIncomeFilterSubmit(e) {
+            e.preventDefault();
+            updateAllUI(allTransactions);
+        }
+        function handleIncomeFilterClear() {
+            incomeFilterForm.reset();
+            updateAllUI(allTransactions);
+        }
+        
+        /** Lida com filtros de Contas a Pagar */
+        function handlePendingFilterSubmit(e) {
+            e.preventDefault();
+            updateAllUI(allTransactions); 
+        }
+        function handlePendingFilterClear() {
+            pendingFilterForm.reset();
             updateAllUI(allTransactions);
         }
 
@@ -1798,24 +2006,23 @@
         // --- Ponto de Entrada da Aplicação ---
         window.onload = async () => {
             try {
-                // Define as datas padrão nos formulários
                 today = new Date().toISOString().split('T')[0];
                 dueDateInput.value = today;
                 paymentDateInput.value = today;
 
-                // Inicializa o Tema
                 initializeTheme();
                 
-                // Listeners estáticos (abas, modais, formulários)
-                tabBtnDashboard.addEventListener('click', () => switchTab('dashboard'));
-                tabBtnPending.addEventListener('click', () => switchTab('pending'));
-                tabBtnPlanning.addEventListener('click', () => switchTab('planning'));
+                // Listeners da Sidebar (Req 2)
+                navBtnDashboard.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-dashboard'); });
+                navBtnPending.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-pending'); });
+                navBtnHistory.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-history'); });
+                navBtnIncome.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-income'); });
+                navBtnPlanning.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-planning'); });
                 
                 statusSelect.addEventListener('change', togglePaymentDateVisibility);
                 
-                // NOVO: Listener para mostrar/esconder tipo de despesa (Req 4)
                 typeRadioButtons.forEach(radio => radio.addEventListener('change', toggleExpenseTypeVisibility));
-                toggleExpenseTypeVisibility(); // Chama uma vez para setar o estado inicial
+                toggleExpenseTypeVisibility(); 
 
                 createFamilyBtn.addEventListener('click', handleCreateFamily);
                 joinFamilyBtn.addEventListener('click', handleJoinFamily);
@@ -1828,14 +2035,27 @@
                 closeSettingsBtn.addEventListener('click', () => hideElement(settingsModal));
                 settingsForm.addEventListener('submit', handleSaveSettings);
 
+                // Listeners do Modal (Req 3)
                 transactionForm.addEventListener('submit', handleTransactionSubmit);
+                addTransactionBtn.addEventListener('click', () => openTransactionModal(false));
+                closeTransactionModalBtn.addEventListener('click', closeTransactionModal);
                 
-                // NOVO: Listeners do Filtro (Req 3)
+                // Listeners do Filtro de Histórico (Req 3/4)
                 filterForm.addEventListener('submit', handleFilterSubmit);
                 clearFilterBtn.addEventListener('click', handleFilterClear);
+                
+                // Listeners do Filtro de Entradas (Req 4)
+                incomeFilterForm.addEventListener('submit', handleIncomeFilterSubmit);
+                incomeClearFilterBtn.addEventListener('click', handleIncomeFilterClear);
 
+                // Listeners do Filtro "A Pagar" (Req 1)
+                pendingFilterForm.addEventListener('submit', handlePendingFilterSubmit);
+                pendingClearFilterBtn.addEventListener('click', handlePendingFilterClear);
+
+                // CORREÇÃO: Adiciona listener ao botão de importar
                 importCsvBtn.addEventListener('click', () => csvFileInput.click());
                 csvFileInput.addEventListener('change', handleFileSelect);
+                
                 closeImportModalBtn.addEventListener('click', () => hideElement(importModal));
                 cancelImportBtn.addEventListener('click', () => hideElement(importModal));
                 confirmImportBtn.addEventListener('click', processImport);
@@ -1873,11 +2093,10 @@
 
             } catch (error) {
                 // --- TRATAMENTO DE ERRO CRÍTICO ---
-                // Se algo falhar na inicialização, mostra o erro na tela
                 console.error("Erro crítico na inicialização:", error);
                 const loadingText = loadingIndicator.querySelector('p');
                 const spinner = loadingIndicator.querySelector('.spinner');
-                if (spinner) spinner.style.display = 'none'; // Esconde o spinner
+                if (spinner) spinner.style.display = 'none'; 
                 if (loadingText) {
                     loadingText.innerHTML = `
                         <strong class="text-red-600 dark:text-red-400">Erro Crítico na Inicialização</strong>
