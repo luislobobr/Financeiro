@@ -18,7 +18,7 @@
             to { transform: rotate(360deg); }
         }
         
-        /* NOVO: Estilos da Sidebar (Req 2) */
+        /* Estilos da Sidebar */
         .sidebar-link {
             transition: all 0.3s ease;
         }
@@ -271,10 +271,10 @@
 
 
     <!-- ===== 3. CONTEÚDO PRINCIPAL DA APLICAÇÃO ===== -->
-    <!-- NOVO: Layout com Sidebar (Req 2) -->
+    <!-- Layout com Sidebar (Req 2) -->
     <div id="appContainer" class="lg:flex min-h-screen hidden">
 
-        <!-- NOVO: Sidebar (Req 2) -->
+        <!-- Sidebar (Req 2) -->
         <aside id="sidebar" class="w-full lg:w-64 bg-white dark:bg-gray-800 shadow-lg lg:fixed lg:h-screen lg:flex lg:flex-col">
             <!-- Cabeçalho da Sidebar -->
             <header class="p-6 border-b dark:border-gray-700">
@@ -297,12 +297,12 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     Contas a Pagar
                 </a>
-                <!-- NOVO: Link Histórico (Req 1/3) -->
+                <!-- Link Histórico (Req 1/3) -->
                 <a href="#" id="navBtnHistory" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                     Contas Pagas
                 </a>
-                <!-- NOVO: Link Entradas (Req 4) -->
+                <!-- Link Entradas (Req 4) -->
                 <a href="#" id="navBtnIncome" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                     Entradas
@@ -329,12 +329,12 @@
             </div>
         </aside>
 
-        <!-- NOVO: Conteúdo Principal (à direita da Sidebar) -->
+        <!-- Conteúdo Principal (à direita da Sidebar) -->
         <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64"> <!-- ml-64 para compensar a sidebar no desktop -->
             
             <!-- ===== PÁGINA 1: PAINEL PRINCIPAL ===== -->
             <div id="page-dashboard">
-                <!-- NOVO: Balancete Geral do Mês (Req 5) -->
+                <!-- Balancete Geral do Mês (Req 5) -->
                 <section class="mb-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Balancete do Mês</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -385,8 +385,6 @@
                          <p id="totalOverdueAmount" class="text-right font-semibold text-red-600 dark:text-red-500 mt-4 pr-4"></p>
                     </div>
                 </section>
-                
-                <!-- Formulário de Transação foi MOVIDO PARA O MODAL (Req 3) -->
             </div>
 
             <!-- ===== PÁGINA 2: CONTAS A PAGAR ===== -->
@@ -443,14 +441,14 @@
                 </section>
             </div>
             
-            <!-- NOVO: PÁGINA 3: HISTÓRICO DE CONTAS PAGAS (Req 1 e 3) -->
+            <!-- PÁGINA 3: HISTÓRICO DE CONTAS PAGAS (Req 1 e 3) -->
             <div id="page-history" class="hidden">
                  <section>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
                         
-                        <!-- CORREÇÃO: Botão de Importar movido para cá -->
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
                             <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Histórico de Contas Pagas</h2>
+                            <!-- Botão de Importar -->
                             <button id="importCsvBtn" class="mt-2 sm:mt-0 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -508,7 +506,7 @@
                 </section>
             </div>
             
-            <!-- NOVO: PÁGINA 4: ENTRADAS (Req 4) -->
+            <!-- PÁGINA 4: ENTRADAS (Req 4) -->
             <div id="page-income" class="hidden">
                  <section>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -578,8 +576,8 @@
         </main> <!-- Fim do Conteúdo Principal -->
     </div>
 
-    <!-- NOVO: Botão Flutuante (FAB) para Adicionar Transação (Req 3) -->
-    <button id="addTransactionBtn" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform hover:scale-110">
+    <!-- Botão Flutuante (FAB) para Adicionar Transação (Req 3) -->
+    <button id="addTransactionBtn" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform hover:scale-110 hidden"> <!-- Começa escondido -->
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
         </svg>
@@ -591,7 +589,8 @@
         <!-- O conteúdo e a cor (bg-green-500 ou bg-red-500) serão definidos pelo JS -->
     </div>
 
-    <!-- ===== 4. SCRIPT PRINCIPAL DA APLICAÇÃO ===== -->
+    <!-- NOVO: Link para o ficheiro JS externo -->
+    <!-- CORREÇÃO: Movido para o final do BODY e type="module" -->
     <script type="module">
         // Importa as funções necessárias do Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -617,1394 +616,1351 @@
             getDoc
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Variáveis Globais ---
-        let db, auth, userId, appId, familyId;
-        let unsubscribeTransactions = null; // Listener para transações
-        let unsubscribeFamilySettings = null; // Listener para as configurações da família
-        let unsubscribeBudget = null; // Listener para o orçamento
+        // --- Ponto de Entrada da Aplicação ---
+        // CORREÇÃO: TODO o código agora está dentro do window.onload
+        window.onload = async () => {
         
-        let currentEditId = null; // Para rastrear a transação em modo de edição
-        let partnerNames = { partner1: 'Parceiro 1', partner2: 'Parceiro 2' }; // Nomes padrão
-        let monthlyBudget = {}; // Armazena os limites do orçamento
-        let parsedCsvData = []; // Armazena os dados do CSV/Planilha lido
-        let allTransactions = []; // Cache local de todas as transações
-        let today = new Date().toISOString().split('T')[0]; // Data de hoje em YYYY-MM-DD
-
-        // Lista de categorias padrão (ATUALIZADA)
-        const categories = [
-            'Moradia', 
-            'Alimentação', 
-            'Transporte', 
-            'Lazer', 
-            'Saúde', 
-            'Conta de Energia', 
-            'Conta de Água', 
-            'Internet', 
-            'Salário', 
-            'Outros'
-        ];
-        
-        // Mapeamento de cores (ATUALIZADO)
-        const categoryColors = {
-            'Moradia': '#3b82f6', // blue-500
-            'Alimentação': '#22c55e', // green-500
-            'Transporte': '#eab308', // yellow-500
-            'Lazer': '#ec4899', // pink-500
-            'Saúde': '#8b5cf6', // violet-500
-            'Conta de Energia': '#f59e0b', // amber-500
-            'Conta de Água': '#06b6d4', // cyan-500
-            'Internet': '#4f46e5', // indigo-600
-            'Salário': '#14b8a6', // teal-500
-            'Outros': '#6b7280', // gray-500
-        };
-        const categoryColorClasses = {
-            'Moradia': 'bg-blue-500',
-            'Alimentação': 'bg-green-500',
-            'Transporte': 'bg-yellow-500',
-            'Lazer': 'bg-pink-500',
-            'Saúde': 'bg-violet-500',
-            'Conta de Energia': 'bg-amber-500',
-            'Conta de Água': 'bg-cyan-500',
-            'Internet': 'bg-indigo-600',
-            'Salário': 'bg-teal-500',
-            'Outros': 'bg-gray-500',
-        };
-
-        // --- Elementos do DOM ---
-        const familyModal = document.getElementById('familyModal');
-        const createFamilyBtn = document.getElementById('createFamilyBtn');
-        const joinFamilyBtn = document.getElementById('joinFamilyBtn');
-        const familyIdInput = document.getElementById('familyIdInput');
-        const newFamilyIdSection = document.getElementById('newFamilyIdSection');
-        const familyIdDisplay = document.getElementById('familyIdDisplay');
-        const copyFamilyIdBtn = document.getElementById('copyFamilyIdBtn');
-        const startAppBtn = document.getElementById('startAppBtn');
-
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        // NOVO: appContainer substitui appContent para o layout da sidebar
-        const appContainer = document.getElementById('appContainer');
-        
-        const currentFamilyIdEl = document.getElementById('currentFamilyId');
-        const copyIdBtn = document.getElementById('copyIdBtn');
-        
-        // Elementos do Modal de Configurações
-        const settingsModal = document.getElementById('settingsModal');
-        const openSettingsBtn = document.getElementById('openSettingsBtn');
-        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-        const settingsForm = document.getElementById('settingsForm');
-        const partner1NameInput = document.getElementById('partner1NameInput');
-        const partner2NameInput = document.getElementById('partner2NameInput');
-
-        // Elementos do Modal de Importação
-        const importCsvBtn = document.getElementById('importCsvBtn'); // CORREÇÃO: Este ID agora existe
-        const csvFileInput = document.getElementById('csvFileInput'); // CORREÇÃO: Este ID agora existe
-        const importModal = document.getElementById('importModal');
-        const closeImportModalBtn = document.getElementById('closeImportModalBtn');
-        const cancelImportBtn = document.getElementById('cancelImportBtn');
-        const confirmImportBtn = document.getElementById('confirmImportBtn');
-        const importPaidBySelect = document.getElementById('importPaidBy');
-        const csvPreviewHead = document.getElementById('csvPreviewHead');
-        const csvPreviewBody = document.getElementById('csvPreviewBody');
-        const importReviewStep = document.getElementById('importReviewStep');
-        const importLoadingStep = document.getElementById('importLoadingStep');
-
-        // Elemento Toast
-        const toastNotification = document.getElementById('toastNotification');
-
-        // NOVO: Botões de Navegação da Sidebar (Req 2)
-        const navBtnDashboard = document.getElementById('navBtnDashboard');
-        const navBtnPending = document.getElementById('navBtnPending');
-        const navBtnHistory = document.getElementById('navBtnHistory');
-        const navBtnIncome = document.getElementById('navBtnIncome');
-        const navBtnPlanning = document.getElementById('navBtnPlanning');
-        
-        // NOVO: Páginas de Conteúdo (Req 2)
-        const pageDashboard = document.getElementById('page-dashboard');
-        const pagePending = document.getElementById('page-pending');
-        const pageHistory = document.getElementById('page-history');
-        const pageIncome = document.getElementById('page-income');
-        const pagePlanning = document.getElementById('page-planning');
-        const allPages = [pageDashboard, pagePending, pageHistory, pageIncome, pagePlanning];
-        const allNavBtns = [navBtnDashboard, navBtnPending, navBtnHistory, navBtnIncome, navBtnPlanning];
-
-        // Painel Principal
-        const totalBalanceEl = document.getElementById('totalBalance');
-        const totalIncomeEl = document.getElementById('totalIncome');
-        const totalExpenseEl = document.getElementById('totalExpense');
-        const budgetProgressContainer = document.getElementById('budgetProgressContainer');
-        const overdueList = document.getElementById('overdueList'); // Lista de Atrasadas
-        const emptyStateOverdue = document.getElementById('emptyStateOverdue'); // Estado Vazio Atrasadas
-        const totalOverdueAmountEl = document.getElementById('totalOverdueAmount'); // Elemento para mostrar o total atrasado
-
-        // Contas a Pagar
-        const pendingList = document.getElementById('pendingList');
-        const emptyStatePending = document.getElementById('emptyStatePending');
-        const pendingTotalAmountEl = document.getElementById('pendingTotalAmount'); // Total a Pagar (Filtrado)
-        const pendingTotalFixedAmountEl = document.getElementById('pendingTotalFixedAmount'); // Total Fixas (Filtrado)
-        const pendingFilterForm = document.getElementById('pendingFilterForm');
-        const pendingFilterStartDate = document.getElementById('pendingFilterStartDate');
-        const pendingFilterEndDate = document.getElementById('pendingFilterEndDate');
-        const pendingClearFilterBtn = document.getElementById('pendingClearFilterBtn');
-
-        // NOVO: Elementos da Página de Histórico (Req 1/3)
-        const transactionList = document.getElementById('transactionList');
-        const emptyState = document.getElementById('emptyState');
-        const filterForm = document.getElementById('filterForm');
-        const filterStartDate = document.getElementById('filterStartDate');
-        const filterEndDate = document.getElementById('filterEndDate');
-        const filterCategory = document.getElementById('filterCategory');
-        const clearFilterBtn = document.getElementById('clearFilterBtn');
-        const historyTotalAmountEl = document.getElementById('historyTotalAmount'); // (Req 6)
-
-        // NOVO: Elementos da Página de Entradas (Req 4)
-        const incomeList = document.getElementById('incomeList');
-        const emptyStateIncome = document.getElementById('emptyStateIncome');
-        const incomeFilterForm = document.getElementById('incomeFilterForm');
-        const incomeFilterStartDate = document.getElementById('incomeFilterStartDate');
-        const incomeFilterEndDate = document.getElementById('incomeFilterEndDate');
-        const incomeFilterCategory = document.getElementById('incomeFilterCategory');
-        const incomeClearFilterBtn = document.getElementById('incomeClearFilterBtn');
-        const incomeTotalAmountEl = document.getElementById('incomeTotalAmount');
-
-        // Planejamento
-        const budgetForm = document.getElementById('budgetForm');
-
-        // NOVO: Modal de Transação (Req 3)
-        const transactionModal = document.getElementById('transactionModal');
-        const transactionModalTitle = document.getElementById('transactionModalTitle');
-        const closeTransactionModalBtn = document.getElementById('closeTransactionModalBtn');
-        const addTransactionBtn = document.getElementById('addTransactionBtn'); // FAB
-
-        // Formulário de Transação (dentro do modal)
-        const transactionForm = document.getElementById('transactionForm');
-        const categorySelect = document.getElementById('category');
-        const paidBySelect = document.getElementById('paidBy');
-        const dueDateInput = document.getElementById('dueDate');
-        const paymentDateInput = document.getElementById('paymentDate');
-        const statusSelect = document.getElementById('status');
-        const transactionSubmitBtn = document.getElementById('transactionSubmitBtn'); // Botão do modal
-        const expenseTypeContainer = document.getElementById('expenseTypeContainer'); // (Req 4)
-        const expenseTypeSelect = document.getElementById('expenseType'); // (Req 4)
-        const isRecurringCheckbox = document.getElementById('isRecurring'); // (Req 5)
-        const typeRadioButtons = document.querySelectorAll('input[name="type"]'); // (Req 4)
-        
-        // Botão de Tema
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-
-        // --- Funções Auxiliares ---
-
-        /** Formata um número para a moeda BRL */
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', { 
-                style: 'currency', 
-                currency: 'BRL' 
-            }).format(value);
-        }
-        
-        /** Formata data YYYY-MM-DD para DD/MM/YYYY */
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const [year, month, day] = dateString.split('-');
-            return `${day}/${month}/${year}`;
-        }
-        
-        /** Converte vários formatos de data (Excel, DD/MM/YYYY, YYYY-MM-DD) para um objeto Date */
-        function parseDateFromSheet(dateValue) {
-            if (dateValue instanceof Date) {
-                return dateValue; // Já é um objeto Date (SheetJS cellDates:true)
-            }
-            if (typeof dateValue === 'string') {
-                if (dateValue.includes('/')) {
-                    // Formato DD/MM/YYYY
-                    const parts = dateValue.split('/');
-                    if (parts.length === 3) {
-                        // Atenção ao mês (0-indexado)
-                        return new Date(parts[2], parseInt(parts[1], 10) - 1, parts[0]);
-                    }
-                } else if (dateValue.includes('-')) {
-                    // Formato YYYY-MM-DD
-                    return new Date(dateValue + 'T00:00:00'); // Adiciona T00:00:00 para tratar como local
-                }
-            }
-            // Tenta converter diretamente (último recurso)
-            const dateObj = new Date(dateValue);
-            if (dateObj && !isNaN(dateObj.getTime())) {
-                return dateObj;
-            }
+            // --- Variáveis Globais (Escopo do onload) ---
+            let db, auth, userId, appId, familyId;
+            let unsubscribeTransactions = null;
+            let unsubscribeFamilySettings = null;
+            let unsubscribeBudget = null;
             
-            return null; // Formato desconhecido ou inválido
-        }
-
-        /** Mostra um elemento */
-        function showElement(el) {
-            if (el) el.classList.remove('hidden');
-        }
-
-        /** Esconde um elemento */
-        function hideElement(el) {
-            if (el) el.classList.add('hidden');
-        }
-
-        /** Copia um texto para a área de transferência */
-        function copyToClipboard(text, button) {
-            // Usa execCommand como fallback para ambientes restritos (iframes)
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                if (button) {
-                    const originalText = button.innerHTML;
-                    button.innerHTML = 'Copiado!';
-                    button.classList.add('bg-green-600', 'text-white');
-                    setTimeout(() => {
-                        button.innerHTML = originalText;
-                        button.classList.remove('bg-green-600', 'text-white');
-                    }, 2000);
-                }
-            } catch (err) {
-                console.error('Falha ao copiar:', err);
-            }
-            document.body.removeChild(textarea);
-        }
-
-        /** Mostra uma notificação toast */
-        // CORREÇÃO: Removida a declaração duplicada que existia aqui.
-        function showToast(message, isError = false) {
-            toastNotification.textContent = message;
-            toastNotification.classList.remove('bg-green-600', 'bg-red-600'); // Limpa cores anteriores
-            if (isError) {
-                toastNotification.classList.add('bg-red-600');
-            } else {
-                toastNotification.classList.add('bg-green-600');
-            }
-            toastNotification.classList.remove('hidden', 'translate-x-[200%]');
-            toastNotification.classList.add('translate-x-0');
-
-            setTimeout(() => {
-                toastNotification.classList.remove('translate-x-0');
-                toastNotification.classList.add('translate-x-[200%]');
-                setTimeout(() => toastNotification.classList.add('hidden'), 300);
-            }, 3000);
-        }
-
-        /** Obtém um ícone SVG para uma categoria (ATUALIZADO) */
-        function getCategoryIcon(category) {
-            const icons = {
-                'Moradia': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" /></svg>`,
-                'Alimentação': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M12 14.5v-5" /></svg>`,
-                'Transporte': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75c-2.4 0-4.5-2.03-4.5-4.5s2.1-4.5 4.5-4.5 4.5 2.03 4.5 4.5-2.1 4.5-4.5 4.5zM12 4.5v2.25m-6.364 1.909l1.591 1.591m-3.282 3.282h2.25m1.909 6.364l1.591-1.591m3.282 3.282v-2.25m6.364-1.909l-1.591-1.591m3.282-3.282h-2.25m-1.909-6.364l-1.591 1.591" /></svg>`,
-                'Lazer': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
-                'Saúde': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m-3-3V8m0 4h.01M12 16h.01" /></svg>`,
-                'Conta de Energia': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3c-3.866 0-7 3.134-7 7 0 3.402 2.103 6.26 5 6.87V21h4v-4.13c2.897-.61 5-3.468 5-6.87 0-3.866-3.134-7-7-7z" /></svg>`,
-                'Conta de Água': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-1.7-9.7C13.4 9.1 12.3 9 11 9c-2.4 0-4.6.9-6.2 2.3A4 4 0 003 15zM12 19v2M8 19v2m8-2v2" /></svg>`,
-                'Internet': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.5a4 4 0 015.778 0M5 13.414a8 8 0 0114 0M1.889 10.328a12 12 0 0120.222 0" /></svg>`,
-                'Salário': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 10.5v3m-6.495-6.495l-2.122 2.122m-5.656 5.656l-2.122 2.122m12.728-2.122l2.122 2.122M4.75 10.5v3M12 21V3" /></svg>`,
-                'Outros': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5M8.25 12h7.5m-7.5 5.25h7.5M3 12a9 9 0 1118 0 9 9 0 01-18 0z" /></svg>`
+            let currentEditId = null;
+            let partnerNames = { partner1: 'Parceiro 1', partner2: 'Parceiro 2' };
+            let monthlyBudget = {};
+            let parsedCsvData = [];
+            let allTransactions = [];
+            let today = new Date().toISOString().split('T')[0];
+            
+            // Constantes de Categoria
+            const categories = [
+                'Moradia', 
+                'Alimentação', 
+                'Transporte', 
+                'Lazer', 
+                'Saúde', 
+                'Conta de Energia', 
+                'Conta de Água', 
+                'Internet', 
+                'Salário', 
+                'Outros'
+            ];
+            const categoryColors = {
+                'Moradia': '#3b82f6', 'Alimentação': '#22c55e', 'Transporte': '#eab308',
+                'Lazer': '#ec4899', 'Saúde': '#8b5cf6', 'Conta de Energia': '#f59e0b',
+                'Conta de Água': '#06b6d4', 'Internet': '#4f46e5', 'Salário': '#14b8a6', 'Outros': '#6b7280',
             };
-            return icons[category] || icons['Outros'];
-        }
+            const categoryColorClasses = {
+                'Moradia': 'bg-blue-500', 'Alimentação': 'bg-green-500', 'Transporte': 'bg-yellow-500',
+                'Lazer': 'bg-pink-500', 'Saúde': 'bg-violet-500', 'Conta de Energia': 'bg-amber-500',
+                'Conta de Água': 'bg-cyan-500', 'Internet': 'bg-indigo-600', 'Salário': 'bg-teal-500', 'Outros': 'bg-gray-500',
+            };
 
-        // --- Funções de UI (Nomes, Formulário, Abas) ---
+            // --- Elementos do DOM (Assignados DENTRO do onload) ---
+            const familyModal = document.getElementById('familyModal');
+            const createFamilyBtn = document.getElementById('createFamilyBtn');
+            const joinFamilyBtn = document.getElementById('joinFamilyBtn');
+            const familyIdInput = document.getElementById('familyIdInput');
+            const newFamilyIdSection = document.getElementById('newFamilyIdSection');
+            const familyIdDisplay = document.getElementById('familyIdDisplay');
+            const copyFamilyIdBtn = document.getElementById('copyFamilyIdBtn');
+            const startAppBtn = document.getElementById('startAppBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const appContainer = document.getElementById('appContainer');
+            const currentFamilyIdEl = document.getElementById('currentFamilyId');
+            const copyIdBtn = document.getElementById('copyIdBtn');
+            const settingsModal = document.getElementById('settingsModal');
+            const openSettingsBtn = document.getElementById('openSettingsBtn');
+            const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+            const settingsForm = document.getElementById('settingsForm');
+            const partner1NameInput = document.getElementById('partner1NameInput');
+            const partner2NameInput = document.getElementById('partner2NameInput');
+            const importCsvBtn = document.getElementById('importCsvBtn');
+            const csvFileInput = document.getElementById('csvFileInput');
+            const importModal = document.getElementById('importModal');
+            const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+            const cancelImportBtn = document.getElementById('cancelImportBtn');
+            const confirmImportBtn = document.getElementById('confirmImportBtn');
+            const importPaidBySelect = document.getElementById('importPaidBy');
+            const csvPreviewHead = document.getElementById('csvPreviewHead');
+            const csvPreviewBody = document.getElementById('csvPreviewBody');
+            const importReviewStep = document.getElementById('importReviewStep');
+            const importLoadingStep = document.getElementById('importLoadingStep');
+            const toastNotification = document.getElementById('toastNotification');
+            const navBtnDashboard = document.getElementById('navBtnDashboard');
+            const navBtnPending = document.getElementById('navBtnPending');
+            const navBtnHistory = document.getElementById('navBtnHistory');
+            const navBtnIncome = document.getElementById('navBtnIncome');
+            const navBtnPlanning = document.getElementById('navBtnPlanning');
+            const pageDashboard = document.getElementById('page-dashboard');
+            const pagePending = document.getElementById('page-pending');
+            const pageHistory = document.getElementById('page-history');
+            const pageIncome = document.getElementById('page-income');
+            const pagePlanning = document.getElementById('page-planning');
+            const allPages = [pageDashboard, pagePending, pageHistory, pageIncome, pagePlanning];
+            const allNavBtns = [navBtnDashboard, navBtnPending, navBtnHistory, navBtnIncome, navBtnPlanning];
+            const totalBalanceEl = document.getElementById('totalBalance');
+            const totalIncomeEl = document.getElementById('totalIncome');
+            const totalExpenseEl = document.getElementById('totalExpense');
+            const budgetProgressContainer = document.getElementById('budgetProgressContainer');
+            const overdueList = document.getElementById('overdueList');
+            const emptyStateOverdue = document.getElementById('emptyStateOverdue');
+            const totalOverdueAmountEl = document.getElementById('totalOverdueAmount');
+            const pendingList = document.getElementById('pendingList');
+            const emptyStatePending = document.getElementById('emptyStatePending');
+            const pendingTotalAmountEl = document.getElementById('pendingTotalAmount');
+            const pendingTotalFixedAmountEl = document.getElementById('pendingTotalFixedAmount');
+            const pendingFilterForm = document.getElementById('pendingFilterForm');
+            const pendingFilterStartDate = document.getElementById('pendingFilterStartDate');
+            const pendingFilterEndDate = document.getElementById('pendingFilterEndDate');
+            const pendingClearFilterBtn = document.getElementById('pendingClearFilterBtn');
+            const transactionList = document.getElementById('transactionList');
+            const emptyState = document.getElementById('emptyState');
+            const filterForm = document.getElementById('filterForm');
+            const filterStartDate = document.getElementById('filterStartDate');
+            const filterEndDate = document.getElementById('filterEndDate');
+            const filterCategory = document.getElementById('filterCategory');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+            const historyTotalAmountEl = document.getElementById('historyTotalAmount');
+            const incomeList = document.getElementById('incomeList');
+            const emptyStateIncome = document.getElementById('emptyStateIncome');
+            const incomeFilterForm = document.getElementById('incomeFilterForm');
+            const incomeFilterStartDate = document.getElementById('incomeFilterStartDate');
+            const incomeFilterEndDate = document.getElementById('incomeFilterEndDate');
+            const incomeFilterCategory = document.getElementById('incomeFilterCategory');
+            const incomeClearFilterBtn = document.getElementById('incomeClearFilterBtn');
+            const incomeTotalAmountEl = document.getElementById('incomeTotalAmount');
+            const budgetForm = document.getElementById('budgetForm');
+            const transactionModal = document.getElementById('transactionModal');
+            const transactionModalTitle = document.getElementById('transactionModalTitle');
+            const closeTransactionModalBtn = document.getElementById('closeTransactionModalBtn');
+            const addTransactionBtn = document.getElementById('addTransactionBtn');
+            const transactionForm = document.getElementById('transactionForm');
+            const categorySelect = document.getElementById('category');
+            const paidBySelect = document.getElementById('paidBy');
+            const dueDateInput = document.getElementById('dueDate');
+            const paymentDateInput = document.getElementById('paymentDate');
+            const statusSelect = document.getElementById('status');
+            const transactionSubmitBtn = document.getElementById('transactionSubmitBtn');
+            const expenseTypeContainer = document.getElementById('expenseTypeContainer');
+            const expenseTypeSelect = document.getElementById('expenseType');
+            const isRecurringCheckbox = document.getElementById('isRecurring');
+            const typeRadioButtons = document.querySelectorAll('input[name="type"]');
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
 
-        /** Popula os seletores de categoria (e o novo filtro) */
-        function populateCategorySelects() {
-            const optionsHtml = categories.map(c => `<option>${c}</option>`).join('');
-            categorySelect.innerHTML = optionsHtml;
-            
-            // Popula o filtro de categoria (Req 3 / Req 4)
-            filterCategory.innerHTML = `<option>Todas</option>` + optionsHtml;
-            
-            // NOVO: Popula o filtro de categoria de Entradas (Req 4)
-            const incomeCategories = categories.filter(c => c === 'Salário' || c === 'Outros'); // Exemplo
-            incomeFilterCategory.innerHTML = `<option>Todas</option>` + incomeCategories.map(c => `<option>${c}</option>`).join('');
-        }
+            // --- Funções Auxiliares ---
 
-        /** Atualiza um dropdown "Pago Por" com os nomes personalizados */
-        function updatePaidByDropdown(selectElement) {
-            if (!selectElement) return;
-            const currentValue = selectElement.value;
-            
-            selectElement.innerHTML = `
-                <option>${partnerNames.partner1}</option>
-                <option>${partnerNames.partner2}</option>
-                <option>Conta Conjunta</option>
-            `;
-
-            if ([partnerNames.partner1, partnerNames.partner2, 'Conta Conjunta'].includes(currentValue)) {
-                 selectElement.value = currentValue;
+            /** Formata um número para a moeda BRL */
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('pt-BR', { 
+                    style: 'currency', 
+                    currency: 'BRL' 
+                }).format(value);
             }
-        }
-
-        /** Atualiza os inputs do modal de configurações */
-        function updateSettingsModalInputs() {
-            partner1NameInput.value = partnerNames.partner1;
-            partner2NameInput.value = partnerNames.partner2;
-        }
-
-        // NOVO: Funções do Modal de Transação (Req 3)
-        /** Abre o modal de transação, opcionalmente em modo de edição */
-        function openTransactionModal(isEdit = false) {
-            if (isEdit) {
-                transactionModalTitle.textContent = "Editar Transação";
-                transactionSubmitBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Atualizar Transação
-                `;
-                transactionSubmitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                transactionSubmitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-            } else {
-                resetFormState(); // Garante que o formulário está limpo para adicionar
-                transactionModalTitle.textContent = "Adicionar Transação";
-                transactionSubmitBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    Adicionar Transação
-                `;
-                transactionSubmitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                transactionSubmitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            }
-            showElement(transactionModal);
-        }
-
-        /** Fecha o modal de transação e reseta o formulário */
-        function closeTransactionModal() {
-            hideElement(transactionModal);
-            resetFormState(); // Reseta o formulário após fechar
-        }
-
-        /** Reseta o formulário para o modo "Adicionar" */
-        function resetFormState() {
-            currentEditId = null;
-            transactionForm.reset();
-            dueDateInput.value = today; // Define a data de vencimento padrão
-            paymentDateInput.value = today; // Define a data de pagamento padrão
-            statusSelect.value = "Pago"; // Define status padrão
-            expenseTypeSelect.value = "Variável"; // (Req 4)
-            isRecurringCheckbox.checked = false; // (Req 5)
             
-            togglePaymentDateVisibility(); 
-            toggleExpenseTypeVisibility(); // (Req 4)
-        }
-
-        /** Alterna a visibilidade da Data de Pagamento baseada no Status */
-        function togglePaymentDateVisibility() {
-            const status = statusSelect.value;
-            if (status === 'A Pagar') {
-                hideElement(paymentDateInput.parentElement); // Esconde o div pai
-                paymentDateInput.value = ''; // Limpa o valor
-            } else {
-                showElement(paymentDateInput.parentElement); // Mostra o div pai
-                if (!paymentDateInput.value) {
-                    paymentDateInput.value = today; // Define hoje como padrão se estiver vazio
+            /** Formata data YYYY-MM-DD para DD/MM/YYYY */
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const [year, month, day] = dateString.split('-');
+                return `${day}/${month}/${year}`;
+            }
+            
+            /** Converte vários formatos de data (Excel, DD/MM/YYYY, YYYY-MM-DD) para um objeto Date */
+            function parseDateFromSheet(dateValue) {
+                if (dateValue instanceof Date) {
+                    return dateValue; // Já é um objeto Date (SheetJS cellDates:true)
                 }
-            }
-        }
-        
-        // Mostra/esconde o tipo de despesa (Req 4)
-        function toggleExpenseTypeVisibility() {
-            const type = transactionForm.elements['type'].value;
-            if (type === 'Despesa') {
-                showElement(expenseTypeContainer);
-            } else {
-                hideElement(expenseTypeContainer);
-            }
-        }
-
-        // NOVO: Gerencia a troca de Páginas (Req 2)
-        function switchPage(targetPageId) {
-            // Esconde todas as páginas
-            allPages.forEach(page => hideElement(page));
-            // Remove classe ativa de todos os botões
-            allNavBtns.forEach(btn => btn.classList.remove('active'));
-
-            // Mostra a página alvo e ativa o botão
-            const pageToShow = document.getElementById(targetPageId);
-            const btnToActivate = document.getElementById(targetPageId.replace('page-', 'navBtn'));
-            
-            if (pageToShow) showElement(pageToShow);
-            if (btnToActivate) btnToActivate.classList.add('active');
-        }
-
-        /** Aplica o tema (dark ou light) */
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            }
-        }
-
-        /** Alterna o tema atual */
-        function toggleTheme() {
-            const currentTheme = localStorage.getItem('theme');
-            if (currentTheme === 'dark') {
-                setTheme('light');
-            } else {
-                setTheme('dark');
-            }
-        }
-
-        /** Inicializa o tema ao carregar a página */
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                setTheme(savedTheme);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                setTheme('dark'); // Usa o tema do sistema
-            } else {
-                setTheme('light');
-            }
-            if(themeToggleBtn) {
-                themeToggleBtn.addEventListener('click', toggleTheme);
-            }
-        }
-
-        // --- Funções Principais da Aplicação ---
-
-        /** Inicializa o Firebase e autentica o usuário */
-        async function initializeAndAuth(configJson, token) {
-            try {
-                const firebaseConfig = JSON.parse(configJson);
-                const initialAuthToken = token;
-
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                appId = firebaseConfig.appId || 'default-app-id';
-                
-                return new Promise((resolve, reject) => {
-                    onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            resolve();
-                        } else if (initialAuthToken) {
-                            try {
-                                const userCredential = await signInWithCustomToken(auth, initialAuthToken);
-                                userId = userCredential.user.uid;
-                                resolve();
-                            } catch (error) {
-                                reject(new Error(`Erro ao autenticar com token: ${error.message}`));
-                            }
-                        } else {
-                            try {
-                                const userCredential = await signInAnonymously(auth);
-                                userId = userCredential.user.uid;
-                                resolve();
-                            } catch (error) {
-                                reject(new Error(`Erro ao autenticar anonimamente: ${error.message}`));
-                            }
+                if (typeof dateValue === 'string') {
+                    if (dateValue.includes('/')) {
+                        // Formato DD/MM/YYYY
+                        const parts = dateValue.split('/');
+                        if (parts.length === 3) {
+                            // Atenção ao mês (0-indexado)
+                            return new Date(parts[2], parseInt(parts[1], 10) - 1, parts[0]);
                         }
-                    });
-                });
-            } catch (error) {
-                throw new Error(`Falha na inicialização do Firebase: ${error.message}`);
-            }
-        }
-
-        /** Verifica se o usuário tem um familyId salvo */
-        function checkFamilyId() {
-            const storedFamilyId = localStorage.getItem('familyAppId');
-            if (storedFamilyId) {
-                initApp(storedFamilyId);
-            } else {
-                hideElement(loadingIndicator); 
-                showElement(familyModal);
-            }
-        }
-
-        /** Ação para criar uma nova família */
-        function handleCreateFamily() {
-            const newFamilyId = crypto.randomUUID();
-            familyIdDisplay.textContent = newFamilyId;
-            showElement(newFamilyIdSection);
-            createFamilyBtn.disabled = true;
-            joinFamilyBtn.disabled = true;
-        }
-
-        /** Ação para confirmar e salvar o ID da nova família */
-        function handleStartApp() {
-            const newFamilyId = familyIdDisplay.textContent;
-            localStorage.setItem('familyAppId', newFamilyId);
-            initApp(newFamilyId);
-        }
-
-        /** Ação para entrar em uma família existente */
-        function handleJoinFamily() {
-            const joinedFamilyId = familyIdInput.value.trim();
-            if (joinedFamilyId) {
-                localStorage.setItem('familyAppId', joinedFamilyId);
-                initApp(joinedFamilyId);
-            } else {
-                showToast("Por favor, insira um ID de Família válido.", true);
-            }
-        }
-
-        /** Inicializa a aplicação principal com o familyId */
-        function initApp(currentFamilyId) {
-            familyId = currentFamilyId;
-            
-            hideElement(familyModal);
-            showElement(loadingIndicator); 
-            hideElement(appContainer); // Esconde o container principal da app
-
-            currentFamilyIdEl.textContent = familyId;
-
-            // Configura os listeners
-            setupTransactionListener();
-            setupFamilySettingsListener();
-            setupBudgetListener();
-            
-            // Popula os selects estáticos
-            populateCategorySelects();
-            initBudgetForm();
-        }
-
-        // --- Funções de Leitura (Listeners do Firestore) ---
-
-        /** Retorna a referência do documento da família (para configurações) */
-        function getFamilyDocRef() {
-            return doc(db, 'artifacts', appId, 'public', 'data', 'families', familyId);
-        }
-
-        /** Retorna a referência da coleção de transações da família */
-        function getTransactionsCollectionRef() {
-            return collection(getFamilyDocRef(), 'transactions');
-        }
-
-        /** Retorna a referência do documento de orçamento mensal */
-        function getBudgetDocRef() {
-            return doc(db, 'artifacts', appId, 'public', 'data', 'families', familyId, 'budgets', 'monthly');
-        }
-
-        /** Configura o 'listener' onSnapshot para as Configurações da Família */
-        function setupFamilySettingsListener() {
-            if (unsubscribeFamilySettings) unsubscribeFamilySettings();
-            
-            const familyDocRef = getFamilyDocRef();
-            unsubscribeFamilySettings = onSnapshot(familyDocRef, (docSnap) => {
-                if (docSnap.exists() && docSnap.data().names) {
-                    partnerNames = docSnap.data().names;
-                } else {
-                    partnerNames = { partner1: 'Parceiro 1', partner2: 'Parceiro 2' };
-                    if (!docSnap.exists()) {
-                        setDoc(familyDocRef, { names: partnerNames }, { merge: true })
-                            .catch(e => console.error("Erro ao criar doc da família:", e));
+                    } else if (dateValue.includes('-')) {
+                        // Formato YYYY-MM-DD
+                        return new Date(dateValue + 'T00:00:00'); // Adiciona T00:00:00 para tratar como local
                     }
                 }
-                
-                localStorage.setItem('partner1Name', partnerNames.partner1);
-                localStorage.setItem('partner2Name', partnerNames.partner2);
-
-                updatePaidByDropdown(paidBySelect);
-                updatePaidByDropdown(importPaidBySelect);
-                updateSettingsModalInputs();
-            }, (error) => {
-                console.error("Erro ao ouvir configurações da família:", error);
-            });
-        }
-
-        /** Configura o 'listener' onSnapshot para Transações */
-        function setupTransactionListener() {
-            if (unsubscribeTransactions) unsubscribeTransactions();
-
-            const transCollectionRef = getTransactionsCollectionRef();
-            const q = query(transCollectionRef, orderBy("dueDate", "desc"));
-            
-            unsubscribeTransactions = onSnapshot(q, (snapshot) => {
-                allTransactions = [];
-                snapshot.forEach(doc => {
-                    allTransactions.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Atualiza toda a interface com os novos dados
-                updateAllUI(allTransactions);
-                
-                hideElement(loadingIndicator);
-                showElement(appContainer); // Mostra o container principal da app
-
-            }, (error) => {
-                console.error("Erro ao ouvir transações:", error);
-                hideElement(loadingIndicator);
-                showToast("Erro ao carregar dados. Verifique o console.", true);
-            });
-        }
-
-        /** Configura o 'listener' onSnapshot para o Orçamento */
-        function setupBudgetListener() {
-            if (unsubscribeBudget) unsubscribeBudget();
-
-            const budgetDocRef = getBudgetDocRef();
-            unsubscribeBudget = onSnapshot(budgetDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    monthlyBudget = docSnap.data();
-                } else {
-                    monthlyBudget = {}; 
-                }
-                updateBudgetFormInputs();
-                updateAllUI(allTransactions); 
-            }, (error) => {
-                console.error("Erro ao ouvir orçamento:", error);
-            });
-        }
-
-
-        // --- Funções de Escrita (Ações no Firestore) ---
-        
-        // NOVO: Lógica de Recorrência (Req 6)
-        /** Cria 12 instâncias futuras de uma transação recorrente */
-        async function createFutureRecurringTransactions(baseTransaction) {
-            try {
-                const promises = [];
-                const originalDueDate = new Date(baseTransaction.dueDate + 'T00:00:00'); 
-
-                for (let i = 1; i <= 12; i++) {
-                    const nextTransaction = { ...baseTransaction };
-                    delete nextTransaction.id; 
-                    
-                    const nextDueDate = new Date(originalDueDate.getFullYear(), originalDueDate.getMonth() + i, originalDueDate.getDate());
-                    
-                    if (nextDueDate.getDate() < originalDueDate.getDate()) {
-                        nextDueDate.setDate(0); 
-                    }
-                    
-                    nextTransaction.dueDate = nextDueDate.toISOString().split('T')[0];
-                    nextTransaction.status = "A Pagar";
-                    nextTransaction.paymentDate = "";
-                    // CORREÇÃO: Usar nextTransaction em vez de newTransaction
-                    nextTransaction.createdAt = new Date().toISOString(); 
-                    
-                    promises.push(addDoc(getTransactionsCollectionRef(), nextTransaction));
+                // Tenta converter diretamente (último recurso)
+                const dateObj = new Date(dateValue);
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    return dateObj;
                 }
                 
-                await Promise.all(promises);
-                showToast("12 contas recorrentes futuras foram criadas!");
-
-            } catch (error) {
-                console.error("Erro ao criar contas recorrentes:", error);
-                showToast("Erro ao gerar contas recorrentes.", true);
-            }
-        }
-
-
-        /** Manipulador para ADICIONAR ou ATUALIZAR uma transação */
-        async function handleTransactionSubmit(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(transactionForm);
-            const amount = parseFloat(formData.get('amount'));
-            
-            if (isNaN(amount) || amount <= 0) {
-                showToast("Por favor, insira um valor válido.", true);
-                return;
+                return null; // Formato desconhecido ou inválido
             }
 
-            const transactionData = {
-                description: formData.get('description'),
-                amount: amount,
-                type: formData.get('type'),
-                category: formData.get('category'),
-                paidBy: formData.get('paidBy'),
-                status: formData.get('status'),
-                dueDate: formData.get('dueDate'),
-                paymentDate: formData.get('paymentDate') || '',
-                expenseType: formData.get('type') === 'Despesa' ? formData.get('expenseType') : '',
-                isRecurring: formData.get('isRecurring') === 'on'
-            };
-
-            if (transactionData.status === 'Pago' && !transactionData.paymentDate) {
-                transactionData.paymentDate = today;
-            } else if (transactionData.status === 'A Pagar') {
-                transactionData.paymentDate = '';
-            }
-            
-            if (transactionData.type === 'Receita') {
-                transactionData.status = 'Pago';
-                if (!transactionData.paymentDate) {
-                    transactionData.paymentDate = transactionData.dueDate;
-                }
-                transactionData.expenseType = '';
+            /** Mostra um elemento */
+            function showElement(el) {
+                if (el) el.classList.remove('hidden');
             }
 
-            try {
-                if (currentEditId) {
-                    // --- MODO DE ATUALIZAÇÃO ---
-                    const docRef = doc(getTransactionsCollectionRef(), currentEditId);
-                    await updateDoc(docRef, transactionData);
-                    showToast("Transação atualizada!");
-                } else {
-                    // --- MODO DE ADIÇÃO ---
-                    transactionData.createdAt = new Date().toISOString();
-                    await addDoc(getTransactionsCollectionRef(), transactionData);
-                    showToast("Transação adicionada!");
-                    
-                    // NOVO: Lógica de Recorrência (Req 6)
-                    if (transactionData.isRecurring) {
-                        await createFutureRecurringTransactions(transactionData);
-                    }
-                }
-                closeTransactionModal(); // NOVO: Fecha o modal (Req 3)
-            } catch (error) {
-                console.error("Erro ao salvar transação:", error);
-                showToast("Erro ao salvar transação.", true);
+            /** Esconde um elemento */
+            function hideElement(el) {
+                if (el) el.classList.add('hidden');
             }
-        }
 
-        /** Manipulador para excluir uma transação */
-        async function handleDeleteTransaction(id) {
-            try {
-                const docRef = doc(getTransactionsCollectionRef(), id);
-                await deleteDoc(docRef);
-                showToast("Transação excluída!");
-            } catch (error) {
-                console.error("Erro ao excluir transação:", error);
-                showToast("Não foi possível excluir a transação.", true);
-            }
-        }
-
-        /** Prepara o formulário para editar uma transação */
-        function handleEditTransaction(transaction) {
-            currentEditId = transaction.id;
-
-            // Preenche o formulário
-            transactionForm.description.value = transaction.description;
-            transactionForm.amount.value = transaction.amount;
-            transactionForm.type.value = transaction.type;
-            transactionForm.category.value = transaction.category;
-            transactionForm.paidBy.value = transaction.paidBy;
-            transactionForm.status.value = transaction.status;
-            transactionForm.dueDate.value = transaction.dueDate;
-            transactionForm.paymentDate.value = transaction.paymentDate;
-            transactionForm.expenseType.value = transaction.expenseType || 'Variável';
-            transactionForm.isRecurring.checked = transaction.isRecurring || false;
-
-            togglePaymentDateVisibility(); 
-            toggleExpenseTypeVisibility();
-            
-            // NOVO: Abre o modal em modo de edição (Req 3)
-            openTransactionModal(true); 
-        }
-        
-        /** Marca uma conta como paga */
-        async function handleMarkAsPaid(id) {
-            try {
-                // Lógica de recorrência foi MOVIDA para handleTransactionSubmit
-                
-                // Marca a transação atual como paga
-                const docRef = doc(getTransactionsCollectionRef(), id);
-                await updateDoc(docRef, {
-                    status: "Pago",
-                    paymentDate: today 
-                });
-                showToast("Conta marcada como paga!");
-                
-            } catch (error) {
-                console.error("Erro ao marcar como pago:", error);
-                showToast("Erro ao atualizar conta.", true);
-            }
-        }
-
-        /** Manipulador para salvar as configurações de nomes */
-        async function handleSaveSettings(e) {
-            e.preventDefault();
-            const name1 = partner1NameInput.value.trim() || 'Parceiro 1';
-            const name2 = partner2NameInput.value.trim() || 'Parceiro 2';
-            const newNames = { partner1: name1, partner2: name2 };
-
-            try {
-                await setDoc(getFamilyDocRef(), { names: newNames }, { merge: true });
-                localStorage.setItem('partner1Name', name1);
-                localStorage.setItem('partner2Name', name2);
-                hideElement(settingsModal);
-                showToast("Nomes salvos!");
-            } catch (error) {
-                console.error("Erro ao salvar nomes:", error);
-                showToast("Erro ao salvar nomes.", true);
-            }
-        }
-        
-        /** Inicializa o formulário de orçamento na aba Planejamento */
-        function initBudgetForm() {
-            budgetForm.innerHTML = ''; // Limpa o formulário
-            const expenseCategories = categories.filter(c => c !== 'Salário'); // Orçamento é para despesas
-            
-            expenseCategories.forEach(category => {
-                const div = document.createElement('div');
-                div.className = "grid grid-cols-3 gap-4 items-center";
-                
-                const colorClass = categoryColorClasses[category] || categoryColorClasses['Outros'];
-                
-                div.innerHTML = `
-                    <label for="budget-${category}" class="col-span-1 text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                        <span class="w-3 h-3 rounded-full mr-2 ${colorClass}"></span>
-                        ${category}
-                    </label>
-                    <div class="col-span-2 relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
-                        <input type="number" step="0.01" min="0" 
-                               id="budget-${category}" 
-                               data-category="${category}"
-                               placeholder="0,00"
-                               class="budget-input pl-10 pr-4 py-2 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                `;
-                budgetForm.appendChild(div);
-            });
-            
-            // Adiciona listeners para salvar automaticamente
-            budgetForm.querySelectorAll('.budget-input').forEach(input => {
-                input.addEventListener('change', handleBudgetChange);
-            });
-            
-            updateBudgetFormInputs();
-        }
-        
-        /** Atualiza os valores nos inputs do formulário de orçamento */
-        function updateBudgetFormInputs() {
-            budgetForm.querySelectorAll('.budget-input').forEach(input => {
-                const category = input.dataset.category;
-                input.value = monthlyBudget[category] || '';
-            });
-        }
-        
-        /** Salva o valor do orçamento quando o input muda */
-        async function handleBudgetChange(e) {
-            const category = e.target.dataset.category;
-            const amount = parseFloat(e.target.value) || 0; // Salva 0 se limpar
-
-            try {
-                const budgetUpdate = {};
-                budgetUpdate[category] = amount;
-                
-                await setDoc(getBudgetDocRef(), budgetUpdate, { merge: true });
-                showToast(`Orçamento de ${category} salvo!`);
-            } catch (error) {
-                console.error("Erro ao salvar orçamento:", error);
-                showToast("Erro ao salvar orçamento.", true);
-            }
-        }
-
-
-        // --- Funções de Importação ---
-
-        /** Manipula a seleção do arquivo (Excel ou CSV) */
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            csvFileInput.value = null; 
-
-            const requiredCols = ['Descrição', 'Valor', 'Tipo', 'Vencimento', 'Categoria'];
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            /** Copia um texto para a área de transferência */
+            function copyToClipboard(text, button) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
                 try {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary', cellDates: true });
-                    const sheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[sheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { cellDates: true });
-
-                    if (jsonData.length === 0) {
-                        showToast("Arquivo vazio ou planilha sem dados.", true);
-                        return;
+                    document.execCommand('copy');
+                    if (button) {
+                        const originalText = button.innerHTML;
+                        button.innerHTML = 'Copiado!';
+                        button.classList.add('bg-green-600', 'text-white');
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.classList.remove('bg-green-600', 'text-white');
+                        }, 2000);
                     }
+                } catch (err) {
+                    console.error('Falha ao copiar:', err);
+                }
+                document.body.removeChild(textarea);
+            }
 
-                    const headers = Object.keys(jsonData[0]);
-                    const missingCols = requiredCols.filter(col => !headers.includes(col));
+            /** Mostra uma notificação toast */
+            function showToast(message, isError = false) {
+                toastNotification.textContent = message;
+                toastNotification.classList.remove('bg-green-600', 'bg-red-600');
+                if (isError) {
+                    toastNotification.classList.add('bg-red-600');
+                } else {
+                    toastNotification.classList.add('bg-green-600');
+                }
+                toastNotification.classList.remove('hidden', 'translate-x-[200%]');
+                toastNotification.classList.add('translate-x-0');
+
+                setTimeout(() => {
+                    toastNotification.classList.remove('translate-x-0');
+                    toastNotification.classList.add('translate-x-[200%]');
+                    setTimeout(() => toastNotification.classList.add('hidden'), 300);
+                }, 3000);
+            }
+
+            /** Obtém um ícone SVG para uma categoria */
+            function getCategoryIcon(category) {
+                const icons = {
+                    'Moradia': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" /></svg>`,
+                    'Alimentação': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M12 14.5v-5" /></svg>`,
+                    'Transporte': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75c-2.4 0-4.5-2.03-4.5-4.5s2.1-4.5 4.5-4.5 4.5 2.03 4.5 4.5-2.1 4.5-4.5 4.5zM12 4.5v2.25m-6.364 1.909l1.591 1.591m-3.282 3.282h2.25m1.909 6.364l1.591-1.591m3.282 3.282v-2.25m6.364-1.909l-1.591-1.591m3.282-3.282h-2.25m-1.909-6.364l-1.591 1.591" /></svg>`,
+                    'Lazer': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>`,
+                    'Saúde': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m-3-3V8m0 4h.01M12 16h.01" /></svg>`,
+                    'Conta de Energia': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3c-3.866 0-7 3.134-7 7 0 3.402 2.103 6.26 5 6.87V21h4v-4.13c2.897-.61 5-3.468 5-6.87 0-3.866-3.134-7-7-7z" /></svg>`,
+                    'Conta de Água': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-1.7-9.7C13.4 9.1 12.3 9 11 9c-2.4 0-4.6.9-6.2 2.3A4 4 0 003 15zM12 19v2M8 19v2m8-2v2" /></svg>`,
+                    'Internet': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.5a4 4 0 015.778 0M5 13.414a8 8 0 0114 0M1.889 10.328a12 12 0 0120.222 0" /></svg>`,
+                    'Salário': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 10.5v3m-6.495-6.495l-2.122 2.122m-5.656 5.656l-2.122 2.122m12.728-2.122l2.122 2.122M4.75 10.5v3M12 21V3" /></svg>`,
+                    'Outros': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5M8.25 12h7.5m-7.5 5.25h7.5M3 12a9 9 0 1118 0 9 9 0 01-18 0z" /></svg>`
+                };
+                return icons[category] || icons['Outros'];
+            }
+
+            // --- Funções de UI (Nomes, Formulário, Abas) ---
+
+            /** Popula os seletores de categoria (e o novo filtro) */
+            function populateCategorySelects() {
+                const optionsHtml = categories.map(c => `<option>${c}</option>`).join('');
+                categorySelect.innerHTML = optionsHtml;
+                
+                // Popula o filtro de categoria (Req 3 / Req 4)
+                filterCategory.innerHTML = `<option>Todas</option>` + optionsHtml;
+                
+                // NOVO: Popula o filtro de categoria de Entradas (Req 4)
+                const incomeCategories = categories.filter(c => c === 'Salário' || c === 'Outros'); // Exemplo
+                incomeFilterCategory.innerHTML = `<option>Todas</option>` + incomeCategories.map(c => `<option>${c}</option>`).join('');
+            }
+
+            /** Atualiza um dropdown "Pago Por" com os nomes personalizados */
+            function updatePaidByDropdown(selectElement) {
+                if (!selectElement) return;
+                const currentValue = selectElement.value;
+                
+                selectElement.innerHTML = `
+                    <option>${partnerNames.partner1}</option>
+                    <option>${partnerNames.partner2}</option>
+                    <option>Conta Conjunta</option>
+                `;
+
+                if ([partnerNames.partner1, partnerNames.partner2, 'Conta Conjunta'].includes(currentValue)) {
+                     selectElement.value = currentValue;
+                }
+            }
+
+            /** Atualiza os inputs do modal de configurações */
+            function updateSettingsModalInputs() {
+                partner1NameInput.value = partnerNames.partner1;
+                partner2NameInput.value = partnerNames.partner2;
+            }
+
+            // NOVO: Funções do Modal de Transação (Req 3)
+            /** Abre o modal de transação, opcionalmente em modo de edição */
+            function openTransactionModal(isEdit = false) {
+                if (isEdit) {
+                    transactionModalTitle.textContent = "Editar Transação";
+                    transactionSubmitBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Atualizar Transação
+                    `;
+                    transactionSubmitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    transactionSubmitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                } else {
+                    resetFormState(); // Garante que o formulário está limpo para adicionar
+                    transactionModalTitle.textContent = "Adicionar Transação";
+                    transactionSubmitBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        Adicionar Transação
+                    `;
+                    transactionSubmitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    transactionSubmitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                }
+                showElement(transactionModal);
+            }
+
+            /** Fecha o modal de transação e reseta o formulário */
+            function closeTransactionModal() {
+                hideElement(transactionModal);
+                resetFormState(); // Reseta o formulário após fechar
+            }
+
+            /** Reseta o formulário para o modo "Adicionar" */
+            function resetFormState() {
+                currentEditId = null;
+                transactionForm.reset();
+                dueDateInput.value = today; // Define a data de vencimento padrão
+                paymentDateInput.value = today; // Define a data de pagamento padrão
+                statusSelect.value = "Pago"; // Define status padrão
+                expenseTypeSelect.value = "Variável"; // (Req 4)
+                isRecurringCheckbox.checked = false; // (Req 5)
+                
+                togglePaymentDateVisibility(); 
+                toggleExpenseTypeVisibility(); // (Req 4)
+            }
+
+            /** Alterna a visibilidade da Data de Pagamento baseada no Status */
+            function togglePaymentDateVisibility() {
+                const status = statusSelect.value;
+                if (status === 'A Pagar') {
+                    hideElement(paymentDateInput.parentElement); // Esconde o div pai
+                    paymentDateInput.value = ''; // Limpa o valor
+                } else {
+                    showElement(paymentDateInput.parentElement); // Mostra o div pai
+                    if (!paymentDateInput.value) {
+                        paymentDateInput.value = today; // Define hoje como padrão se estiver vazio
+                    }
+                }
+            }
+            
+            // Mostra/esconde o tipo de despesa (Req 4)
+            function toggleExpenseTypeVisibility() {
+                const type = transactionForm.elements['type'].value;
+                if (type === 'Despesa') {
+                    showElement(expenseTypeContainer);
+                } else {
+                    hideElement(expenseTypeContainer);
+                }
+            }
+
+            // NOVO: Gerencia a troca de Páginas (Req 2)
+            function switchPage(targetPageId) {
+                // Esconde todas as páginas
+                allPages.forEach(page => hideElement(page));
+                // Remove classe ativa de todos os botões
+                allNavBtns.forEach(btn => btn.classList.remove('active'));
+
+                // Mostra a página alvo e ativa o botão
+                const pageToShow = document.getElementById(targetPageId);
+                const btnToActivate = document.getElementById(targetPageId.replace('page-', 'navBtn'));
+                
+                if (pageToShow) showElement(pageToShow);
+                if (btnToActivate) btnToActivate.classList.add('active');
+            }
+
+            /** Aplica o tema (dark ou light) */
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+
+            /** Alterna o tema atual */
+            function toggleTheme() {
+                const currentTheme = localStorage.getItem('theme');
+                if (currentTheme === 'dark') {
+                    setTheme('light');
+                } else {
+                    setTheme('dark');
+                }
+            }
+
+            /** Inicializa o tema ao carregar a página */
+            function initializeTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme) {
+                    setTheme(savedTheme);
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    setTheme('dark'); // Usa o tema do sistema
+                } else {
+                    setTheme('light');
+                }
+                if(themeToggleBtn) {
+                    themeToggleBtn.addEventListener('click', toggleTheme);
+                }
+            }
+
+            // --- Funções Principais da Aplicação ---
+
+            /** Inicializa o Firebase e autentica o usuário */
+            async function initializeAndAuth(configJson, token) {
+                try {
+                    const firebaseConfig = JSON.parse(configJson);
+                    const initialAuthToken = token;
+
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    appId = firebaseConfig.appId || 'default-app-id';
                     
-                    if (missingCols.length > 0) {
-                        showToast(`Arquivo inválido. Colunas faltando: ${missingCols.join(', ')}`, true);
-                        return;
-                    }
+                    return new Promise((resolve, reject) => {
+                        onAuthStateChanged(auth, async (user) => {
+                            if (user) {
+                                userId = user.uid;
+                                resolve();
+                            } else if (initialAuthToken) {
+                                try {
+                                    const userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                                    userId = userCredential.user.uid;
+                                    resolve();
+                                } catch (error) {
+                                    reject(new Error(`Erro ao autenticar com token: ${error.message}`));
+                                }
+                            } else {
+                                try {
+                                    const userCredential = await signInAnonymously(auth);
+                                    userId = userCredential.user.uid;
+                                    resolve();
+                                } catch (error) {
+                                    reject(new Error(`Erro ao autenticar anonimamente: ${error.message}`));
+                                }
+                            }
+                        });
+                    });
+                } catch (error) {
+                    throw new Error(`Falha na inicialização do Firebase: ${error.message}`);
+                }
+            }
 
-                    parsedCsvData = jsonData;
-                    showReviewModal(parsedCsvData);
+            /** Verifica se o usuário tem um familyId salvo */
+            function checkFamilyId() {
+                const storedFamilyId = localStorage.getItem('familyAppId');
+                if (storedFamilyId) {
+                    initApp(storedFamilyId);
+                } else {
+                    hideElement(loadingIndicator); 
+                    showElement(familyModal);
+                }
+            }
+
+            /** Ação para criar uma nova família */
+            function handleCreateFamily() {
+                const newFamilyId = crypto.randomUUID();
+                familyIdDisplay.textContent = newFamilyId;
+                showElement(newFamilyIdSection);
+                createFamilyBtn.disabled = true;
+                joinFamilyBtn.disabled = true;
+            }
+
+            /** Ação para confirmar e salvar o ID da nova família */
+            function handleStartApp() {
+                const newFamilyId = familyIdDisplay.textContent;
+                localStorage.setItem('familyAppId', newFamilyId);
+                initApp(newFamilyId);
+            }
+
+            /** Ação para entrar em uma família existente */
+            function handleJoinFamily() {
+                const joinedFamilyId = familyIdInput.value.trim();
+                if (joinedFamilyId) {
+                    localStorage.setItem('familyAppId', joinedFamilyId);
+                    initApp(joinedFamilyId);
+                } else {
+                    showToast("Por favor, insira um ID de Família válido.", true);
+                }
+            }
+
+            /** Inicializa a aplicação principal com o familyId */
+            function initApp(currentFamilyId) {
+                familyId = currentFamilyId;
+                
+                hideElement(familyModal);
+                showElement(loadingIndicator); 
+                hideElement(appContainer); // Esconde o container principal da app
+                hideElement(addTransactionBtn); // Esconde o FAB
+
+                currentFamilyIdEl.textContent = familyId;
+
+                // Configura os listeners
+                setupTransactionListener();
+                setupFamilySettingsListener();
+                setupBudgetListener();
+                
+                // Popula os selects estáticos
+                populateCategorySelects();
+                initBudgetForm();
+            }
+
+            // --- Funções de Leitura (Listeners do Firestore) ---
+
+            /** Retorna a referência do documento da família (para configurações) */
+            function getFamilyDocRef() {
+                return doc(db, 'artifacts', appId, 'public', 'data', 'families', familyId);
+            }
+
+            /** Retorna a referência da coleção de transações da família */
+            function getTransactionsCollectionRef() {
+                return collection(getFamilyDocRef(), 'transactions');
+            }
+
+            /** Retorna a referência do documento de orçamento mensal */
+            function getBudgetDocRef() {
+                return doc(db, 'artifacts', appId, 'public', 'data', 'families', familyId, 'budgets', 'monthly');
+            }
+
+            /** Configura o 'listener' onSnapshot para as Configurações da Família */
+            function setupFamilySettingsListener() {
+                if (unsubscribeFamilySettings) unsubscribeFamilySettings();
+                
+                const familyDocRef = getFamilyDocRef();
+                unsubscribeFamilySettings = onSnapshot(familyDocRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().names) {
+                        partnerNames = docSnap.data().names;
+                    } else {
+                        partnerNames = { partner1: 'Parceiro 1', partner2: 'Parceiro 2' };
+                        if (!docSnap.exists()) {
+                            setDoc(familyDocRef, { names: partnerNames }, { merge: true })
+                                .catch(e => console.error("Erro ao criar doc da família:", e));
+                        }
+                    }
+                    
+                    localStorage.setItem('partner1Name', partnerNames.partner1);
+                    localStorage.setItem('partner2Name', partnerNames.partner2);
+
+                    updatePaidByDropdown(paidBySelect);
+                    updatePaidByDropdown(importPaidBySelect);
+                    updateSettingsModalInputs();
+                }, (error) => {
+                    console.error("Erro ao ouvir configurações da família:", error);
+                });
+            }
+
+            /** Configura o 'listener' onSnapshot para Transações */
+            function setupTransactionListener() {
+                if (unsubscribeTransactions) unsubscribeTransactions();
+
+                const transCollectionRef = getTransactionsCollectionRef();
+                const q = query(transCollectionRef, orderBy("dueDate", "desc"));
+                
+                unsubscribeTransactions = onSnapshot(q, (snapshot) => {
+                    allTransactions = [];
+                    snapshot.forEach(doc => {
+                        allTransactions.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Atualiza toda a interface com os novos dados
+                    updateAllUI(allTransactions);
+                    
+                    hideElement(loadingIndicator);
+                    showElement(appContainer); // Mostra o container principal da app
+                    showElement(addTransactionBtn); // Mostra o FAB
+
+                }, (error) => {
+                    console.error("Erro ao ouvir transações:", error);
+                    hideElement(loadingIndicator);
+                    showToast("Erro ao carregar dados. Verifique o console.", true);
+                });
+            }
+
+            /** Configura o 'listener' onSnapshot para o Orçamento */
+            function setupBudgetListener() {
+                if (unsubscribeBudget) unsubscribeBudget();
+
+                const budgetDocRef = getBudgetDocRef();
+                unsubscribeBudget = onSnapshot(budgetDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        monthlyBudget = docSnap.data();
+                    } else {
+                        monthlyBudget = {}; 
+                    }
+                    updateBudgetFormInputs();
+                    updateAllUI(allTransactions); 
+                }, (error) => {
+                    console.error("Erro ao ouvir orçamento:", error);
+                });
+            }
+
+
+            // --- Funções de Escrita (Ações no Firestore) ---
+            
+            // Lógica de Recorrência (Req 6)
+            /** Cria 12 instâncias futuras de uma transação recorrente */
+            async function createFutureRecurringTransactions(baseTransaction) {
+                try {
+                    const promises = [];
+                    const originalDueDate = new Date(baseTransaction.dueDate + 'T00:00:00'); 
+
+                    for (let i = 1; i <= 12; i++) {
+                        const nextTransaction = { ...baseTransaction };
+                        delete nextTransaction.id; 
+                        
+                        const nextDueDate = new Date(originalDueDate.getFullYear(), originalDueDate.getMonth() + i, originalDueDate.getDate());
+                        
+                        if (nextDueDate.getDate() < originalDueDate.getDate()) {
+                            nextDueDate.setDate(0); 
+                        }
+                        
+                        nextTransaction.dueDate = nextDueDate.toISOString().split('T')[0];
+                        nextTransaction.status = "A Pagar";
+                        nextTransaction.paymentDate = "";
+                        nextTransaction.createdAt = new Date().toISOString(); 
+                        
+                        promises.push(addDoc(getTransactionsCollectionRef(), nextTransaction));
+                    }
+                    
+                    await Promise.all(promises);
+                    showToast("12 contas recorrentes futuras foram criadas!");
 
                 } catch (error) {
-                    console.error("Erro ao ler o arquivo (SheetJS):", error);
-                    showToast("Erro ao ler o arquivo. Verifique o formato.", true);
+                    console.error("Erro ao criar contas recorrentes:", error);
+                    showToast("Erro ao gerar contas recorrentes.", true);
                 }
-            };
-            reader.onerror = (error) => showToast("Não foi possível ler o arquivo.", true);
-            reader.readAsBinaryString(file);
-        }
+            }
 
-        /** Mostra o modal de revisão com os dados */
-        function showReviewModal(data) {
-            updatePaidByDropdown(importPaidBySelect); 
 
-            const headers = Object.keys(data[0]);
-            csvPreviewHead.innerHTML = `
-                <tr>
-                    ${headers.map(h => `<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">${h}</th>`).join('')}
-                </tr>
-            `;
-
-            const previewData = data.slice(0, 5);
-            csvPreviewBody.innerHTML = previewData.map(row => `
-                <tr>
-                    ${headers.map(h => {
-                        let val = row[h] || '';
-                        if (val instanceof Date) {
-                            val = val.toLocaleDateString('pt-BR');
-                        }
-                        return `<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${val}</td>`
-                    }).join('')}
-                </tr>
-            `).join('');
-
-            showElement(importReviewStep);
-            hideElement(importLoadingStep);
-            showElement(importModal);
-        }
-
-        /** Processa e importa os dados para o Firestore */
-        async function processImport() {
-            if (parsedCsvData.length === 0) return;
-
-            const defaultPaidBy = importPaidBySelect.value;
-            showElement(importLoadingStep);
-            hideElement(importReviewStep);
-
-            const importPromises = [];
-            let processedCount = 0;
-
-            for (const row of parsedCsvData) {
-                let amount;
-                if (typeof row.Valor === 'number') {
-                    amount = row.Valor;
-                } else {
-                    let amountStr = String(row.Valor).replace(/R\$|\s/g, '');
-                    if (amountStr.includes(',') && amountStr.includes('.')) {
-                        amountStr = amountStr.replace(/\./g, '');
-                    }
-                    amountStr = amountStr.replace(',', '.');
-                    amount = parseFloat(amountStr);
-                }
-
-                const type = row.Tipo;
-                const dueDateValue = row['Vencimento'];
-                const paymentDateValue = row['Data Pagamento'] || ''; 
+            /** Manipulador para ADICIONAR ou ATUALIZAR uma transação */
+            async function handleTransactionSubmit(e) {
+                e.preventDefault();
                 
-                const dueDate = parseDateFromSheet(dueDateValue);
+                const formData = new FormData(transactionForm);
+                const amount = parseFloat(formData.get('amount'));
                 
-                if (!dueDate || isNaN(dueDate.getTime())) {
-                    console.warn("Linha pulada (Data de Vencimento inválida):", row);
-                    continue; 
-                }
-                
-                let paymentDate = '';
-                if (paymentDateValue) {
-                    const pd = parseDateFromSheet(paymentDateValue);
-                    if (pd && !isNaN(pd.getTime())) {
-                        paymentDate = pd.toISOString().split('T')[0];
-                    }
-                }
-                
-                const statusValue = row['Status'] || (paymentDate ? 'Pago' : 'A Pagar'); 
-                const category = (row.Categoria === 'N/A' || !row.Categoria) ? 'Outros' : row.Categoria;
-                const expenseType = row['Tipo de Despesa'] === 'Fixa' ? 'Fixa' : 'Variável';
-                const isRecurring = row['Recorrente'] === true || row['Recorrente'] === 'Sim';
-
-                if (!row.Descrição || isNaN(amount) || amount <= 0 || !type) {
-                    console.warn("Linha pulada (dados inválidos):", row);
-                    continue;
+                if (isNaN(amount) || amount <= 0) {
+                    showToast("Por favor, insira um valor válido.", true);
+                    return;
                 }
 
-                const newTransaction = {
-                    description: row.Descrição,
+                const transactionData = {
+                    description: formData.get('description'),
                     amount: amount,
-                    dueDate: dueDate.toISOString().split('T')[0],
-                    paymentDate: paymentDate,
-                    status: statusValue,
-                    type: type,
-                    category: category,
-                    paidBy: defaultPaidBy,
-                    expenseType: (type === 'Despesa') ? expenseType : '',
-                    isRecurring: isRecurring,
-                    createdAt: new Date().toISOString()
+                    type: formData.get('type'),
+                    category: formData.get('category'),
+                    paidBy: formData.get('paidBy'),
+                    status: formData.get('status'),
+                    dueDate: formData.get('dueDate'),
+                    paymentDate: formData.get('paymentDate') || '',
+                    expenseType: formData.get('type') === 'Despesa' ? formData.get('expenseType') : '',
+                    isRecurring: formData.get('isRecurring') === 'on'
                 };
 
-                importPromises.push(addDoc(getTransactionsCollectionRef(), newTransaction));
-                processedCount++;
-            }
+                if (transactionData.status === 'Pago' && !transactionData.paymentDate) {
+                    transactionData.paymentDate = today;
+                } else if (transactionData.status === 'A Pagar') {
+                    transactionData.paymentDate = '';
+                }
+                
+                if (transactionData.type === 'Receita') {
+                    transactionData.status = 'Pago';
+                    if (!transactionData.paymentDate) {
+                        transactionData.paymentDate = transactionData.dueDate;
+                    }
+                    transactionData.expenseType = '';
+                }
 
-            try {
-                await Promise.all(importPromises);
-                showToast(`Sucesso! ${processedCount} transações importadas.`);
-            } catch (error) {
-                console.error("Erro durante a importação:", error);
-                showToast("Erro ao importar transações.", true);
-            } finally {
-                hideElement(importModal);
-                parsedCsvData = [];
-                csvFileInput.value = null;
-            }
-        }
-
-
-        // --- Funções de Renderização (Atualização da UI) ---
-
-        /** Função principal para atualizar toda a UI com novos dados */
-        function updateAllUI(transactions) {
-            // Filtros de data
-            const firstDayOfMonth = new Date(today.split('-')[0], today.split('-')[1] - 1, 1);
-            
-            // Transações do mês corrente (para o Painel Principal)
-            const monthTransactions = transactions.filter(t => {
-                const dateToCompare = t.paymentDate || t.dueDate;
                 try {
-                    const transactionDate = new Date(dateToCompare + 'T00:00:00'); // Garante que é local
-                    return transactionDate >= firstDayOfMonth;
-                } catch(e) {
-                    console.warn("Data inválida encontrada:", t);
-                    return false;
-                }
-            });
-            
-            // Transações atrasadas (para o novo card) (Req 2)
-            const overdueTransactions = transactions.filter(t => t.status === 'A Pagar' && t.dueDate < today);
-            
-            // Total de Contas Atrasadas (Req 2)
-            const totalOverdue = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
-
-            // 1. Renderiza o Painel Principal
-            renderDashboard(monthTransactions); // Req 5 (Balancete)
-            renderBudgetProgress(monthTransactions);
-            renderOverdueList(overdueTransactions, totalOverdue); // Req 2
-            
-            // 2. Renderiza a Aba "Contas a Pagar"
-            renderPendingList(transactions); // Req 1 e 6
-            
-            // 3. Renderiza o Histórico ("Contas Pagas")
-            renderHistoryList(transactions); // Req 1, 3, 4, 6
-            
-            // 4. Renderiza a Aba "Entradas"
-            renderIncomeList(transactions); // Req 4
-        }
-
-        /** Renderiza os cards do Dashboard (Balancete Req 5) */
-        function renderDashboard(monthTransactions) {
-            let totalIncome = 0;
-            let totalExpense = 0;
-
-            monthTransactions.forEach(t => {
-                if (t.type === 'Receita' && t.status === 'Pago') { 
-                    totalIncome += t.amount;
-                } else if (t.type === 'Despesa' && t.status === 'Pago') { 
-                    totalExpense += t.amount;
-                }
-            });
-
-            const totalBalance = totalIncome - totalExpense;
-
-            totalBalanceEl.textContent = formatCurrency(totalBalance);
-            totalBalanceEl.classList.toggle('text-red-600', totalBalance < 0);
-            totalBalanceEl.classList.toggle('dark:text-gray-100', totalBalance >= 0); 
-            totalBalanceEl.classList.toggle('text-gray-900', totalBalance >= 0);
-            
-            totalIncomeEl.textContent = formatCurrency(totalIncome);
-            totalExpenseEl.textContent = formatCurrency(totalExpense);
-        }
-        
-        /** Renderiza o progresso do orçamento no Painel Principal */
-        function renderBudgetProgress(monthTransactions) {
-            budgetProgressContainer.innerHTML = ''; 
-            
-            const expensesByCategory = {};
-            monthTransactions
-                .filter(t => t.type === 'Despesa' && t.status === 'Pago')
-                .forEach(t => {
-                    expensesByCategory[t.category] = (expensesByCategory[t.category] || 0) + t.amount;
-                });
-            
-            if (Object.keys(monthlyBudget).length === 0 && Object.keys(expensesByCategory).length === 0) {
-                budgetProgressContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center">Defina seus orçamentos na aba "Planejamento" para começar.</p>';
-                return;
-            }
-
-            const allBudgetCategories = new Set([...Object.keys(monthlyBudget), ...Object.keys(expensesByCategory)]);
-            
-            allBudgetCategories.forEach(category => {
-                if (category === 'Salário') return; 
-                
-                const spent = expensesByCategory[category] || 0;
-                const limit = monthlyBudget[category] || 0;
-                const percent = (limit > 0) ? (spent / limit) * 100 : 0;
-                const remaining = limit - spent;
-                
-                let progressBarClass = 'bg-blue-500'; 
-                let remainingText = `${formatCurrency(remaining)} restantes`;
-                
-                if (spent > limit && limit > 0) {
-                    progressBarClass = 'bg-red-500'; 
-                    remainingText = `${formatCurrency(Math.abs(remaining))} acima`;
-                } else if (percent > 85 && limit > 0) {
-                    progressBarClass = 'bg-yellow-500'; 
-                } else if (limit === 0 && spent > 0) {
-                    progressBarClass = 'bg-gray-400'; 
-                    remainingText = 'Sem limite definido';
-                } else if (limit > 0 && spent === 0) {
-                     remainingText = `Limite de ${formatCurrency(limit)}`;
-                }
-
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${category}</span>
-                        <span class="text-sm font-semibold ${spent > limit && limit > 0 ? 'text-red-600 dark:text-red-500' : 'text-gray-800 dark:text-gray-200'}">
-                            ${formatCurrency(spent)} / ${limit > 0 ? formatCurrency(limit) : '...'}
-                        </span>
-                    </div>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                        <div class="${progressBarClass} h-2.5 rounded-full" style="width: ${Math.min(percent, 100)}%"></div>
-                    </div>
-                    <p class="text-xs text-right text-gray-500 dark:text-gray-400 mt-1">${remainingText}</p>
-                `;
-                budgetProgressContainer.appendChild(div);
-            });
-        }
-
-        /** Renderiza uma lista de transações (para Painel, Contas a Pagar, Atrasadas) */
-        function renderGenericTransactionList(element, transactions, showEmptyStateEl) {
-            element.innerHTML = ''; // Limpa a lista
-            
-            if (transactions.length === 0) {
-                showElement(showEmptyStateEl);
-                return;
-            }
-            
-            hideElement(showEmptyStateEl);
-
-            transactions.forEach(t => {
-                const li = document.createElement('li');
-                li.className = 'py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between';
-                
-                const amountColor = t.type === 'Receita' ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500';
-                const amountSign = t.type === 'Receita' ? '+' : '-';
-                const iconColor = t.type === 'Receita' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : (
-                    t.status === 'Pago' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-                );
-                
-                const isOverdue = t.dueDate < today && t.status === 'A Pagar';
-                
-                li.innerHTML = `
-                    <div class="flex items-center mb-2 sm:mb-0 flex-grow mr-4">
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full ${iconColor} flex items-center justify-center mr-3">
-                            ${getCategoryIcon(t.category)}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-base font-medium text-gray-900 dark:text-gray-100 truncate ${isOverdue ? 'text-red-600 dark:text-red-400 font-bold' : ''}">
-                                ${t.description}
-                                ${t.isRecurring ? `<span class="text-xs text-blue-500 ml-1">(Recorrente)</span>` : ''} <!-- (Req 5) -->
-                            </p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                ${t.status === 'Pago' ? `Pago em ${formatDate(t.paymentDate)}` : `Vence em ${formatDate(t.dueDate)}`}
-                                 · ${t.category}
-                                 ${t.expenseType ? `· ${t.expenseType}` : ''} <!-- (Req 4) -->
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between sm:justify-end mt-2 sm:mt-0 flex-shrink-0">
-                        <span class="text-lg font-semibold ${amountColor} sm:mr-4">
-                            ${amountSign} ${formatCurrency(t.amount)}
-                        </span>
-                        
-                        ${t.status === 'A Pagar' ? `
-                        <button title="Marcar como Pago" class="pay-btn p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        ` : ''}
-                        
-                        <button title="Editar" class="edit-btn p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </button>
-                        <button title="Excluir" class="delete-btn p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                
-                const fullTransaction = allTransactions.find(trans => trans.id === t.id);
-                
-                li.querySelector('.delete-btn')?.addEventListener('click', () => handleDeleteTransaction(t.id));
-                li.querySelector('.edit-btn')?.addEventListener('click', () => {
-                    if (fullTransaction) {
-                        handleEditTransaction(fullTransaction);
+                    if (currentEditId) {
+                        // --- MODO DE ATUALIZAÇÃO ---
+                        const docRef = doc(getTransactionsCollectionRef(), currentEditId);
+                        await updateDoc(docRef, transactionData);
+                        showToast("Transação atualizada!");
                     } else {
-                        console.error("Não foi possível encontrar a transação para editar.");
+                        // --- MODO DE ADIÇÃO ---
+                        transactionData.createdAt = new Date().toISOString();
+                        await addDoc(getTransactionsCollectionRef(), transactionData);
+                        showToast("Transação adicionada!");
+                        
+                        // Lógica de Recorrência (Req 6)
+                        if (transactionData.isRecurring) {
+                            await createFutureRecurringTransactions(transactionData);
+                        }
+                    }
+                    closeTransactionModal(); // Fecha o modal (Req 3)
+                } catch (error) {
+                    console.error("Erro ao salvar transação:", error);
+                    showToast("Erro ao salvar transação.", true);
+                }
+            }
+
+            /** Manipulador para excluir uma transação */
+            async function handleDeleteTransaction(id) {
+                try {
+                    const docRef = doc(getTransactionsCollectionRef(), id);
+                    await deleteDoc(docRef);
+                    showToast("Transação excluída!");
+                } catch (error) {
+                    console.error("Erro ao excluir transação:", error);
+                    showToast("Não foi possível excluir a transação.", true);
+                }
+            }
+
+            /** Prepara o formulário para editar uma transação */
+            function handleEditTransaction(transaction) {
+                currentEditId = transaction.id;
+
+                // Preenche o formulário
+                transactionForm.description.value = transaction.description;
+                transactionForm.amount.value = transaction.amount;
+                transactionForm.type.value = transaction.type;
+                transactionForm.category.value = transaction.category;
+                transactionForm.paidBy.value = transaction.paidBy;
+                transactionForm.status.value = transaction.status;
+                transactionForm.dueDate.value = transaction.dueDate;
+                transactionForm.paymentDate.value = transaction.paymentDate;
+                transactionForm.expenseType.value = transaction.expenseType || 'Variável';
+                transactionForm.isRecurring.checked = transaction.isRecurring || false;
+
+                togglePaymentDateVisibility(); 
+                toggleExpenseTypeVisibility();
+                
+                // Abre o modal em modo de edição (Req 3)
+                openTransactionModal(true); 
+            }
+            
+            /** Marca uma conta como paga */
+            async function handleMarkAsPaid(id) {
+                try {
+                    // Lógica de recorrência foi MOVIDA para handleTransactionSubmit
+                    
+                    // Marca a transação atual como paga
+                    const docRef = doc(getTransactionsCollectionRef(), id);
+                    await updateDoc(docRef, {
+                        status: "Pago",
+                        paymentDate: today 
+                    });
+                    showToast("Conta marcada como paga!");
+                    
+                } catch (error) {
+                    console.error("Erro ao marcar como pago:", error);
+                    showToast("Erro ao atualizar conta.", true);
+                }
+            }
+
+            /** Manipulador para salvar as configurações de nomes */
+            async function handleSaveSettings(e) {
+                e.preventDefault();
+                const name1 = partner1NameInput.value.trim() || 'Parceiro 1';
+                const name2 = partner2NameInput.value.trim() || 'Parceiro 2';
+                const newNames = { partner1: name1, partner2: name2 };
+
+                try {
+                    await setDoc(getFamilyDocRef(), { names: newNames }, { merge: true });
+                    localStorage.setItem('partner1Name', name1);
+                    localStorage.setItem('partner2Name', name2);
+                    hideElement(settingsModal);
+                    showToast("Nomes salvos!");
+                } catch (error) {
+                    console.error("Erro ao salvar nomes:", error);
+                    showToast("Erro ao salvar nomes.", true);
+                }
+            }
+            
+            /** Inicializa o formulário de orçamento na aba Planejamento */
+            function initBudgetForm() {
+                budgetForm.innerHTML = ''; // Limpa o formulário
+                const expenseCategories = categories.filter(c => c !== 'Salário'); // Orçamento é para despesas
+                
+                expenseCategories.forEach(category => {
+                    const div = document.createElement('div');
+                    div.className = "grid grid-cols-3 gap-4 items-center";
+                    
+                    const colorClass = categoryColorClasses[category] || categoryColorClasses['Outros'];
+                    
+                    div.innerHTML = `
+                        <label for="budget-${category}" class="col-span-1 text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+                            <span class="w-3 h-3 rounded-full mr-2 ${colorClass}"></span>
+                            ${category}
+                        </label>
+                        <div class="col-span-2 relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                            <input type="number" step="0.01" min="0" 
+                                   id="budget-${category}" 
+                                   data-category="${category}"
+                                   placeholder="0,00"
+                                   class="budget-input pl-10 pr-4 py-2 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    `;
+                    budgetForm.appendChild(div);
+                });
+                
+                // Adiciona listeners para salvar automaticamente
+                budgetForm.querySelectorAll('.budget-input').forEach(input => {
+                    input.addEventListener('change', handleBudgetChange);
+                });
+                
+                updateBudgetFormInputs();
+            }
+            
+            /** Atualiza os valores nos inputs do formulário de orçamento */
+            function updateBudgetFormInputs() {
+                budgetForm.querySelectorAll('.budget-input').forEach(input => {
+                    const category = input.dataset.category;
+                    input.value = monthlyBudget[category] || '';
+                });
+            }
+            
+            /** Salva o valor do orçamento quando o input muda */
+            async function handleBudgetChange(e) {
+                const category = e.target.dataset.category;
+                const amount = parseFloat(e.target.value) || 0; // Salva 0 se limpar
+
+                try {
+                    const budgetUpdate = {};
+                    budgetUpdate[category] = amount;
+                    
+                    await setDoc(getBudgetDocRef(), budgetUpdate, { merge: true });
+                    showToast(`Orçamento de ${category} salvo!`);
+                } catch (error) {
+                    console.error("Erro ao salvar orçamento:", error);
+                    showToast("Erro ao salvar orçamento.", true);
+                }
+            }
+
+
+            // --- Funções de Importação ---
+
+            /** Manipula a seleção do arquivo (Excel ou CSV) */
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                csvFileInput.value = null; 
+
+                const requiredCols = ['Descrição', 'Valor', 'Tipo', 'Vencimento', 'Categoria'];
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = e.target.result;
+                        const workbook = XLSX.read(data, { type: 'binary', cellDates: true });
+                        const sheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { cellDates: true });
+
+                        if (jsonData.length === 0) {
+                            showToast("Arquivo vazio ou planilha sem dados.", true);
+                            return;
+                        }
+
+                        const headers = Object.keys(jsonData[0]);
+                        const missingCols = requiredCols.filter(col => !headers.includes(col));
+                        
+                        if (missingCols.length > 0) {
+                            showToast(`Arquivo inválido. Colunas faltando: ${missingCols.join(', ')}`, true);
+                            return;
+                        }
+
+                        parsedCsvData = jsonData;
+                        showReviewModal(parsedCsvData);
+
+                    } catch (error) {
+                        console.error("Erro ao ler o arquivo (SheetJS):", error);
+                        showToast("Erro ao ler o arquivo. Verifique o formato.", true);
+                    }
+                };
+                reader.onerror = (error) => showToast("Não foi possível ler o arquivo.", true);
+                reader.readAsBinaryString(file);
+            }
+
+            /** Mostra o modal de revisão com os dados */
+            function showReviewModal(data) {
+                updatePaidByDropdown(importPaidBySelect); 
+
+                const headers = Object.keys(data[0]);
+                csvPreviewHead.innerHTML = `
+                    <tr>
+                        ${headers.map(h => `<th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">${h}</th>`).join('')}
+                    </tr>
+                `;
+
+                const previewData = data.slice(0, 5);
+                csvPreviewBody.innerHTML = previewData.map(row => `
+                    <tr>
+                        ${headers.map(h => {
+                            let val = row[h] || '';
+                            if (val instanceof Date) {
+                                val = val.toLocaleDateString('pt-BR');
+                            }
+                            return `<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">${val}</td>`
+                        }).join('')}
+                    </tr>
+                `).join('');
+
+                showElement(importReviewStep);
+                hideElement(importLoadingStep);
+                showElement(importModal);
+            }
+
+            /** Processa e importa os dados para o Firestore */
+            async function processImport() {
+                if (parsedCsvData.length === 0) return;
+
+                const defaultPaidBy = importPaidBySelect.value;
+                showElement(importLoadingStep);
+                hideElement(importReviewStep);
+
+                const importPromises = [];
+                let processedCount = 0;
+
+                for (const row of parsedCsvData) {
+                    let amount;
+                    if (typeof row.Valor === 'number') {
+                        amount = row.Valor;
+                    } else {
+                        let amountStr = String(row.Valor).replace(/R\$|\s/g, '');
+                        if (amountStr.includes(',') && amountStr.includes('.')) {
+                            amountStr = amountStr.replace(/\./g, '');
+                        }
+                        amountStr = amountStr.replace(',', '.');
+                        amount = parseFloat(amountStr);
+                    }
+
+                    const type = row.Tipo;
+                    const dueDateValue = row['Vencimento'];
+                    const paymentDateValue = row['Data Pagamento'] || ''; 
+                    
+                    const dueDate = parseDateFromSheet(dueDateValue);
+                    
+                    if (!dueDate || isNaN(dueDate.getTime())) {
+                        console.warn("Linha pulada (Data de Vencimento inválida):", row);
+                        continue; 
+                    }
+                    
+                    let paymentDate = '';
+                    if (paymentDateValue) {
+                        const pd = parseDateFromSheet(paymentDateValue);
+                        if (pd && !isNaN(pd.getTime())) {
+                            paymentDate = pd.toISOString().split('T')[0];
+                        }
+                    }
+                    
+                    const statusValue = row['Status'] || (paymentDate ? 'Pago' : 'A Pagar'); 
+                    const category = (row.Categoria === 'N/A' || !row.Categoria) ? 'Outros' : row.Categoria;
+                    const expenseType = row['Tipo de Despesa'] === 'Fixa' ? 'Fixa' : 'Variável';
+                    const isRecurring = row['Recorrente'] === true || row['Recorrente'] === 'Sim';
+
+                    if (!row.Descrição || isNaN(amount) || amount <= 0 || !type) {
+                        console.warn("Linha pulada (dados inválidos):", row);
+                        continue;
+                    }
+
+                    const newTransaction = {
+                        description: row.Descrição,
+                        amount: amount,
+                        dueDate: dueDate.toISOString().split('T')[0],
+                        paymentDate: paymentDate,
+                        status: statusValue,
+                        type: type,
+                        category: category,
+                        paidBy: defaultPaidBy,
+                        expenseType: (type === 'Despesa') ? expenseType : '',
+                        isRecurring: isRecurring,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    importPromises.push(addDoc(getTransactionsCollectionRef(), newTransaction));
+                    processedCount++;
+                }
+
+                try {
+                    await Promise.all(importPromises);
+                    showToast(`Sucesso! ${processedCount} transações importadas.`);
+                } catch (error) {
+                    console.error("Erro durante a importação:", error);
+                    showToast("Erro ao importar transações.", true);
+                } finally {
+                    hideElement(importModal);
+                    parsedCsvData = [];
+                    csvFileInput.value = null;
+                }
+            }
+
+
+            // --- Funções de Renderização (Atualização da UI) ---
+
+            /** Função principal para atualizar toda a UI com novos dados */
+            function updateAllUI(transactions) {
+                // Filtros de data
+                const firstDayOfMonth = new Date(today.split('-')[0], today.split('-')[1] - 1, 1);
+                
+                // Transações do mês corrente (para o Painel Principal)
+                const monthTransactions = transactions.filter(t => {
+                    const dateToCompare = t.paymentDate || t.dueDate;
+                    try {
+                        const transactionDate = new Date(dateToCompare + 'T00:00:00'); // Garante que é local
+                        return transactionDate >= firstDayOfMonth;
+                    } catch(e) {
+                        console.warn("Data inválida encontrada:", t);
+                        return false;
                     }
                 });
-                li.querySelector('.pay-btn')?.addEventListener('click', () => handleMarkAsPaid(t.id));
+                
+                // Transações atrasadas (para o novo card) (Req 2)
+                const overdueTransactions = transactions.filter(t => t.status === 'A Pagar' && t.dueDate < today);
+                
+                // Total de Contas Atrasadas (Req 2)
+                const totalOverdue = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
 
-                element.appendChild(li);
-            });
-        }
-
-        /** Renderiza a lista de histórico (Contas Pagas) COM FILTROS (Req 3 / Req 4) */
-        function renderHistoryList(allTransactions) {
-            
-            const startDate = filterStartDate.value;
-            const endDate = filterEndDate.value;
-            const category = filterCategory.value;
-
-            // Filtra apenas despesas pagas
-            let filteredTransactions = allTransactions.filter(t => t.status === 'Pago' && t.type === 'Despesa');
-            
-            if (startDate) {
-                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) >= startDate);
-            }
-            if (endDate) {
-                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) <= endDate);
-            }
-            if (category && category !== 'Todas') {
-                filteredTransactions = filteredTransactions.filter(t => t.category === category);
-            }
-            
-            filteredTransactions.sort((a, b) => new Date(b.paymentDate || b.dueDate) - new Date(a.paymentDate || a.dueDate));
-            
-            // NOVO: Calcula total (Req 6)
-            const totalPaid = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
-            if (totalPaid > 0) {
-                historyTotalAmountEl.textContent = `Total Pago (Filtrado): ${formatCurrency(totalPaid)}`;
-                showElement(historyTotalAmountEl);
-            } else {
-                hideElement(historyTotalAmountEl);
+                // 1. Renderiza o Painel Principal
+                renderDashboard(monthTransactions); // Req 5 (Balancete)
+                renderBudgetProgress(monthTransactions);
+                renderOverdueList(overdueTransactions, totalOverdue); // Req 2
+                
+                // 2. Renderiza a Aba "Contas a Pagar"
+                renderPendingList(transactions); // Req 1 e 6
+                
+                // 3. Renderiza o Histórico ("Contas Pagas")
+                renderHistoryList(transactions); // Req 1, 3, 4, 6
+                
+                // 4. Renderiza a Aba "Entradas"
+                renderIncomeList(transactions); // Req 4
             }
 
-            renderGenericTransactionList(transactionList, filteredTransactions, emptyState);
-        }
-        
-        /** NOVO: Renderiza a lista de Entradas COM FILTROS (Req 4) */
-        function renderIncomeList(allTransactions) {
-            const startDate = incomeFilterStartDate.value;
-            const endDate = incomeFilterEndDate.value;
-            const category = incomeFilterCategory.value;
+            /** Renderiza os cards do Dashboard (Balancete Req 5) */
+            function renderDashboard(monthTransactions) {
+                let totalIncome = 0;
+                let totalExpense = 0;
 
-            // Filtra apenas receitas
-            let filteredTransactions = allTransactions.filter(t => t.type === 'Receita');
-            
-            if (startDate) {
-                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) >= startDate);
+                monthTransactions.forEach(t => {
+                    if (t.type === 'Receita' && t.status === 'Pago') { 
+                        totalIncome += t.amount;
+                    } else if (t.type === 'Despesa' && t.status === 'Pago') { 
+                        totalExpense += t.amount;
+                    }
+                });
+
+                const totalBalance = totalIncome - totalExpense;
+
+                totalBalanceEl.textContent = formatCurrency(totalBalance);
+                totalBalanceEl.classList.toggle('text-red-600', totalBalance < 0);
+                totalBalanceEl.classList.toggle('dark:text-gray-100', totalBalance >= 0); 
+                totalBalanceEl.classList.toggle('text-gray-900', totalBalance >= 0);
+                
+                totalIncomeEl.textContent = formatCurrency(totalIncome);
+                totalExpenseEl.textContent = formatCurrency(totalExpense);
             }
-            if (endDate) {
-                filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) <= endDate);
-            }
-            if (category && category !== 'Todas') {
-                filteredTransactions = filteredTransactions.filter(t => t.category === category);
-            }
             
-            filteredTransactions.sort((a, b) => new Date(b.paymentDate || b.dueDate) - new Date(a.paymentDate || a.dueDate));
-            
-            // Calcula total
-            const totalIncome = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
-            if (totalIncome > 0) {
-                incomeTotalAmountEl.textContent = `Total Recebido (Filtrado): ${formatCurrency(totalIncome)}`;
-                showElement(incomeTotalAmountEl);
-            } else {
-                hideElement(incomeTotalAmountEl);
+            /** Renderiza o progresso do orçamento no Painel Principal */
+            function renderBudgetProgress(monthTransactions) {
+                budgetProgressContainer.innerHTML = ''; 
+                
+                const expensesByCategory = {};
+                monthTransactions
+                    .filter(t => t.type === 'Despesa' && t.status === 'Pago')
+                    .forEach(t => {
+                        expensesByCategory[t.category] = (expensesByCategory[t.category] || 0) + t.amount;
+                    });
+                
+                if (Object.keys(monthlyBudget).length === 0 && Object.keys(expensesByCategory).length === 0) {
+                    budgetProgressContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center">Defina seus orçamentos na aba "Planejamento" para começar.</p>';
+                    return;
+                }
+
+                const allBudgetCategories = new Set([...Object.keys(monthlyBudget), ...Object.keys(expensesByCategory)]);
+                
+                allBudgetCategories.forEach(category => {
+                    if (category === 'Salário') return; 
+                    
+                    const spent = expensesByCategory[category] || 0;
+                    const limit = monthlyBudget[category] || 0;
+                    const percent = (limit > 0) ? (spent / limit) * 100 : 0;
+                    const remaining = limit - spent;
+                    
+                    let progressBarClass = 'bg-blue-500'; 
+                    let remainingText = `${formatCurrency(remaining)} restantes`;
+                    
+                    if (spent > limit && limit > 0) {
+                        progressBarClass = 'bg-red-500'; 
+                        remainingText = `${formatCurrency(Math.abs(remaining))} acima`;
+                    } else if (percent > 85 && limit > 0) {
+                        progressBarClass = 'bg-yellow-500'; 
+                    } else if (limit === 0 && spent > 0) {
+                        progressBarClass = 'bg-gray-400'; 
+                        remainingText = 'Sem limite definido';
+                    } else if (limit > 0 && spent === 0) {
+                         remainingText = `Limite de ${formatCurrency(limit)}`;
+                    }
+
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${category}</span>
+                            <span class="text-sm font-semibold ${spent > limit && limit > 0 ? 'text-red-600 dark:text-red-500' : 'text-gray-800 dark:text-gray-200'}">
+                                ${formatCurrency(spent)} / ${limit > 0 ? formatCurrency(limit) : '...'}
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div class="${progressBarClass} h-2.5 rounded-full" style="width: ${Math.min(percent, 100)}%"></div>
+                        </div>
+                        <p class="text-xs text-right text-gray-500 dark:text-gray-400 mt-1">${remainingText}</p>
+                    `;
+                    budgetProgressContainer.appendChild(div);
+                });
             }
 
-            renderGenericTransactionList(incomeList, filteredTransactions, emptyStateIncome);
-        }
+            /** Renderiza uma lista de transações (para Painel, Contas a Pagar, Atrasadas) */
+            function renderGenericTransactionList(element, transactions, showEmptyStateEl) {
+                element.innerHTML = ''; // Limpa a lista
+                
+                if (transactions.length === 0) {
+                    showElement(showEmptyStateEl);
+                    return;
+                }
+                
+                hideElement(showEmptyStateEl);
 
-        /** Renderiza a lista de Contas a Pagar (Todas) */
-        function renderPendingList(allTransactions) {
-            
-            const startDate = pendingFilterStartDate.value;
-            const endDate = pendingFilterEndDate.value;
-            
-            let pendingTransactions = allTransactions.filter(t => t.status === 'A Pagar');
-            
-            if (startDate) {
-                pendingTransactions = pendingTransactions.filter(t => t.dueDate >= startDate);
-            }
-            if (endDate) {
-                pendingTransactions = pendingTransactions.filter(t => t.dueDate <= endDate);
-            }
-            
-            // Calcula totais com base nos filtros (Req 1)
-            const totalPending = pendingTransactions.reduce((sum, t) => sum + t.amount, 0);
-            const totalFixed = pendingTransactions
-                .filter(t => t.expenseType === 'Fixa')
-                .reduce((sum, t) => sum + t.amount, 0);
+                transactions.forEach(t => {
+                    const li = document.createElement('li');
+                    li.className = 'py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between';
+                    
+                    const amountColor = t.type === 'Receita' ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500';
+                    const amountSign = t.type === 'Receita' ? '+' : '-';
+                    const iconColor = t.type === 'Receita' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : (
+                        t.status === 'Pago' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                    );
+                    
+                    const isOverdue = t.dueDate < today && t.status === 'A Pagar';
+                    
+                    li.innerHTML = `
+                        <div class="flex items-center mb-2 sm:mb-0 flex-grow mr-4">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full ${iconColor} flex items-center justify-center mr-3">
+                                ${getCategoryIcon(t.category)}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-base font-medium text-gray-900 dark:text-gray-100 truncate ${isOverdue ? 'text-red-600 dark:text-red-400 font-bold' : ''}">
+                                    ${t.description}
+                                    ${t.isRecurring ? `<span class="text-xs text-blue-500 ml-1">(Recorrente)</span>` : ''} <!-- (Req 5) -->
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    ${t.status === 'Pago' ? `Pago em ${formatDate(t.paymentDate)}` : `Vence em ${formatDate(t.dueDate)}`}
+                                     · ${t.category}
+                                     ${t.expenseType ? `· ${t.expenseType}` : ''} <!-- (Req 4) -->
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end mt-2 sm:mt-0 flex-shrink-0">
+                            <span class="text-lg font-semibold ${amountColor} sm:mr-4">
+                                ${amountSign} ${formatCurrency(t.amount)}
+                            </span>
+                            
+                            ${t.status === 'A Pagar' ? `
+                            <button title="Marcar como Pago" class="pay-btn p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            ` : ''}
+                            
+                            <button title="Editar" class="edit-btn p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                            <button title="Excluir" class="delete-btn p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    
+                    const fullTransaction = allTransactions.find(trans => trans.id === t.id);
+                    
+                    li.querySelector('.delete-btn')?.addEventListener('click', () => handleDeleteTransaction(t.id));
+                    li.querySelector('.edit-btn')?.addEventListener('click', () => {
+                        if (fullTransaction) {
+                            handleEditTransaction(fullTransaction);
+                        } else {
+                            console.error("Não foi possível encontrar a transação para editar.");
+                        }
+                    });
+                    li.querySelector('.pay-btn')?.addEventListener('click', () => handleMarkAsPaid(t.id));
 
-            pendingTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-            renderGenericTransactionList(pendingList, pendingTransactions, emptyStatePending);
+                    element.appendChild(li);
+                });
+            }
+
+            /** Renderiza a lista de histórico (Contas Pagas) COM FILTROS (Req 3 / Req 4) */
+            function renderHistoryList(allTransactions) {
+                
+                const startDate = filterStartDate.value;
+                const endDate = filterEndDate.value;
+                const category = filterCategory.value;
+
+                // Filtra apenas despesas pagas
+                let filteredTransactions = allTransactions.filter(t => t.status === 'Pago' && t.type === 'Despesa');
+                
+                if (startDate) {
+                    filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) >= startDate);
+                }
+                if (endDate) {
+                    filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) <= endDate);
+                }
+                if (category && category !== 'Todas') {
+                    filteredTransactions = filteredTransactions.filter(t => t.category === category);
+                }
+                
+                filteredTransactions.sort((a, b) => new Date(b.paymentDate || b.dueDate) - new Date(a.paymentDate || a.dueDate));
+                
+                // Calcula total (Req 6)
+                const totalPaid = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+                if (totalPaid > 0) {
+                    historyTotalAmountEl.textContent = `Total Pago (Filtrado): ${formatCurrency(totalPaid)}`;
+                    showElement(historyTotalAmountEl);
+                } else {
+                    hideElement(historyTotalAmountEl);
+                }
+
+                renderGenericTransactionList(transactionList, filteredTransactions, emptyState);
+            }
             
-            if (totalPending > 0) {
-                pendingTotalAmountEl.textContent = `Total (Filtrado): ${formatCurrency(totalPending)}`;
-                showElement(pendingTotalAmountEl);
-            } else {
-                hideElement(pendingTotalAmountEl);
-            }
-            if (totalFixed > 0) {
-                pendingTotalFixedAmountEl.textContent = `Despesas Fixas (Filtrado): ${formatCurrency(totalFixed)}`;
-                showElement(pendingTotalFixedAmountEl);
-            } else {
-                hideElement(pendingTotalFixedAmountEl);
-            }
-        }
+            /** Renderiza a lista de Entradas COM FILTROS (Req 4) */
+            function renderIncomeList(allTransactions) {
+                const startDate = incomeFilterStartDate.value;
+                const endDate = incomeFilterEndDate.value;
+                const category = incomeFilterCategory.value;
 
-        /** Renderiza a lista de Contas Atrasadas no Painel Principal */
-        function renderOverdueList(overdueTransactions, totalOverdue) {
-            overdueTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-            renderGenericTransactionList(overdueList, overdueTransactions, emptyStateOverdue);
+                // Filtra apenas receitas
+                let filteredTransactions = allTransactions.filter(t => t.type === 'Receita');
+                
+                if (startDate) {
+                    filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) >= startDate);
+                }
+                if (endDate) {
+                    filteredTransactions = filteredTransactions.filter(t => (t.paymentDate || t.dueDate) <= endDate);
+                }
+                if (category && category !== 'Todas') {
+                    filteredTransactions = filteredTransactions.filter(t => t.category === category);
+                }
+                
+                filteredTransactions.sort((a, b) => new Date(b.paymentDate || b.dueDate) - new Date(a.paymentDate || a.dueDate));
+                
+                // Calcula total
+                const totalIncome = filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
+                if (totalIncome > 0) {
+                    incomeTotalAmountEl.textContent = `Total Recebido (Filtrado): ${formatCurrency(totalIncome)}`;
+                    showElement(incomeTotalAmountEl);
+                } else {
+                    hideElement(incomeTotalAmountEl);
+                }
+
+                renderGenericTransactionList(incomeList, filteredTransactions, emptyStateIncome);
+            }
+
+            /** Renderiza a lista de Contas a Pagar (Todas) */
+            function renderPendingList(allTransactions) {
+                
+                const startDate = pendingFilterStartDate.value;
+                const endDate = pendingFilterEndDate.value;
+                
+                let pendingTransactions = allTransactions.filter(t => t.status === 'A Pagar');
+                
+                if (startDate) {
+                    pendingTransactions = pendingTransactions.filter(t => t.dueDate >= startDate);
+                }
+                if (endDate) {
+                    pendingTransactions = pendingTransactions.filter(t => t.dueDate <= endDate);
+                }
+                
+                // Calcula totais com base nos filtros (Req 1)
+                const totalPending = pendingTransactions.reduce((sum, t) => sum + t.amount, 0);
+                const totalFixed = pendingTransactions
+                    .filter(t => t.expenseType === 'Fixa')
+                    .reduce((sum, t) => sum + t.amount, 0);
+
+                pendingTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                renderGenericTransactionList(pendingList, pendingTransactions, emptyStatePending);
+                
+                if (totalPending > 0) {
+                    pendingTotalAmountEl.textContent = `Total (Filtrado): ${formatCurrency(totalPending)}`;
+                    showElement(pendingTotalAmountEl);
+                } else {
+                    hideElement(pendingTotalAmountEl);
+                }
+                if (totalFixed > 0) {
+                    pendingTotalFixedAmountEl.textContent = `Despesas Fixas (Filtrado): ${formatCurrency(totalFixed)}`;
+                    showElement(pendingTotalFixedAmountEl);
+                } else {
+                    hideElement(pendingTotalFixedAmountEl);
+                }
+            }
+
+            /** Renderiza a lista de Contas Atrasadas no Painel Principal */
+            function renderOverdueList(overdueTransactions, totalOverdue) {
+                overdueTransactions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                renderGenericTransactionList(overdueList, overdueTransactions, emptyStateOverdue);
+                
+                if(totalOverdue > 0) {
+                     totalOverdueAmountEl.textContent = `Total Atrasado: ${formatCurrency(totalOverdue)}`;
+                     showElement(totalOverdueAmountEl);
+                } else {
+                     hideElement(totalOverdueAmountEl);
+                }
+            }
             
-            if(totalOverdue > 0) {
-                 totalOverdueAmountEl.textContent = `Total Atrasado: ${formatCurrency(totalOverdue)}`;
-                 showElement(totalOverdueAmountEl);
-            } else {
-                 hideElement(totalOverdueAmountEl);
+            /** Lida com filtros de Histórico (Contas Pagas) */
+            function handleFilterSubmit(e) {
+                e.preventDefault();
+                updateAllUI(allTransactions);
             }
-        }
-        
-        /** Lida com filtros de Histórico (Contas Pagas) */
-        function handleFilterSubmit(e) {
-            e.preventDefault();
-            updateAllUI(allTransactions);
-        }
-        function handleFilterClear() {
-            filterForm.reset();
-            updateAllUI(allTransactions);
-        }
-        
-        /** Lida com filtros de Entradas */
-        function handleIncomeFilterSubmit(e) {
-            e.preventDefault();
-            updateAllUI(allTransactions);
-        }
-        function handleIncomeFilterClear() {
-            incomeFilterForm.reset();
-            updateAllUI(allTransactions);
-        }
-        
-        /** Lida com filtros de Contas a Pagar */
-        function handlePendingFilterSubmit(e) {
-            e.preventDefault();
-            updateAllUI(allTransactions); 
-        }
-        function handlePendingFilterClear() {
-            pendingFilterForm.reset();
-            updateAllUI(allTransactions);
-        }
+            function handleFilterClear() {
+                filterForm.reset();
+                updateAllUI(allTransactions);
+            }
+            
+            /** Lida com filtros de Entradas */
+            function handleIncomeFilterSubmit(e) {
+                e.preventDefault();
+                updateAllUI(allTransactions);
+            }
+            function handleIncomeFilterClear() {
+                incomeFilterForm.reset();
+                updateAllUI(allTransactions);
+            }
+            
+            /** Lida com filtros de Contas a Pagar */
+            function handlePendingFilterSubmit(e) {
+                e.preventDefault();
+                updateAllUI(allTransactions); 
+            }
+            function handlePendingFilterClear() {
+                pendingFilterForm.reset();
+                updateAllUI(allTransactions);
+            }
 
 
-        // --- Ponto de Entrada da Aplicação ---
-        window.onload = async () => {
+            // --- Bloco de Inicialização ---
             try {
                 today = new Date().toISOString().split('T')[0];
                 dueDateInput.value = today;
