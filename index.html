@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Carrega SheetJS (xlsx.js) para ler Excel e CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- NOVO: Carrega D3.js para visualização de dados no BI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <style>
         /* Estilo para o spinner de carregamento */
         .spinner {
@@ -47,6 +49,16 @@
         #theme-toggle-moon {
             opacity: 0;
             transform: rotate(-90deg);
+        }
+        /* Estilo base para o gráfico D3 para garantir que o texto seja legível nos temas */
+        #bi-chart svg {
+            font-family: inherit;
+        }
+        #bi-chart .x-axis line, #bi-chart .y-axis line {
+            stroke: #d1d5db; /* gray-300 */
+        }
+        .dark #bi-chart .x-axis line, .dark #bi-chart .y-axis line {
+            stroke: #4b5563; /* gray-600 */
         }
     </style>
 </head>
@@ -100,7 +112,7 @@
         <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl relative">
             <button id="closeSettingsBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Configurações da Família</h2>
@@ -125,7 +137,7 @@
         <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
             <button id="closeImportModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Importar Transações (Planilha)</h2>
@@ -177,7 +189,7 @@
         <div class="bg-white dark:bg-gray-800 w-full max-w-4xl p-6 sm:p-8 rounded-lg shadow-xl relative">
             <button id="closeTransactionModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
             <h2 id="transactionModalTitle" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Adicionar Transação</h2>
@@ -311,6 +323,16 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                     Planejamento
                 </a>
+                <!-- NOVO: Link para Relatórios -->
+                <a href="#" id="navBtnReports" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-4-6h-4m8 0h4m-4 0v4m0 0h4m-4 0h-4m4 0v-4" /></svg>
+                    Relatórios
+                </a>
+                <!-- NOVO: Link para BI/Insights -->
+                <a href="#" id="navBtnBi" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                    BI / Insights
+                </a>
             </nav>
 
             <!-- Controles da Sidebar (Config, Tema) -->
@@ -334,10 +356,11 @@
             
             <!-- ===== PÁGINA 1: PAINEL PRINCIPAL ===== -->
             <div id="page-dashboard">
-                <!-- Balancete Geral do Mês (Req 5) -->
+                <!-- Balancete Geral do Mês (ATUALIZADO PARA 4 COLUNAS) -->
                 <section class="mb-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Balancete do Mês</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Novo layout de 4 colunas para incluir Contas a Pagar -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
                             <h3 class="text-sm font-semibold text-green-500 uppercase">Total de Entradas</h3>
                             <p id="totalIncome" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-2">R$ 0,00</p>
@@ -346,6 +369,12 @@
                             <h3 class="text-sm font-semibold text-red-500 uppercase">Total de Saídas (Pagas)</h3>
                             <p id="totalExpense" class="text-3xl font-bold text-red-600 dark:text-red-500 mt-2">R$ 0,00</p>
                         </div>
+                        <!-- CARD: CONTAS A PAGAR DO MÊS -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-amber-500">
+                            <h3 class="text-sm font-semibold text-amber-700 dark:text-amber-500 uppercase">Contas a Pagar (Mês)</h3>
+                            <p id="totalPendingCurrentMonth" class="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-2">R$ 0,00</p>
+                        </div>
+                        <!-- FIM NOVO CARD -->
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
                             <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Saldo (Entradas - Saídas)</h3>
                             <p id="totalBalance" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">R$ 0,00</p>
@@ -366,14 +395,14 @@
                     <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
                          <h3 class="text-lg font-semibold text-red-700 dark:text-red-500 mb-4 flex items-center">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                              </svg>
                              Contas Atrasadas
                          </h3>
                          <!-- Estado Vazio -->
                          <div id="emptyStateOverdue" class="text-center text-gray-500 dark:text-gray-400 py-6 hidden">
                              <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                              </svg>
                              <h4 class="mt-2 text-md font-semibold text-gray-700 dark:text-gray-300">Nenhuma conta atrasada!</h4>
                          </div>
@@ -418,7 +447,7 @@
                             </div>
                             <div>
                                 <label for="pendingFilterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vencimento Fim</label>
-                                <input type="date" id="pendingFilterEndDate" name="pendingFilterEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                                <input type="date" id="pendingFilterEndDate" name="pendingFilterEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
                             </div>
                             <div>
                                 <label for="pendingFilterCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
@@ -479,7 +508,7 @@
                             <!-- Botão de Importar -->
                             <button id="importCsvBtn" class="mt-2 sm:mt-0 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
                                 Importar Planilha
                             </button>
@@ -514,7 +543,7 @@
                             </div>
                             <div>
                                 <label for="filterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Fim</label>
-                                <input type="date" id="filterEndDate" name="filterEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                                <input type="date" id="filterEndDate" name="filterEndDate" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
                             </div>
                             <div>
                                 <label for="filterCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
@@ -562,7 +591,7 @@
                             <!-- Itens da lista serão inseridos pelo JS -->
                         </ul>
                     </div>
-                </section>
+                 </section>
             </div>
             
             <!-- PÁGINA 4: ENTRADAS -->
@@ -616,7 +645,7 @@
                             <!-- Itens da lista serão inseridos pelo JS -->
                         </ul>
                     </div>
-                </section>
+                 </section>
             </div>
 
             <!-- ===== PÁGINA 5: PLANEJAMENTO ===== -->
@@ -628,6 +657,67 @@
                         <form id="budgetForm" class="space-y-4">
                             <!-- Inputs do orçamento serão inseridos pelo JS -->
                         </form>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- ===== PÁGINA 6: RELATÓRIOS (NOVA) ===== -->
+            <div id="page-reports" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Relatórios Analíticos</h2>
+                        
+                        <!-- Filtros de Relatório -->
+                        <form id="reportFilterForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <div>
+                                <label for="reportMonth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Mês</label>
+                                <select id="reportMonth" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                    <!-- Opções preenchidas pelo JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label for="reportYear" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ano</label>
+                                <input type="number" id="reportYear" min="2020" max="2100" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Gerar Relatório
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Título do Relatório (DRE) -->
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Demonstração do Resultado (DRE)</h3>
+
+                        <!-- Contêiner do Relatório -->
+                        <div id="dreReportContainer" class="overflow-x-auto">
+                            <!-- A tabela do DRE será renderizada aqui -->
+                        </div>
+                        <div id="dreReportEmpty" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Selecione um mês para gerar o DRE.</h4>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÁGINA 7: BI / INSIGHTS (NOVA COM GRÁFICO) ===== -->
+            <div id="page-bi" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">BI e Visualização de Dados</h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Despesas Pagas por Categoria (Últimos 3 Meses)</p>
+                        <div id="bi-chart-container" class="w-full">
+                            <!-- O gráfico D3.js será renderizado aqui -->
+                            <div id="bi-chart" class="overflow-x-auto"></div>
+                            <!-- Estado Vazio para o gráfico -->
+                            <div id="bi-chart-empty" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Sem dados de despesas pagas para o período.</h4>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -692,6 +782,10 @@
             let allTransactions = [];
             let today = new Date().toISOString().split('T')[0];
             
+            // Variável global para armazenar o mês/ano atual do filtro do Relatório DRE
+            let currentReportMonth; 
+            let currentReportYear; 
+            
             // Constantes de Categoria
             const categories = [
                 'Moradia', 
@@ -752,16 +846,24 @@
             const navBtnHistory = document.getElementById('navBtnHistory');
             const navBtnIncome = document.getElementById('navBtnIncome');
             const navBtnPlanning = document.getElementById('navBtnPlanning');
+            const navBtnReports = document.getElementById('navBtnReports');
+            const navBtnBi = document.getElementById('navBtnBi');
+            
             const pageDashboard = document.getElementById('page-dashboard');
             const pagePending = document.getElementById('page-pending');
             const pageHistory = document.getElementById('page-history');
             const pageIncome = document.getElementById('page-income');
             const pagePlanning = document.getElementById('page-planning');
-            const allPages = [pageDashboard, pagePending, pageHistory, pageIncome, pagePlanning];
-            const allNavBtns = [navBtnDashboard, navBtnPending, navBtnHistory, navBtnIncome, navBtnPlanning];
+            const pageReports = document.getElementById('page-reports');
+            const pageBi = document.getElementById('page-bi');
+
+            const allPages = [pageDashboard, pagePending, pageHistory, pageIncome, pagePlanning, pageReports, pageBi];
+            const allNavBtns = [navBtnDashboard, navBtnPending, navBtnHistory, navBtnIncome, navBtnPlanning, navBtnReports, navBtnBi];
+            
             const totalBalanceEl = document.getElementById('totalBalance');
             const totalIncomeEl = document.getElementById('totalIncome');
             const totalExpenseEl = document.getElementById('totalExpense');
+            const totalPendingCurrentMonthEl = document.getElementById('totalPendingCurrentMonth'); 
             const budgetProgressContainer = document.getElementById('budgetProgressContainer');
             const overdueList = document.getElementById('overdueList');
             const emptyStateOverdue = document.getElementById('emptyStateOverdue');
@@ -818,6 +920,15 @@
             const isRecurringCheckbox = document.getElementById('isRecurring');
             const typeRadioButtons = document.querySelectorAll('input[name="type"]');
             const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const biChartContainer = document.getElementById('bi-chart');
+            const biChartEmpty = document.getElementById('bi-chart-empty');
+            // NOVOS ELEMENTOS DE RELATÓRIO
+            const dreReportContainer = document.getElementById('dreReportContainer');
+            const dreReportEmpty = document.getElementById('dreReportEmpty');
+            const reportFilterForm = document.getElementById('reportFilterForm');
+            const reportMonthSelect = document.getElementById('reportMonth');
+            const reportYearInput = document.getElementById('reportYear');
+
 
             // --- Funções Auxiliares ---
 
@@ -930,6 +1041,24 @@
                     'Outros': `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5M8.25 12h7.5m-7.5 5.25h7.5M3 12a9 9 0 1118 0 9 9 0 01-18 0z" /></svg>`
                 };
                 return icons[category] || icons['Outros'];
+            }
+
+            /** Preenche os selects de Mês e define o ano */
+            function populateReportFilters() {
+                const months = [
+                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                ];
+                reportMonthSelect.innerHTML = months.map((m, i) => 
+                    `<option value="${i + 1}">${m}</option>`
+                ).join('');
+                
+                const now = new Date();
+                currentReportMonth = now.getMonth() + 1;
+                currentReportYear = now.getFullYear();
+                
+                reportMonthSelect.value = currentReportMonth;
+                reportYearInput.value = currentReportYear;
             }
 
             // --- Funções de UI (Nomes, Formulário, Abas) ---
@@ -1320,6 +1449,7 @@
                 // Popula os selects estáticos
                 populateCategorySelects();
                 initBudgetForm();
+                populateReportFilters(); // NOVO: Inicializa filtros de relatório
             }
 
             // --- Funções de Leitura (Listeners do Firestore) ---
@@ -1371,6 +1501,7 @@
                 if (unsubscribeTransactions) unsubscribeTransactions();
 
                 const transCollectionRef = getTransactionsCollectionRef();
+                // ATENÇÃO: Embora orderBy seja usado aqui, o filtro de data (no JS) deve ser feito em memória.
                 const q = query(transCollectionRef, orderBy("dueDate", "desc"));
                 
                 unsubscribeTransactions = onSnapshot(q, (snapshot) => {
@@ -1602,10 +1733,10 @@
                         <div class="col-span-2 relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
                             <input type="number" step="0.01" min="0" 
-                                   id="budget-${category}" 
-                                   data-category="${category}"
-                                   placeholder="0,00"
-                                   class="budget-input pl-10 pr-4 py-2 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                       id="budget-${category}" 
+                                       data-category="${category}"
+                                       placeholder="0,00"
+                                       class="budget-input pl-10 pr-4 py-2 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     `;
                     budgetForm.appendChild(div);
@@ -1816,6 +1947,7 @@
                     const dateToCompare = t.paymentDate || t.dueDate;
                     try {
                         const transactionDate = new Date(dateToCompare + 'T00:00:00'); // Garante que é local
+                        // Filtra para transações que caíram neste mês (seja pago ou vencido)
                         return transactionDate >= firstDayOfMonth;
                     } catch(e) {
                         console.warn("Data inválida encontrada:", t);
@@ -1830,7 +1962,7 @@
                 const totalOverdue = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
 
                 // 1. Renderiza o Painel Principal
-                renderDashboard(monthTransactions); 
+                renderDashboard(transactions); // Passa todas as transações para calcular totais do mês corretamente
                 renderBudgetProgress(monthTransactions);
                 renderOverdueList(overdueTransactions, totalOverdue); 
                 
@@ -1842,18 +1974,40 @@
                 
                 // 4. Renderiza a Aba "Entradas"
                 renderIncomeList(transactions); 
+                
+                // NOVO: Renderiza o relatório DRE
+                renderDREReport(transactions);
+                
+                // NOVO: Renderiza o gráfico BI
+                renderBIReport(transactions);
             }
 
             /** Renderiza os cards do Dashboard */
-            function renderDashboard(monthTransactions) {
+            function renderDashboard(allTransactions) {
                 let totalIncome = 0;
                 let totalExpense = 0;
+                // NOVO: Inicializa o total a pagar do mês
+                let totalPendingCurrentMonth = 0; 
 
-                monthTransactions.forEach(t => {
-                    if (t.type === 'Receita' && t.status === 'Pago') { 
+                // Obtém o primeiro e o último dia do mês corrente (comparado ao DueDate)
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth(); // 0 a 11
+                const firstDay = new Date(currentYear, currentMonth, 1).toISOString().split('T')[0];
+                const lastDay = new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0];
+                
+
+                allTransactions.forEach(t => {
+                    // Cálculo de Saldo (apenas transações pagas)
+                    if (t.type === 'Receita' && t.status === 'Pago' && (t.paymentDate || t.dueDate) >= firstDay && (t.paymentDate || t.dueDate) <= lastDay) { 
                         totalIncome += t.amount;
-                    } else if (t.type === 'Despesa' && t.status === 'Pago') { 
+                    } else if (t.type === 'Despesa' && t.status === 'Pago' && (t.paymentDate || t.dueDate) >= firstDay && (t.paymentDate || t.dueDate) <= lastDay) { 
                         totalExpense += t.amount;
+                    }
+                    
+                    // NOVO CÁLCULO: Contas a Pagar (mês corrente)
+                    if (t.type === 'Despesa' && t.status === 'A Pagar' && t.dueDate >= firstDay && t.dueDate <= lastDay) {
+                         totalPendingCurrentMonth += t.amount;
                     }
                 });
 
@@ -1866,6 +2020,9 @@
                 
                 totalIncomeEl.textContent = formatCurrency(totalIncome);
                 totalExpenseEl.textContent = formatCurrency(totalExpense);
+                
+                // NOVO: Atualiza o card de contas a pagar do mês
+                totalPendingCurrentMonthEl.textContent = formatCurrency(totalPendingCurrentMonth);
             }
             
             /** Renderiza o progresso do orçamento no Painel Principal */
@@ -1925,6 +2082,209 @@
                     budgetProgressContainer.appendChild(div);
                 });
             }
+            
+            /** Renderiza o gráfico de despesas por categoria usando D3.js */
+            function renderBIReport(allTransactions) {
+                // 1. Definir período (Últimos 3 meses, incluindo o mês atual)
+                const now = new Date();
+                // Primeiro dia de 3 meses atrás (Mês atual - 2)
+                const startPeriod = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString().split('T')[0];
+                
+                // 2. Filtrar e Agrupar Dados
+                const expenseData = {};
+                let totalSpent = 0;
+
+                allTransactions
+                    .filter(t => t.type === 'Despesa' && t.status === 'Pago' && (t.paymentDate || t.dueDate) >= startPeriod)
+                    .forEach(t => {
+                        expenseData[t.category] = (expenseData[t.category] || 0) + t.amount;
+                        totalSpent += t.amount;
+                    });
+
+                // Converter para array D3 (Categoria, Valor)
+                const chartData = Object.keys(expenseData).map(category => ({
+                    category: category,
+                    value: expenseData[category],
+                    color: categoryColors[category] || categoryColors['Outros']
+                })).sort((a, b) => b.value - a.value); // Ordena decrescente
+
+                // Lidar com estado vazio
+                if (chartData.length === 0 || totalSpent === 0) {
+                    d3.select("#bi-chart").html('');
+                    showElement(biChartEmpty);
+                    return;
+                }
+                hideElement(biChartEmpty);
+
+                // 3. Configuração do D3.js
+                const container = d3.select("#bi-chart");
+                container.html(''); // Limpa gráficos anteriores
+
+                const margin = { top: 20, right: 30, bottom: 60, left: 70 },
+                      // Garante que o gráfico não saia da tela
+                      width = Math.max(container.node().clientWidth, 400) - margin.left - margin.right, 
+                      // Altura baseada na quantidade de barras (50px por barra)
+                      height = chartData.length * 40; 
+
+                // Cria o SVG
+                const svg = container.append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+                    
+                // Escalas
+                const x = d3.scaleLinear()
+                    .domain([0, d3.max(chartData, d => d.value) * 1.1]) // Multiplica por 1.1 para dar espaço para o rótulo
+                    .range([0, width]);
+
+                const y = d3.scaleBand()
+                    .domain(chartData.map(d => d.category))
+                    .range([0, height])
+                    .padding(0.2); // Aumenta o padding
+
+                // Eixos
+                svg.append("g")
+                    .attr("class", "x-axis")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x).ticks(5).tickFormat(d => `R$ ${d3.format(".2s")(d)}`))
+                    .selectAll("text")
+                        .style("text-anchor", "end")
+                        .attr("dx", "-.8em")
+                        .attr("dy", ".15em")
+                        .attr("transform", "rotate(-25)")
+                        .attr("class", "fill-gray-600 dark:fill-gray-400 text-sm"); // Estilo Tailwind
+
+                svg.append("g")
+                    .attr("class", "y-axis")
+                    .call(d3.axisLeft(y))
+                    .selectAll("text")
+                        .attr("class", "fill-gray-600 dark:fill-gray-300 font-medium"); // Estilo Tailwind
+                        
+                // Desenhar Barras
+                svg.selectAll(".bar")
+                    .data(chartData)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "bar")
+                    .attr("x", x(0))
+                    .attr("y", d => y(d.category))
+                    .attr("width", 0) // Começa com largura 0 para animação
+                    .attr("height", y.bandwidth())
+                    .attr("fill", d => d.color)
+                    .transition() // Animação de entrada
+                    .duration(800)
+                    .attr("width", d => x(d.value));
+
+                // Adicionar Valores (Rótulos)
+                svg.selectAll(".label")
+                    .data(chartData)
+                    .enter()
+                    .append("text")
+                    .attr("class", "label fill-gray-800 dark:fill-gray-100 text-xs font-semibold")
+                    .attr("x", d => x(d.value) + 5) // Posição à direita da barra
+                    .attr("y", d => y(d.category) + y.bandwidth() / 2)
+                    .attr("dy", ".35em")
+                    .text(d => formatCurrency(d.value));
+
+                // Adicionar título ao eixo X
+                svg.append("text")
+                    .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
+                    .style("text-anchor", "middle")
+                    .attr("class", "fill-gray-700 dark:fill-gray-300 font-medium")
+                    .text("Valor Total Gasto (R$)");
+            }
+            
+            /** Renderiza a Demonstração do Resultado do Exercício (DRE) */
+            function renderDREReport(allTransactions) {
+                // Filtros
+                const month = currentReportMonth;
+                const year = currentReportYear;
+                
+                if (!month || !year) {
+                    dreReportContainer.innerHTML = '';
+                    showElement(dreReportEmpty);
+                    return;
+                }
+                
+                // Esconde o estado vazio do relatório
+                hideElement(dreReportEmpty);
+
+                // 1. Filtrar transações para o mês/ano selecionado (apenas pagas)
+                const filteredTransactions = allTransactions.filter(t => {
+                    if (t.status !== 'Pago' || !t.paymentDate) return false;
+                    
+                    const paymentDate = new Date(t.paymentDate + 'T00:00:00');
+                    // Verifica se o ano e o mês (ajustado para 1-12) coincidem
+                    return paymentDate.getFullYear() === year && (paymentDate.getMonth() + 1) === month;
+                });
+
+                // 2. Agrupar por Receita/Despesa e Categoria
+                let totalReceita = 0;
+                const despesasPorCategoria = {};
+
+                filteredTransactions.forEach(t => {
+                    if (t.type === 'Receita') {
+                        totalReceita += t.amount;
+                    } else if (t.type === 'Despesa') {
+                        despesasPorCategoria[t.category] = (despesasPorCategoria[t.category] || 0) + t.amount;
+                    }
+                });
+
+                // 3. Calcular Totais
+                const totalDespesas = Object.values(despesasPorCategoria).reduce((sum, amount) => sum + amount, 0);
+                const resultadoLiquido = totalReceita - totalDespesas;
+
+                // 4. Montar a Tabela DRE
+                let html = `
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                `;
+
+                // --- RECEITAS ---
+                html += `
+                    <tr class="bg-green-50 dark:bg-green-900/50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-700 dark:text-green-300">RECEITAS TOTAIS</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-700 dark:text-green-300 text-right">${formatCurrency(totalReceita)}</td>
+                    </tr>
+                `;
+
+                // --- DESPESAS (CUSTOS) ---
+                html += `
+                    <tr class="bg-red-50 dark:bg-red-900/50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-700 dark:text-red-300">(-) DESPESAS E CUSTOS</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-700 dark:text-red-300 text-right">(${formatCurrency(totalDespesas)})</td>
+                    </tr>
+                `;
+                
+                // Detalhamento das Despesas
+                const sortedCategories = Object.keys(despesasPorCategoria).sort();
+                sortedCategories.forEach(category => {
+                    const amount = despesasPorCategoria[category];
+                    html += `
+                        <tr class="text-gray-700 dark:text-gray-300">
+                            <td class="px-6 py-2 whitespace-nowrap text-sm pl-10">${category}</td>
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-right">(${formatCurrency(amount)})</td>
+                        </tr>
+                    `;
+                });
+
+                // --- RESULTADO FINAL ---
+                const resultadoClass = resultadoLiquido >= 0 
+                    ? 'bg-blue-100 dark:bg-blue-900/70 text-blue-800 dark:text-blue-200' 
+                    : 'bg-red-100 dark:bg-red-900/70 text-red-800 dark:text-red-200';
+                
+                html += `
+                    <tr class="${resultadoClass} text-lg">
+                        <td class="px-6 py-4 whitespace-nowrap font-bold">RESULTADO LÍQUIDO MENSAL</td>
+                        <td class="px-6 py-4 whitespace-nowrap font-bold text-right">${formatCurrency(resultadoLiquido)}</td>
+                    </tr>
+                `;
+
+                html += `</tbody></table>`;
+                
+                dreReportContainer.innerHTML = html;
+            }
 
             /** Renderiza uma lista de transações (para Painel, Contas a Pagar, Atrasadas) */
             function renderGenericTransactionList(element, transactions, showEmptyStateEl) {
@@ -1961,8 +2321,8 @@
                                 </p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
                                     ${t.status === 'Pago' ? `Pago em ${formatDate(t.paymentDate)}` : `Vence em ${formatDate(t.dueDate)}`}
-                                     · ${t.category}
-                                     ${t.expenseType ? `· ${t.expenseType}` : ''}
+                                    · ${t.category}
+                                    ${t.expenseType ? `· ${t.expenseType}` : ''}
                                 </p>
                             </div>
                         </div>
@@ -1974,19 +2334,19 @@
                             ${t.status === 'A Pagar' ? `
                             <button title="Marcar como Pago" class="pay-btn p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                 </svg>
                             </button>
                             ` : ''}
                             
                             <button title="Editar" class="edit-btn p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                             </button>
                             <button title="Excluir" class="delete-btn p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-gray-700 rounded-full transition duration-300" data-id="${t.id}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </div>
@@ -2173,6 +2533,9 @@
                 navBtnHistory.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-history'); });
                 navBtnIncome.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-income'); });
                 navBtnPlanning.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-planning'); });
+                // NOVOS LISTENERS DE NAVEGAÇÃO
+                navBtnReports.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-reports'); });
+                navBtnBi.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-bi'); });
                 
                 statusSelect.addEventListener('change', togglePaymentDateVisibility);
                 
@@ -2237,6 +2600,14 @@
                 // Listeners do Filtro "A Pagar"
                 pendingFilterForm.addEventListener('submit', handlePendingFilterSubmit);
                 pendingClearFilterBtn.addEventListener('click', handlePendingFilterClear);
+                
+                // Listener do Formulário de Relatório (DRE)
+                reportFilterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    currentReportMonth = parseInt(reportMonthSelect.value, 10);
+                    currentReportYear = parseInt(reportYearInput.value, 10);
+                    updateAllUI(allTransactions); 
+                });
 
                 // CORREÇÃO: Adiciona listener ao botão de importar
                 importCsvBtn.addEventListener('click', () => csvFileInput.click());
