@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Redirect</title>
+</head>
+
+<body>
+    <h1>Redirecionando...</h1>
+    <script>
+        // Clear all cache
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Force redirect with timestamp
+        setTimeout(() => {
+            window.location.href = 'index.html?cachebust=' + Date.now();
+        }, 500);
+    </script>
+</body>
+
+</html>

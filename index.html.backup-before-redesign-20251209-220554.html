@@ -1,0 +1,1187 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR" class="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro para Casais</title>
+
+    <!-- Google Fonts - Inter (Modern, Clean Font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Carrega o Tailwind CSS a partir de um CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind CSS Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Carrega SheetJS (xlsx.js) para ler Excel e CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- NOVO: Carrega D3.js para visualização de dados no BI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        /* Estilo para o spinner de carregamento */
+        .spinner {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Estilos da Sidebar */
+        .sidebar-link {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link.active {
+            background-color: #eef2ff;
+            /* indigo-100 */
+            color: #4f46e5;
+            /* indigo-600 */
+            font-weight: 600;
+        }
+
+        .dark .sidebar-link.active {
+            background-color: #3730a3;
+            /* indigo-800 */
+            color: #e0e7ff;
+            /* indigo-100 */
+        }
+
+        /* Ãcones de Sol/Lua para o toggle de tema */
+        #theme-toggle-sun,
+        #theme-toggle-moon {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dark #theme-toggle-sun {
+            opacity: 0;
+            transform: rotate(90deg);
+        }
+
+        .dark #theme-toggle-moon {
+            opacity: 1;
+            transform: rotate(0deg);
+        }
+
+        #theme-toggle-moon {
+            opacity: 0;
+            transform: rotate(-90deg);
+        }
+
+        /* Estilo base para o grÃ¡fico D3 para garantir que o texto seja legÃ­vel nos temas */
+        #bi-chart svg {
+            font-family: inherit;
+        }
+
+        #bi-chart .x-axis line,
+        #bi-chart .y-axis line {
+            stroke: #d1d5db;
+            /* gray-300 */
+        }
+
+        .dark #bi-chart .x-axis line,
+        .dark #bi-chart .y-axis line {
+            stroke: #4b5563;
+            /* gray-600 */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-300">
+
+    <!-- ===== 1. MODAL DE SELEÃ‡ÃƒO DE FAMÃLIA ===== -->
+    <div id="familyModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl text-center">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Bem-vindo!</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Como vocÃª gostaria de Começar?</p>
+
+            <div class="space-y-4">
+                <button id="createFamilyBtn"
+                    class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    Criar Nova FamÃ­lia
+                </button>
+                <div class="relative flex items-center justify-center">
+                    <span class="absolute bg-white dark:bg-gray-800 px-2 text-gray-500 text-sm">ou</span>
+                    <div class="h-px bg-gray-300 dark:bg-gray-600 w-full"></div>
+                </div>
+                <div class="space-y-3">
+                    <input type="text" id="familyIdInput" placeholder="Cole o ID da FamÃ­lia aqui"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="joinFamilyBtn"
+                        class="w-full bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-gray-800 transition duration-300">
+                        Juntar-se a uma FamÃ­lia
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mostra o ID da nova famÃ­lia apÃ³s a criaÃ§Ã£o -->
+            <div id="newFamilyIdSection" class="mt-6 hidden">
+                <p class="text-gray-700 dark:text-gray-300">Compartilhe este ID com seu parceiro:</p>
+                <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-mono text-lg p-3 my-2 rounded-lg break-words"
+                    id="familyIdDisplay"></div>
+                <button id="copyFamilyIdBtn"
+                    class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                    Copiar ID
+                </button>
+                <button id="startAppBtn"
+                    class="mt-4 w-full text-blue-600 dark:text-blue-400 font-semibold py-2 px-4 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 transition duration-300">
+                    Começar a Usar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2. INDICADOR DE CARREGAMENTO ===== -->
+    <div id="loadingIndicator"
+        class="fixed inset-0 bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center z-40">
+        <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full"></div>
+        <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Carregando finanÃ§as...</p>
+        <!-- Mensagem de erro de inicializaÃ§Ã£o serÃ¡ injetada aqui -->
+    </div>
+
+    <!-- ===== 2.5 MODAL DE CONFIGURAÃ‡Ã•ES ===== -->
+    <div id="settingsModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeSettingsBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Configurações da FamÃ­lia</h2>
+            <form id="settingsForm" class="space-y-4">
+                <div>
+                    <label for="partner1NameInput"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome (Parceiro 1)</label>
+                    <input type="text" id="partner1NameInput" placeholder="Ex: JoÃ£o"
+                        class="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="partner2NameInput"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome (Parceiro 2)</label>
+                    <input type="text" id="partner2NameInput" placeholder="Ex: Maria"
+                        class="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button id="saveSettingsBtn" type="submit"
+                    class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    Salvar Nomes
+                </button>
+            </form>
+
+            <!-- Separator -->
+            <div class="my-6 border-t border-gray-300 dark:border-gray-600"></div>
+
+            <!-- Disconnect Button -->
+            <button id="disconnectFamilyBtn"
+                class="w-full bg-red-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-red-700 transition duration-300 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4.414l-4.293 4.293a1 1 0 01-1.414 0L4 7.414 5.414 6l3.293 3.293L13 5l1.414 1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+                Desconectar da Família
+            </button>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                Isso irá desconectar você desta família. Seus dados não serão apagados.
+            </p>
+        </div>
+    </div>
+
+    <!-- ===== 2.6 MODAL DE IMPORTAÃ‡ÃƒO ===== -->
+    <div id="importModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeImportModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Importar Transações (Planilha)</h2>
+
+            <!-- Passo de RevisÃ£o -->
+            <div id="importReviewStep">
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Por favor, revise os dados e defina um pagador padrÃ£o
+                    para todas as Transações importadas.</p>
+
+                <div class="mb-4">
+                    <label for="importPaidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pagador
+                        PadrÃ£o (para todos os itens)</label>
+                    <select id="importPaidBy"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- OpÃ§Ãµes preenchidas pelo JS -->
+                    </select>
+                </div>
+
+                <div class="mb-6 overflow-x-auto">
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">PrÃ©via (primeiras 5 linhas):
+                    </p>
+                    <table
+                        class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-300 dark:border-gray-700">
+                        <thead id="csvPreviewHead" class="bg-gray-50 dark:bg-gray-700">
+                            <!-- CabeÃ§alho preenchido pelo JS -->
+                        </thead>
+                        <tbody id="csvPreviewBody"
+                            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Linhas preenchidas pelo JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button id="cancelImportBtn"
+                        class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                        Cancelar
+                    </button>
+                    <button id="confirmImportBtn"
+                        class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                        Confirmar e Importar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Passo de Carregamento -->
+            <div id="importLoadingStep" class="text-center py-10 hidden">
+                <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full mx-auto"></div>
+                <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Importando Transações... Por favor, aguarde.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO: MODAL DE TRANSAÃ‡ÃƒO (Req 3) -->
+    <!-- Este modal agora centraliza o formulÃ¡rio de Adicionar e Editar -->
+    <div id="transactionModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-4xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeTransactionModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 id="transactionModalTitle" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Adicionar
+                Transação</h2>
+
+            <!-- FormulÃ¡rio de Transação (Movido para cÃ¡) -->
+            <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- DescriÃ§Ã£o -->
+                <div class="md:col-span-2 lg:col-span-3">
+                    <label for="description"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">DescriÃ§Ã£o</label>
+                    <input type="text" id="description" name="description" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
+                </div>
+                <!-- Valor -->
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor
+                        (R$)</label>
+                    <input type="number" id="amount" name="amount" step="0.01" min="0" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
+                </div>
+                <!-- Tipo (Receita/Despesa) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+                    <div class="mt-2 flex space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="type" value="Receita"
+                                class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Receita</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="type" value="Despesa"
+                                class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                checked>
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Despesa</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- Categoria -->
+                <div>
+                    <label for="category"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                    <select id="category" name="category"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- OpÃ§Ãµes preenchidas pelo JS -->
+                    </select>
+                </div>
+                <!-- Pago Por -->
+                <div>
+                    <label for="paidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pago
+                        Por</label>
+                    <select id="paidBy" name="paidBy"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- OpÃ§Ãµes preenchidas pelo JS -->
+                    </select>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="status"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <select id="status" name="status"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option>Pago</option>
+                        <option>A Pagar</option>
+                    </select>
+                </div>
+                <!-- Data de Vencimento -->
+                <div>
+                    <label for="dueDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data
+                        Vencimento</label>
+                    <input type="date" id="dueDate" name="dueDate" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                </div>
+                <!-- Data de Pagamento -->
+                <div>
+                    <label for="paymentDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data
+                        Pagamento</label>
+                    <input type="date" id="paymentDate" name="paymentDate"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                </div>
+
+                <!-- Tipo de Despesa (Req 4) -->
+                <div id="expenseTypeContainer">
+                    <label for="expenseType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de
+                        Despesa</label>
+                    <select id="expenseType" name="expenseType"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option>VariÃ¡vel</option>
+                        <option>Fixa</option>
+                    </select>
+                </div>
+
+                <!-- Recorrente (Req 5) -->
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="isRecurring" name="isRecurring"
+                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Recorrente (Mensal)</span>
+                    </label>
+                </div>
+
+                <!-- NOVO: SeleÃ§Ã£o de CartÃ£o de CrÃ©dito -->
+                <div id="creditCardContainer" class="hidden">
+                    <label for="creditCard" class="block text-sm font-medium text-gray-700 dark:text-gray-300">CartÃ£o
+                        de
+                        CrÃ©dito</label>
+                    <select id="creditCard" name="creditCard"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecionar CartÃ£o</option>
+                        <!-- OpÃ§Ãµes preenchidas pelo JS -->
+                    </select>
+                </div>
+
+                <!-- BotÃ£o Adicionar / Atualizar -->
+                <div class="md:col-span-2 lg:col-span-3">
+                    <button id="transactionSubmitBtn" type="submit"
+                        class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
+                        <!-- O texto serÃ¡ "Adicionar" ou "Atualizar" via JS -->
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOVO: MODAL DE GERENCIAMENTO DE CATEGORIAS -->
+    <div id="categoriesModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeCategoriesModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Gerenciar Categorias</h2>
+
+            <!-- FormulÃ¡rio para adicionar nova categoria -->
+            <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Adicionar Nova Categoria</h3>
+                <form id="addCategoryForm" class="flex gap-4">
+                    <div class="flex-grow">
+                        <label for="newCategoryName"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da
+                            Categoria</label>
+                        <input type="text" id="newCategoryName" required
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Ex: EducaÃ§Ã£o">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit"
+                            class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                            Adicionar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de categorias existentes -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Categorias Existentes</h3>
+                <div id="categoriesList" class="space-y-2 max-h-80 overflow-y-auto">
+                    <!-- As categorias serÃ£o preenchidas aqui pelo JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO: MODAL DE GERENCIAMENTO DE CARTÃ•ES -->
+    <div id="creditCardsModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeCreditCardsModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Gerenciar Cartões de CrÃ©dito</h2>
+
+            <!-- FormulÃ¡rio para adicionar novo cartÃ£o -->
+            <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Adicionar Novo CartÃ£o</h3>
+                <form id="addCreditCardForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="newCardName"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do
+                            CartÃ£o</label>
+                        <input type="text" id="newCardName" required
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Ex: Nubank">
+                    </div>
+                    <div>
+                        <label for="newCardDueDay"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dia de
+                            Vencimento</label>
+                        <input type="number" id="newCardDueDay" min="1" max="31" required
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Ex: 10">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="newCardLimit"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Limite do CartÃ£o
+                            (R$)</label>
+                        <input type="number" id="newCardLimit" step="0.01" min="0" required
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Ex: 1500.00">
+                    </div>
+                    <div class="md:col-span-2 flex items-end">
+                        <button type="submit"
+                            class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                            Adicionar CartÃ£o
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Cartões existentes -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Cartões Existentes</h3>
+                <div id="creditCardsList" class="space-y-2 max-h-80 overflow-y-auto">
+                    <!-- Os Cartões serÃ£o preenchidos aqui pelo JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 3. CONTEÃšDO PRINCIPAL DA APLICAÃ‡ÃƒO ===== -->
+    <!-- Layout com Sidebar (Req 2) -->
+    <div id="appContainer" class="lg:flex min-h-screen hidden">
+
+        <!-- Sidebar (Req 2) -->
+        <aside id="sidebar"
+            class="w-full lg:w-64 bg-white dark:bg-gray-800 shadow-lg lg:fixed lg:h-screen lg:flex lg:flex-col">
+            <!-- CabeÃ§alho da Sidebar -->
+            <header class="p-6 border-b dark:border-gray-700">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Meu Painel</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    ID: <span id="currentFamilyId" class="font-mono"></span>
+                </p>
+                <button id="copyIdBtn" title="Copiar ID da FamÃ­lia"
+                    class="mt-2 w-full text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                    Copiar ID da FamÃ­lia
+                </button>
+            </header>
+
+            <!-- Menu de NavegaÃ§Ã£o -->
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" id="navBtnDashboard"
+                    class="sidebar-link active flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    Painel Principal
+                </a>
+                <a href="#" id="navBtnPending"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Contas a Pagar
+                </a>
+                <!-- Link Histórico (Req 1/3) -->
+                <a href="#" id="navBtnHistory"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Contas Pagas
+                </a>
+                <!-- Link Entradas (Req 4) -->
+                <a href="#" id="navBtnIncome"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    Entradas
+                </a>
+                <a href="#" id="navBtnPlanning"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Planejamento
+                </a>
+                <!-- NOVO: Link para Relatórios -->
+                <a href="#" id="navBtnReports"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-4-6h-4m8 0h4m-4 0v4m0 0h4m-4 0h-4m4 0v-4" />
+                    </svg>
+                    Relatórios
+                </a>
+                <!-- NOVO: Link para BI/Insights -->
+                <a href="#" id="navBtnBi"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                    BI / Insights
+                </a>
+                <!-- NOVO: Link para Cartões de CrÃ©dito -->
+                <a href="#" id="navBtnCreditCards"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    Cartões de CrÃ©dito
+                </a>
+            </nav>
+
+            <!-- Controles da Sidebar (Config, Tema) -->
+            <div class="p-4 border-t dark:border-gray-700 flex items-center justify-between">
+                <div class="flex space-x-2">
+                    <button id="openSettingsBtn" title="Configurações da FamÃ­lia"
+                        class="flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826 3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Config.
+                    </button>
+                    <!-- NOVO: BotÃ£o para gerenciar categorias -->
+                    <button id="openCategoriesBtn" title="Gerenciar Categorias"
+                        class="flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                        Categorias
+                    </button>
+                    <!-- NOVO: BotÃ£o para gerenciar Cartões -->
+                    <button id="openCreditCardsBtn" title="Gerenciar Cartões"
+                        class="flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        Cartões
+                    </button>
+                </div>
+                <button id="themeToggleBtn" title="Alternar Tema"
+                    class="text-gray-600 dark:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative w-10 h-10 flex items-center justify-center overflow-hidden">
+                    <svg id="theme-toggle-sun" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.05 19.95l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.05 4.05l-.707-.707" />
+                    </svg>
+                    <svg id="theme-toggle-moon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ConteÃºdo Principal (Ã  direita da Sidebar) -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64"> <!-- ml-64 para compensar a sidebar no desktop -->
+
+            <!-- ===== PÃGINA 1: PAINEL PRINCIPAL ===== -->
+            <div id="page-dashboard">
+                <!-- Balancete Geral do Mês (ATUALIZADO PARA 4 COLUNAS) -->
+                <section class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Balancete do Mês</h2>
+                    <!-- Novo layout de 4 colunas para incluir Contas a Pagar -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-green-500 uppercase">Total de Entradas</h3>
+                            <p id="totalIncome" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-2">R$
+                                0,00</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-red-500 uppercase">Total de SaÃ­das (Pagas)</h3>
+                            <p id="totalExpense" class="text-3xl font-bold text-red-600 dark:text-red-500 mt-2">R$ 0,00
+                            </p>
+                        </div>
+                        <!-- CARD: CONTAS A PAGAR DO MÃŠS -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-amber-500">
+                            <h3 class="text-sm font-semibold text-amber-700 dark:text-amber-500 uppercase">Contas a
+                                Pagar (Mês)</h3>
+                            <p id="totalPendingCurrentMonth"
+                                class="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-2">R$ 0,00</p>
+                        </div>
+                        <!-- FIM NOVO CARD -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Saldo (Entradas
+                                - SaÃ­das)</h3>
+                            <p id="totalBalance" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">R$
+                                0,00</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Progresso do Orçamento -->
+                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Progresso do Orçamento
+                            (Mês)</h3>
+                        <div id="budgetProgressContainer" class="space-y-4">
+                            <!-- Barras de progresso serÃ£o inseridas pelo JS -->
+                        </div>
+                    </div>
+
+                    <!-- CARD: CONTAS ATRASADAS (Req 2) -->
+                    <div
+                        class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
+                        <h3 class="text-lg font-semibold text-red-700 dark:text-red-500 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Contas Atrasadas
+                        </h3>
+                        <!-- Estado Vazio -->
+                        <div id="emptyStateOverdue" class="text-center text-gray-500 dark:text-gray-400 py-6 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-green-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h4 class="mt-2 text-md font-semibold text-gray-700 dark:text-gray-300">Nenhuma conta
+                                atrasada!</h4>
+                        </div>
+                        <!-- Lista de Contas Atrasadas -->
+                        <ul id="overdueList"
+                            class="divide-y divide-gray-200 dark:divide-gray-700 max-h-60 overflow-y-auto">
+                            <!-- Itens da lista serÃ£o inseridos pelo JS -->
+                        </ul>
+                        <!-- Total Atrasado -->
+                        <p id="totalOverdueAmount"
+                            class="text-right font-semibold text-red-600 dark:text-red-500 mt-4 pr-4"></p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÃGINA 2: CONTAS A PAGAR ===== -->
+            <div id="page-pending" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Contas a Pagar</h2>
+
+                        <!-- Filtro Melhorado -->
+                        <form id="pendingFilterForm"
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <!-- SeleÃ§Ã£o RÃ¡pida de PerÃ­odo -->
+                            <div class="sm:col-span-2 lg:col-span-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filtro
+                                    RÃ¡pido</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" id="pendingCurrentMonthBtn"
+                                        class="quick-filter-btn bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition duration-300">
+                                        Mês Atual
+                                    </button>
+                                    <button type="button" id="pendingNextMonthBtn"
+                                        class="quick-filter-btn bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300">
+                                        Próximo Mês
+                                    </button>
+                                    <button type="button" id="pendingAllBtn"
+                                        class="quick-filter-btn bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300">
+                                        Todos
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Filtros Detalhados -->
+                            <div>
+                                <label for="pendingFilterStartDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vencimento
+                                    InÃ­cio</label>
+                                <input type="date" id="pendingFilterStartDate" name="pendingFilterStartDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="pendingFilterEndDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vencimento
+                                    Fim</label>
+                                <input type="date" id="pendingFilterEndDate" name="pendingFilterEndDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="pendingFilterCategory"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="pendingFilterCategory" name="pendingFilterCategory"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Todas</option>
+                                    <!-- Preenchido por JS -->
+                                </select>
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit"
+                                    class="w-full flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Filtrar
+                                </button>
+                                <button type="reset" id="pendingClearFilterBtn"
+                                    class="w-full flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Totais de Contas a Pagar -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total a Pagar
+                                    (Filtrado)</h4>
+                                <p id="pendingTotalAmount" class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                                    R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Despesas Fixas
+                                    (Filtrado)</h4>
+                                <p id="pendingTotalFixedAmount"
+                                    class="text-2xl font-bold text-gray-700 dark:text-gray-300">R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Quantidade de Itens
+                                </h4>
+                                <p id="pendingItemsCount"
+                                    class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</p>
+                            </div>
+                        </div>
+
+                        <!-- Estado Vazio -->
+                        <div id="emptyStatePending" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta a pagar</h4>
+                            <p class="mt-1 text-sm">VocÃª estÃ¡ em dia ou os filtros nÃ£o retornaram resultados!</p>
+                        </div>
+                        <!-- Lista de Contas a Pagar -->
+                        <ul id="pendingList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Itens da lista serÃ£o inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PÃGINA 3: HISTÃ“RICO DE CONTAS PAGAS -->
+            <div id="page-history" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Histórico de Contas Pagas
+                            </h2>
+                            <!-- BotÃ£o de Importar -->
+                            <button id="importCsvBtn"
+                                class="mt-2 sm:mt-0 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Importar Planilha
+                            </button>
+                            <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
+                        </div>
+
+                        <!-- FormulÃ¡rio de Filtro Melhorado -->
+                        <form id="filterForm"
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <!-- SeleÃ§Ã£o RÃ¡pida de PerÃ­odo -->
+                            <div class="sm:col-span-2 lg:col-span-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filtro
+                                    RÃ¡pido</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" id="historyCurrentMonthBtn"
+                                        class="quick-filter-btn bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition duration-300">
+                                        Mês Atual
+                                    </button>
+                                    <button type="button" id="historyLastMonthBtn"
+                                        class="quick-filter-btn bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300">
+                                        Mês Anterior
+                                    </button>
+                                    <button type="button" id="historyLast3MonthsBtn"
+                                        class="quick-filter-btn bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300">
+                                        3 Meses
+                                    </button>
+                                    <button type="button" id="historyAllBtn"
+                                        class="quick-filter-btn bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300">
+                                        Todos
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Filtros Detalhados -->
+                            <div>
+                                <label for="filterStartDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data
+                                    InÃ­cio</label>
+                                <input type="date" id="filterStartDate" name="filterStartDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="filterEndDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Fim</label>
+                                <input type="date" id="filterEndDate" name="filterEndDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="filterCategory"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="filterCategory" name="filterCategory"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Todas</option>
+                                    <!-- Preenchido por JS -->
+                                </select>
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit"
+                                    class="w-full flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Filtrar
+                                </button>
+                                <button type="reset" id="clearFilterBtn"
+                                    class="w-full flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Totais -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Pago (Filtrado)
+                                </h4>
+                                <p id="historyTotalAmount" class="text-2xl font-bold text-red-600 dark:text-red-400">R$
+                                    0,00</p>
+                            </div>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">MÃ©dia por Item</h4>
+                                <p id="historyAverageAmount"
+                                    class="text-2xl font-bold text-purple-600 dark:text-purple-400">R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Quantidade de Itens
+                                </h4>
+                                <p id="historyItemsCount" class="text-2xl font-bold text-blue-600 dark:text-blue-400">0
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Estado Vazio -->
+                        <div id="emptyState" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta paga encontrada</h4>
+                            <p class="mt-1 text-sm">Ajuste seus filtros ou marque uma conta como paga.</p>
+                        </div>
+                        <!-- Lista -->
+                        <ul id="transactionList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Itens da lista serÃ£o inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PÃGINA 4: ENTRADAS -->
+            <div id="page-income" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Histórico de Entradas
+                            (Receitas)</h2>
+
+                        <!-- FormulÃ¡rio de Filtro -->
+                        <form id="incomeFilterForm"
+                            class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <div>
+                                <label for="incomeFilterStartDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data
+                                    InÃ­cio</label>
+                                <input type="date" id="incomeFilterStartDate" name="incomeFilterStartDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="incomeFilterEndDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Fim</label>
+                                <input type="date" id="incomeFilterEndDate" name="incomeFilterEndDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="incomeFilterCategory"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="incomeFilterCategory" name="incomeFilterCategory"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Todas</option>
+                                    <!-- Preenchido por JS (apenas categorias de receita) -->
+                                </select>
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit"
+                                    class="w-full flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Filtrar
+                                </button>
+                                <button type="reset" id="incomeClearFilterBtn"
+                                    class="w-full flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Total Recebido (Filtrado) -->
+                        <div class="mb-4">
+                            <p id="incomeTotalAmount"
+                                class="text-right text-xl font-bold text-green-600 dark:text-green-500 pr-4"></p>
+                        </div>
+
+                        <!-- Estado Vazio -->
+                        <div id="emptyStateIncome" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma entrada encontrada</h4>
+                            <p class="mt-1 text-sm">Adicione uma receita ou ajuste seus filtros.</p>
+                        </div>
+                        <!-- Lista -->
+                        <ul id="incomeList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Itens da lista serÃ£o inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÃGINA 5: PLANEJAMENTO ===== -->
+            <div id="page-planning" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Definir Orçamento Mensal
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Defina seus limites de gastos mensais por
+                            categoria. As alteraÃ§Ãµes sÃ£o salvas automaticamente.</p>
+                        <form id="budgetForm" class="space-y-4">
+                            <!-- Inputs do Orçamento serÃ£o inseridos pelo JS -->
+                        </form>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÃGINA 6: RELATÃ“RIOS (NOVA) ===== -->
+            <div id="page-reports" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Relatórios AnalÃ­ticos
+                        </h2>
+
+                        <!-- Filtros de RelatÃ³rio -->
+                        <form id="reportFilterForm"
+                            class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <div>
+                                <label for="reportMonth"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Mês</label>
+                                <select id="reportMonth"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                                    <!-- OpÃ§Ãµes preenchidas pelo JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label for="reportYear"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ano</label>
+                                <input type="number" id="reportYear" min="2020" max="2100"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit"
+                                    class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Gerar RelatÃ³rio
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- TÃ­tulo do RelatÃ³rio (DRE) -->
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">DemonstraÃ§Ã£o do
+                            Resultado (DRE)</h3>
+
+                        <!-- ContÃªiner do RelatÃ³rio -->
+                        <div id="dreReportContainer" class="overflow-x-auto">
+                            <!-- A tabela do DRE serÃ¡ renderizada aqui -->
+                        </div>
+                        <div id="dreReportEmpty" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Selecione um Mês para gerar o
+                                DRE.
+                            </h4>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÃGINA 7: BI / INSIGHTS (NOVA COM GRÃFICO) ===== -->
+            <div id="page-bi" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">BI e VisualizaÃ§Ã£o de
+                            Dados
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Despesas Pagas por Categoria (Últimos 3 Meses)
+                        </p>
+                        <div id="bi-chart-container" class="w-full">
+                            <!-- O grÃ¡fico D3.js serÃ¡ renderizado aqui -->
+                            <div id="bi-chart" class="overflow-x-auto"></div>
+                            <!-- Estado Vazio para o grÃ¡fico -->
+                            <div id="bi-chart-empty" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Sem dados de despesas pagas
+                                    para o perÃ­odo.</h4>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÃGINA 8: CARTÃ•ES DE CRÃ‰DITO (NOVA) ===== -->
+            <div id="page-credit-cards" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Cartões de CrÃ©dito</h2>
+
+                        <!-- Resumo dos Cartões -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                            <!-- Os Cartões serÃ£o preenchidos aqui pelo JavaScript -->
+                        </div>
+
+                        <!-- Faturas em Aberto -->
+                        <div class="mb-6">
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Faturas em Aberto
+                            </h3>
+                            <div id="openInvoicesContainer" class="space-y-4">
+                                <!-- As faturas serÃ£o preenchidas aqui pelo JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Histórico de Faturas -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Histórico de
+                                Faturas
+                            </h3>
+                            <div id="invoicesHistoryContainer" class="space-y-4">
+                                <!-- O Histórico serÃ¡ preenchido aqui pelo JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </main> <!-- Fim do ConteÃºdo Principal -->
+    </div>
+
+    <!-- BotÃ£o Flutuante (FAB) para Adicionar Transação -->
+    <button id="addTransactionBtn"
+        class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform hover:scale-110 hidden">
+        <!-- ComeÃ§a escondido -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+
+    <!-- ===== 3.5 ELEMENTO TOAST/NOTIFICAÃ‡ÃƒO ===== -->
+    <div id="toastNotification"
+        class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-all duration-300 translate-x-[200%] hidden z-50">
+        <!-- O conteÃºdo e a cor (bg-green-500 ou bg-red-500) serÃ£o definidos pelo JS -->
+    </div>
+
+    <!-- Carrega o aplicativo modular -->
+    <script type="module" src="./js/app.js"></script>
+</body>
+
+</html>

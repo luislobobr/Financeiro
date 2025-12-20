@@ -1,0 +1,1257 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR" class="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador Financeiro Familiar</title>
+    <!-- CACHE BUSTING META TAGS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                    console.log("DEBUG: Unregistered Service Worker");
+                }
+            });
+        }
+    </script>
+    <!-- Carrega o Tailwind CSS a partir de um CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <!-- Carrega SheetJS (xlsx.js) para ler Excel e CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- NOVO: Carrega D3.js para visualização de dados no BI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        /* Estilo para o spinner de carregamento */
+        .spinner {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Estilos da Sidebar */
+        .sidebar-link {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link.active {
+            background-color: #eef2ff;
+            /* indigo-100 */
+            color: #4f46e5;
+            /* indigo-600 */
+            font-weight: 600;
+        }
+
+        .dark .sidebar-link.active {
+            background-color: #3730a3;
+            /* indigo-800 */
+            color: #e0e7ff;
+            /* indigo-100 */
+        }
+
+        /* Ícones de Sol/Lua para o toggle de tema */
+        #theme-toggle-sun,
+        #theme-toggle-moon {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dark #theme-toggle-sun {
+            opacity: 0;
+            transform: rotate(90deg);
+        }
+
+        .dark #theme-toggle-moon {
+            opacity: 1;
+            transform: rotate(0deg);
+        }
+
+        #theme-toggle-moon {
+            opacity: 0;
+            transform: rotate(-90deg);
+        }
+
+        /* Estilo base para o gráfico D3 para garantir que o texto seja legível nos temas */
+        #bi-chart svg {
+            font-family: inherit;
+        }
+
+        #bi-chart .x-axis line,
+        #bi-chart .y-axis line {
+            stroke: #d1d5db;
+            /* gray-300 */
+        }
+
+        .dark #bi-chart .x-axis line,
+        .dark #bi-chart .y-axis line {
+            stroke: #4b5563;
+            /* gray-600 */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-300">
+
+    <!-- ===== 1. MODAL DE SELEÇÃO DE FAMÍLIA ===== -->
+    <div id="familyModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl text-center">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Bem-vindo!</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Como você gostaria de começar?</p>
+
+            <div class="space-y-4">
+                <button id="createFamilyBtn"
+                    class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    Criar Nova Família
+                </button>
+                <div class="relative flex items-center justify-center">
+                    <span class="absolute bg-white dark:bg-gray-800 px-2 text-gray-500 text-sm">ou</span>
+                    <div class="h-px bg-gray-300 dark:bg-gray-600 w-full"></div>
+                </div>
+                <div class="space-y-3">
+                    <input type="text" id="familyIdInput" placeholder="Cole o ID da Família aqui"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="joinFamilyBtn"
+                        class="w-full bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-gray-800 transition duration-300">
+                        Juntar-se a uma Família
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mostra o ID da nova família após a criação -->
+            <div id="newFamilyIdSection" class="mt-6 hidden">
+                <p class="text-gray-700 dark:text-gray-300">Compartilhe este ID com seu parceiro:</p>
+                <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-mono text-lg p-3 my-2 rounded-lg break-words"
+                    id="familyIdDisplay"></div>
+                <button id="copyFamilyIdBtn"
+                    class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                    Copiar ID
+                </button>
+                <button id="startAppBtn"
+                    class="mt-4 w-full text-blue-600 dark:text-blue-400 font-semibold py-2 px-4 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 transition duration-300">
+                    Começar a Usar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2. INDICADOR DE CARREGAMENTO ===== -->
+    <div id="loadingIndicator"
+        class="fixed inset-0 bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center z-40">
+        <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full"></div>
+        <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Carregando finanças...</p>
+        <!-- Mensagem de erro de inicialização será injetada aqui -->
+    </div>
+
+    <!-- ===== 2.5 MODAL DE CONFIGURAÇÕES ===== -->
+    <div id="settingsModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeSettingsBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Configurações da Família</h2>
+            <form id="settingsForm" class="space-y-4">
+                <div>
+                    <label for="partner1NameInput"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome (Parceiro 1)</label>
+                    <input type="text" id="partner1NameInput" placeholder="Ex: João"
+                        class="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="partner2NameInput"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome (Parceiro 2)</label>
+                    <input type="text" id="partner2NameInput" placeholder="Ex: Maria"
+                        class="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button id="saveSettingsBtn" type="submit"
+                    class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                    Salvar Nomes
+                </button>
+            </form>
+
+            <!-- Botão Sair da Família -->
+            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <button id="disconnectFamilyBtn"
+                    class="w-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 font-semibold py-3 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition duration-300 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Trocar / Sair da Família
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2.6 MODAL DE IMPORTAÇÃO ===== -->
+    <div id="importModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeImportModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Importar Transações (Planilha)</h2>
+
+            <!-- Passo de Revisão -->
+            <div id="importReviewStep">
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Por favor, revise os dados e defina um pagador padrão
+                    para todas as transações importadas.</p>
+
+                <div class="mb-4">
+                    <label for="importPaidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pagador
+                        Padrão (para todos os itens)</label>
+                    <select id="importPaidBy"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Opções preenchidas pelo JS -->
+                    </select>
+                </div>
+
+                <div class="mb-6 overflow-x-auto">
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Prévia (primeiras 5 linhas):
+                    </p>
+                    <table
+                        class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-300 dark:border-gray-700">
+                        <thead id="csvPreviewHead" class="bg-gray-50 dark:bg-gray-700">
+                            <!-- Cabeçalho preenchido pelo JS -->
+                        </thead>
+                        <tbody id="csvPreviewBody"
+                            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Linhas preenchidas pelo JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button id="cancelImportBtn"
+                        class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                        Cancelar
+                    </button>
+                    <button id="confirmImportBtn"
+                        class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                        Confirmar e Importar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Passo de Carregamento -->
+            <div id="importLoadingStep" class="text-center py-10 hidden">
+                <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full mx-auto"></div>
+                <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Importando transações... Por favor, aguarde.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO: MODAL DE TRANSAÇÃO (Req 3) -->
+    <!-- Este modal agora centraliza o formulário de Adicionar e Editar -->
+    <div id="transactionModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-4xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeTransactionModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 id="transactionModalTitle" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Adicionar
+                Transação</h2>
+
+            <!-- Formulário de Transação (Movido para cá) -->
+            <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Descrição -->
+                <div class="md:col-span-2 lg:col-span-3">
+                    <label for="description"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição</label>
+                    <input type="text" id="description" name="description" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
+                </div>
+                <!-- Valor -->
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor
+                        (R$)</label>
+                    <input type="number" id="amount" name="amount" step="0.01" min="0" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
+                </div>
+                <!-- Tipo (Receita/Despesa) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+                    <div class="mt-2 flex space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="type" value="Receita"
+                                class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Receita</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="type" value="Despesa"
+                                class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                checked>
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Despesa</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- Categoria -->
+                <div>
+                    <label for="category"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                    <select id="category" name="category"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Opções preenchidas pelo JS -->
+                    </select>
+                </div>
+                <!-- Pago Por -->
+                <div>
+                    <label for="paidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pago
+                        Por</label>
+                    <select id="paidBy" name="paidBy"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Opções preenchidas pelo JS -->
+                    </select>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="status"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <select id="status" name="status"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option>Pago</option>
+                        <option>A Pagar</option>
+                    </select>
+                </div>
+                <!-- Data de Vencimento -->
+                <div>
+                    <label for="dueDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data
+                        Vencimento</label>
+                    <input type="date" id="dueDate" name="dueDate" required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                </div>
+                <!-- Data de Pagamento -->
+                <div>
+                    <label for="paymentDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data
+                        Pagamento</label>
+                    <input type="date" id="paymentDate" name="paymentDate"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                </div>
+
+                <!-- Forma de Pagamento -->
+                <div id="paymentMethodContainer">
+                    <label for="paymentMethod" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Forma
+                        de Pagamento</label>
+                    <select id="paymentMethod" name="paymentMethod"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Opções preenchidas pelo JS -->
+                    </select>
+                </div>
+
+                <!-- Tipo de Despesa (Req 4) -->
+                <div id="expenseTypeContainer">
+                    <label for="expenseType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de
+                        Despesa</label>
+                    <select id="expenseType" name="expenseType"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option>Variável</option>
+                        <option>Fixa</option>
+                    </select>
+                </div>
+
+                <!-- Recorrente (Req 5) -->
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="isRecurring" name="isRecurring"
+                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Recorrente (Mensal)</span>
+                    </label>
+                </div>
+
+
+                <!-- Botão Adicionar / Atualizar -->
+                <div class="md:col-span-2 lg:col-span-3">
+                    <button id="transactionSubmitBtn" type="submit"
+                        class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
+                        <!-- O texto será "Adicionar" ou "Atualizar" via JS -->
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOVO: MODAL DE GERENCIAMENTO DE CATEGORIAS -->
+    <div id="categoriesModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeCategoriesModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Gerenciar Categorias</h2>
+
+            <!-- Formulário para adicionar nova categoria -->
+            <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Adicionar Nova Categoria</h3>
+                <form id="addCategoryForm" class="flex gap-4">
+                    <div class="flex-grow">
+                        <label for="newCategoryName"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da
+                            Categoria</label>
+                        <input type="text" id="newCategoryName" required
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Ex: Educação">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit"
+                            class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                            Adicionar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de categorias existentes -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Categorias Existentes</h3>
+                <div id="categoriesList" class="space-y-2 max-h-80 overflow-y-auto">
+                    <!-- As categorias serão preenchidas aqui pelo JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE GERENCIAMENTO DE FORMAS DE PAGAMENTO -->
+    <div id="paymentMethodsModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closePaymentMethodsModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Formas de Pagamento</h2>
+
+            <!-- Formulário para adicionar -->
+            <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <form id="addPaymentMethodForm" class="flex gap-2">
+                    <input type="text" id="newPaymentMethodIcon" placeholder="Ícone (emoji)"
+                        class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-center text-xl">
+                    <input type="text" id="newPaymentMethodName" placeholder="Nome (ex: PIX)" required
+                        class="flex-grow px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md">
+                    <button type="submit"
+                        class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">
+                        Adicionar
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lista -->
+            <div id="paymentMethodsList" class="space-y-2 max-h-64 overflow-y-auto">
+                <!-- Preenchido pelo JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO DE PAGAMENTO -->
+    <div id="confirmPaymentModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-sm p-6 rounded-lg shadow-xl">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Confirmar Pagamento</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Selecione a forma de pagamento:</p>
+
+            <input type="hidden" id="confirmPaymentTransactionId">
+
+            <select id="confirmPaymentMethodSelect"
+                class="w-full mb-4 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md">
+                <option value="">Selecione...</option>
+            </select>
+
+            <div class="flex gap-3">
+                <button id="cancelPaymentBtn"
+                    class="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    Cancelar
+                </button>
+                <button id="confirmPaymentBtn"
+                    class="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 3. CONTEÚDO PRINCIPAL DA APLICAÇÃO ===== -->
+    <!-- Layout com Sidebar (Req 2) -->
+    <div id="appContainer" class="lg:flex min-h-screen hidden">
+
+        <!-- Sidebar (Req 2) -->
+        <aside id="sidebar"
+            class="w-full lg:w-64 bg-white dark:bg-gray-800 shadow-lg lg:fixed lg:h-screen lg:flex lg:flex-col">
+            <!-- Cabeçalho da Sidebar -->
+            <header class="p-6 border-b dark:border-gray-700">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Meu Painel</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    ID: <span id="currentFamilyId" class="font-mono"></span>
+                </p>
+                <button id="copyIdBtn" title="Copiar ID da Família"
+                    class="mt-2 w-full text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                    Copiar ID da Família
+                </button>
+            </header>
+
+            <!-- Menu de Navegação -->
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" id="navBtnDashboard"
+                    class="sidebar-link active flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    Painel Principal
+                </a>
+                <a href="#" id="navBtnPending"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Contas a Pagar
+                </a>
+                <!-- Link Histórico (Req 1/3) -->
+                <a href="#" id="navBtnHistory"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Contas Pagas
+                </a>
+                <!-- Link Entradas (Req 4) -->
+                <a href="#" id="navBtnIncome"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    Entradas
+                </a>
+                <a href="#" id="navBtnPlanning"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Planejamento
+                </a>
+                <!-- NOVO: Link para Relatórios -->
+                <a href="#" id="navBtnReports"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-4-6h-4m8 0h4m-4 0v4m0 0h4m-4 0h-4m4 0v-4" />
+                    </svg>
+                    Relatórios
+                </a>
+                <!-- NOVO: Link para BI/Insights -->
+                <a href="#" id="navBtnBi"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                    BI / Insights
+                </a>
+            </nav>
+
+            <!-- Controles da Sidebar (Config, Tema) - REORGANIZED -->
+            <div class="p-4 border-t dark:border-gray-700">
+                <!-- Settings Row -->
+                <div class="flex items-center justify-between">
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-3">
+                        <button id="openSettingsBtn" title="Configurações"
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826 3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                        <button id="openCategoriesBtn" title="Categorias"
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                            </svg>
+                        </button>
+                        <button id="openPaymentMethodsBtn" title="Formas de Pagamento"
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Theme Toggle -->
+                    <button id="themeToggleBtn" title="Alternar Tema"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-indigo-900 hover:text-yellow-600 dark:hover:text-indigo-400 transition-colors relative overflow-hidden">
+                        <svg id="theme-toggle-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.05 19.95l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.05 4.05l-.707-.707" />
+                        </svg>
+                        <svg id="theme-toggle-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal (à direita da Sidebar) -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64"> <!-- ml-64 para compensar a sidebar no desktop -->
+
+            <!-- ===== PÁGINA 1: PAINEL PRINCIPAL ===== -->
+            <div id="page-dashboard">
+                <!-- Balancete Geral do Mês (ATUALIZADO PARA 4 COLUNAS) -->
+                <section class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Balancete do Mês</h2>
+                    <!-- Novo layout de 4 colunas para incluir Contas a Pagar -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-green-500 uppercase">Total de Entradas</h3>
+                            <p id="totalIncome" class="text-3xl font-bold text-green-600 dark:text-green-500 mt-2">R$
+                                0,00</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-red-500 uppercase">Total de Saídas (Pagas)</h3>
+                            <p id="totalExpense" class="text-3xl font-bold text-red-600 dark:text-red-500 mt-2">R$ 0,00
+                            </p>
+                        </div>
+                        <!-- CARD: CONTAS A PAGAR DO MÊS -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-amber-500">
+                            <h3 class="text-sm font-semibold text-amber-700 dark:text-amber-500 uppercase">Contas a
+                                Pagar (Mês)</h3>
+                            <p id="totalPendingCurrentMonth"
+                                class="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-2">R$ 0,00</p>
+                        </div>
+                        <!-- FIM NOVO CARD -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Saldo (Entradas
+                                - Saídas)</h3>
+                            <p id="totalBalance" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">R$
+                                0,00</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Progresso do Orçamento - Card Compacto com Gráfico Circular -->
+                    <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Orçamento do Mês</h3>
+                        <!-- Gráfico Circular D3 -->
+                        <div id="budgetDonutChart" class="flex justify-center mb-4">
+                            <!-- D3 donut chart será renderizado aqui -->
+                        </div>
+                        <!-- Resumo Compacto -->
+                        <div id="budgetSummary" class="text-center space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500 dark:text-gray-400">Orçamento Total:</span>
+                                <span id="budgetTotalValue" class="font-semibold text-gray-800 dark:text-gray-200">R$
+                                    0,00</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500 dark:text-gray-400">Gasto:</span>
+                                <span id="budgetSpentValue" class="font-semibold text-red-500">R$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500 dark:text-gray-400">Disponível:</span>
+                                <span id="budgetRemainingValue" class="font-semibold text-green-500">R$ 0,00</span>
+                            </div>
+                        </div>
+                        <!-- Container antigo para manter compatibilidade -->
+                        <div id="budgetProgressContainer" class="hidden"></div>
+                    </div>
+
+                    <!-- CARD: CONTAS ATRASADAS - Expandido -->
+                    <div
+                        class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
+                        <h3 class="text-lg font-semibold text-red-700 dark:text-red-500 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Contas Atrasadas
+                        </h3>
+                        <!-- Estado Vazio -->
+                        <div id="emptyStateOverdue" class="text-center text-gray-500 dark:text-gray-400 py-6 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-green-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h4 class="mt-2 text-md font-semibold text-gray-700 dark:text-gray-300">Nenhuma conta
+                                atrasada!</h4>
+                        </div>
+                        <!-- Lista de Contas Atrasadas -->
+                        <ul id="overdueList"
+                            class="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
+                            <!-- Itens da lista serão inseridos pelo JS -->
+                        </ul>
+                        <!-- Total Atrasado -->
+                        <p id="totalOverdueAmount"
+                            class="text-right font-semibold text-red-600 dark:text-red-500 mt-4 pr-4"></p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÁGINA 2: CONTAS A PAGAR ===== -->
+            <div id="page-pending" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+
+                        <!-- Header com título -->
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Contas a Pagar</h2>
+                        </div>
+
+                        <!-- Cards de Resumo (primeiro, bem destacados) -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                                <h4 class="text-sm font-medium text-gray-400 mb-2">Total a Pagar</h4>
+                                <p id="pendingTotalAmount" class="text-2xl font-bold text-amber-500">R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                                <h4 class="text-sm font-medium text-gray-400 mb-2">Despesas Fixas</h4>
+                                <p id="pendingTotalFixedAmount" class="text-2xl font-bold text-purple-500">R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                                <h4 class="text-sm font-medium text-gray-400 mb-2">Quantidade</h4>
+                                <p id="pendingItemsCount" class="text-2xl font-bold text-gray-100">0</p>
+                            </div>
+                            <div class="bg-green-900/50 dark:bg-green-900/30 p-5 rounded-xl border border-green-700">
+                                <h4 class="text-sm font-medium text-green-400 mb-2">Total Selecionado (<span
+                                        id="pendingSelectedCount">0</span>)</h4>
+                                <p id="pendingSelectedAmount" class="text-2xl font-bold text-green-400">R$ 0,00</p>
+                            </div>
+                        </div>
+
+                        <!-- Filtros -->
+                        <form id="pendingFilterForm" class="mb-6">
+                            <!-- Botões de Filtro Rápido -->
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <button type="button" id="pendingCurrentMonthBtn"
+                                    class="quick-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300">
+                                    Este Mês
+                                </button>
+                                <button type="button" id="pendingNextMonthBtn"
+                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Próximo Mês
+                                </button>
+                                <button type="button" id="pendingNext3MonthsBtn"
+                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Próximos 3 Meses
+                                </button>
+                                <button type="button" id="pendingAllBtn"
+                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Todos
+                                </button>
+                            </div>
+
+                            <!-- Filtros Dropdown em linha -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label for="pendingFilterMonth"
+                                        class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
+                                    <select id="pendingFilterMonth" name="pendingFilterMonth"
+                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Todos os meses</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="pendingFilterCategory"
+                                        class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
+                                    <select id="pendingFilterCategory" name="pendingFilterCategory"
+                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Todas</option>
+                                        <!-- Preenchido por JS -->
+                                    </select>
+                                </div>
+                                <div class="hidden">
+                                    <input type="date" id="pendingFilterStartDate" name="pendingFilterStartDate"
+                                        aria-label="Data início">
+                                    <input type="date" id="pendingFilterEndDate" name="pendingFilterEndDate"
+                                        aria-label="Data fim">
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="reset" id="pendingClearFilterBtn"
+                                        class="w-full px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                        Limpar Filtros
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Seleção Geral -->
+                        <div class="flex items-center mb-4 p-3 bg-gray-700/50 rounded-lg">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="selectAllPendingCheckbox"
+                                    class="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                                <span class="ml-3 text-sm font-medium text-gray-300">Selecionar Todos</span>
+                            </label>
+                        </div>
+
+                        <!-- Estado Vazio -->
+                        <div id="emptyStatePending" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta a pagar</h4>
+                            <p class="mt-1 text-sm">Você está em dia ou os filtros não retornaram resultados!</p>
+                        </div>
+                        <!-- Lista de Contas a Pagar -->
+                        <ul id="pendingList" class="divide-y divide-gray-700">
+                            <!-- Itens da lista serão inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PÁGINA 3: HISTÓRICO DE CONTAS PAGAS -->
+            <div id="page-history" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+
+                        <!-- Header com título e botão de importar -->
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Histórico de Contas Pagas
+                            </h2>
+                            <button id="importCsvBtn"
+                                class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Importar
+                            </button>
+                            <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
+                        </div>
+
+                        <!-- Cards de Resumo -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                                <h4 class="text-sm font-medium text-gray-400 mb-2">Total Pago</h4>
+                                <p id="historyTotalAmount" class="text-2xl font-bold text-red-500">R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                                <h4 class="text-sm font-medium text-gray-400 mb-2">Média por Item</h4>
+                                <p id="historyAverageAmount" class="text-2xl font-bold text-purple-500">R$ 0,00</p>
+                            </div>
+                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                                <h4 class="text-sm font-medium text-gray-400 mb-2">Quantidade</h4>
+                                <p id="historyItemsCount" class="text-2xl font-bold text-gray-100">0</p>
+                            </div>
+                        </div>
+
+                        <!-- Filtros -->
+                        <form id="filterForm" class="mb-6">
+                            <!-- Botões de Filtro Rápido -->
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <button type="button" id="historyCurrentMonthBtn"
+                                    class="quick-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300">
+                                    Este Mês
+                                </button>
+                                <button type="button" id="historyLastMonthBtn"
+                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Mês Anterior
+                                </button>
+                                <button type="button" id="historyLast3MonthsBtn"
+                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Últimos 3 Meses
+                                </button>
+                                <button type="button" id="historyAllBtn"
+                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Todos
+                                </button>
+                            </div>
+
+                            <!-- Filtros Dropdown em linha -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label for="historyFilterMonth"
+                                        class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
+                                    <select id="historyFilterMonth" name="historyFilterMonth"
+                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Todos os meses</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="filterCategory"
+                                        class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
+                                    <select id="filterCategory" name="filterCategory"
+                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Todas</option>
+                                        <!-- Preenchido por JS -->
+                                    </select>
+                                </div>
+                                <div class="hidden">
+                                    <input type="date" id="filterStartDate" name="filterStartDate">
+                                    <input type="date" id="filterEndDate" name="filterEndDate">
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="reset" id="clearFilterBtn"
+                                        class="w-full px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                        Limpar Filtros
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Estado Vazio -->
+                        <div id="emptyState" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta paga encontrada</h4>
+                            <p class="mt-1 text-sm">Ajuste seus filtros ou marque uma conta como paga.</p>
+                        </div>
+                        <!-- Lista -->
+                        <ul id="transactionList" class="divide-y divide-gray-700">
+                            <!-- Itens da lista serão inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PÁGINA 4: ENTRADAS -->
+            <div id="page-income" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Histórico de Entradas
+                            (Receitas)</h2>
+
+                        <!-- Formulário de Filtro -->
+                        <form id="incomeFilterForm"
+                            class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 p-4 border dark:border-gray-700 rounded-lg">
+                            <div>
+                                <label for="incomeFilterStartDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data
+                                    Início</label>
+                                <input type="date" id="incomeFilterStartDate" name="incomeFilterStartDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="incomeFilterEndDate"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Fim</label>
+                                <input type="date" id="incomeFilterEndDate" name="incomeFilterEndDate"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]">
+                            </div>
+                            <div>
+                                <label for="incomeFilterCategory"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="incomeFilterCategory" name="incomeFilterCategory"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option>Todas</option>
+                                    <!-- Preenchido por JS (apenas categorias de receita) -->
+                                </select>
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit"
+                                    class="w-full flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                                    Filtrar
+                                </button>
+                                <button type="reset" id="incomeClearFilterBtn"
+                                    class="w-full flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300">
+                                    Limpar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Total Recebido (Filtrado) -->
+                        <div class="mb-4">
+                            <p id="incomeTotalAmount"
+                                class="text-right text-xl font-bold text-green-600 dark:text-green-500 pr-4"></p>
+                        </div>
+
+                        <!-- Estado Vazio -->
+                        <div id="emptyStateIncome" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma entrada encontrada</h4>
+                            <p class="mt-1 text-sm">Adicione uma receita ou ajuste seus filtros.</p>
+                        </div>
+                        <!-- Lista -->
+                        <ul id="incomeList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Itens da lista serão inseridos pelo JS -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÁGINA 5: PLANEJAMENTO ===== -->
+            <div id="page-planning" class="hidden">
+                <section>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Definir Orçamento Mensal
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Defina seus limites de gastos mensais por
+                            categoria. As alterações são salvas automaticamente.</p>
+                        <form id="budgetForm" class="space-y-4">
+                            <!-- Inputs do orçamento serão inseridos pelo JS -->
+                        </form>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== PÁGINA 6: RELATÓRIOS (REDESIGNED) ===== -->
+            <div id="page-reports" class="hidden">
+                <section class="space-y-6">
+
+                    <!-- ===== SEÇÃO 1: DRE ===== -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Demonstração do Resultado
+                            (DRE)</h2>
+
+                        <!-- Filtros DRE -->
+                        <div class="flex flex-wrap gap-4 mb-6">
+                            <div>
+                                <label for="reportMonth"
+                                    class="block text-sm font-medium text-gray-400 mb-1">Mês</label>
+                                <select id="reportMonth"
+                                    class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="reportYear" class="block text-sm font-medium text-gray-400 mb-1">Ano</label>
+                                <input type="number" id="reportYear" min="2020" max="2100"
+                                    class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-24">
+                            </div>
+                        </div>
+
+                        <!-- Contêiner do DRE -->
+                        <div id="dreReportContainer" class="overflow-x-auto">
+                            <!-- A tabela do DRE será renderizada aqui -->
+                        </div>
+                        <div id="dreReportEmpty" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                            <h4 class="text-lg font-semibold dark:text-gray-300">Selecione um mês para gerar o DRE.</h4>
+                        </div>
+                    </div>
+
+                    <!-- ===== SEÇÃO 2: COMPARATIVO MENSAL ===== -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Comparativo Mensal (últimos
+                            6 meses)</h2>
+
+                        <div id="comparativoMensalContainer" class="overflow-x-auto">
+                            <!-- Tabela do comparativo será renderizada aqui -->
+                        </div>
+                    </div>
+
+                    <!-- ===== SEÇÃO 3: DESPESAS POR PARCEIRO ===== -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Despesas por Parceiro</h2>
+
+                        <div id="despesasPorParceiroContainer">
+                            <!-- Cards de parceiros serão renderizados aqui -->
+                        </div>
+                    </div>
+
+                    <!-- ===== SEÇÃO 4: DESPESAS POR FORMA DE PAGAMENTO ===== -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Despesas por Forma de
+                            Pagamento</h2>
+
+                        <div id="despesasPorFormaPagamentoContainer">
+                            <!-- Cards de formas de pagamento serão renderizados aqui -->
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+
+            <!-- ===== PÁGINA 7: BI / BUSINESS INTELLIGENCE (REDESIGNED) ===== -->
+            <div id="page-bi" class="hidden">
+                <section class="space-y-6">
+
+                    <!-- Header with Month Selector -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Business Intelligence</h2>
+                            <div>
+                                <select id="biMonthSelect"
+                                    class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <!-- Populated by JS with Month/Year options -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Receitas do Mês</h4>
+                            <p id="biReceitasMes" class="text-2xl font-bold text-green-500">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Despesas do Mês</h4>
+                            <p id="biDespesasMes" class="text-2xl font-bold text-red-500">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Saldo do Mês</h4>
+                            <p id="biSaldoMes" class="text-2xl font-bold text-white">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row: Despesas por Categoria + Distribuição por Categoria -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Despesas por Categoria (Horizontal Bar Chart) -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Despesas por
+                                Categoria</h3>
+                            <div id="biCategoryBarChart" class="overflow-x-auto min-h-[200px]">
+                                <!-- D3 bar chart rendered here -->
+                            </div>
+                            <div id="biCategoryBarChartEmpty" class="text-center text-gray-500 py-8 hidden">
+                                <p>Sem dados para o período</p>
+                            </div>
+                        </div>
+
+                        <!-- Distribuição por Categoria (Donut Chart) -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Distribuição por
+                                Categoria</h3>
+                            <div class="flex items-center gap-4">
+                                <div id="biDonutChart" class="flex-shrink-0">
+                                    <!-- D3 donut chart rendered here -->
+                                </div>
+                                <div id="biDonutLegend" class="flex-1 space-y-2">
+                                    <!-- Legend items rendered here -->
+                                </div>
+                            </div>
+                            <div id="biDonutChartEmpty" class="text-center text-gray-500 py-8 hidden">
+                                <p>Sem dados para o período</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row: Despesas por Parceiro + Evolução Mensal -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Despesas por Parceiro (Horizontal Bar Chart) -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Despesas por
+                                Parceiro</h3>
+                            <div id="biPartnerBarChart" class="overflow-x-auto min-h-[150px]">
+                                <!-- D3 bar chart rendered here -->
+                            </div>
+                            <div id="biPartnerBarChartEmpty" class="text-center text-gray-500 py-8 hidden">
+                                <p>Sem dados para o período</p>
+                            </div>
+                        </div>
+
+                        <!-- Evolução Mensal (Grouped Bar Chart) -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Evolução Mensal (6
+                                meses)</h3>
+                            <div id="biEvolutionChart" class="overflow-x-auto min-h-[250px]">
+                                <!-- D3 grouped bar chart rendered here -->
+                            </div>
+                            <div id="biEvolutionLegend" class="flex justify-center gap-6 mt-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 bg-green-500 rounded"></div>
+                                    <span class="text-sm text-gray-400">Receitas</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 bg-red-500 rounded"></div>
+                                    <span class="text-sm text-gray-400">Despesas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+
+
+        </main> <!-- Fim do Conteúdo Principal -->
+    </div>
+
+    <!-- Botão Flutuante (FAB) para Adicionar Transação -->
+    <button id="addTransactionBtn"
+        class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg z-30 transition-transform hover:scale-110 hidden">
+        <!-- Começa escondido -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+
+    <!-- ===== 3.5 ELEMENTO TOAST/NOTIFICAÇÃO ===== -->
+    <div id="toastNotification"
+        class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-all duration-300 translate-x-[200%] hidden z-50">
+        <!-- O conteúdo e a cor (bg-green-500 ou bg-red-500) serão definidos pelo JS -->
+    </div>
+
+    <!-- App Module -->
+    <script type="module" src="./js/app.js?v=13"></script>
+</body>
+
+</html>
