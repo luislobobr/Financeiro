@@ -506,11 +506,28 @@
 
     <!-- ===== 3. CONTEÚDO PRINCIPAL DA APLICAÇÃO ===== -->
     <!-- Layout com Sidebar (Req 2) -->
-    <div id="appContainer" class="lg:flex min-h-screen hidden">
+    <div id="appContainer" class="min-h-screen hidden">
+
+        <!-- Mobile Header -->
+        <header id="mobileHeader"
+            class="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 shadow-md px-4 py-3 flex items-center justify-between">
+            <button id="mobileMenuBtn" aria-label="Abrir menu" title="Abrir menu"
+                class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <h1 class="text-lg font-bold text-gray-900 dark:text-gray-100">Meu Painel</h1>
+            <div class="w-10"></div> <!-- Spacer para centralizar título -->
+        </header>
+
+        <!-- Overlay mobile -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
 
         <!-- Sidebar (Req 2) -->
         <aside id="sidebar"
-            class="w-full lg:w-64 bg-white dark:bg-gray-800 shadow-lg lg:fixed lg:h-screen lg:flex lg:flex-col">
+            class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:flex lg:flex-col overflow-y-auto">
             <!-- Cabeçalho da Sidebar -->
             <header class="p-6 border-b dark:border-gray-700">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Meu Painel</h1>
@@ -593,6 +610,20 @@
                     </svg>
                     BI / Insights
                 </a>
+                <!-- NOVO: Link para Consultor IA -->
+                <a href="#" id="navBtnAiConsultant"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 dark:hover:from-purple-900/20 dark:hover:to-blue-900/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-purple-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span
+                        class="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent font-semibold">Consultor
+                        IA</span>
+                    <span
+                        class="ml-auto text-xs bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 px-2 py-0.5 rounded-full">Novo</span>
+                </a>
             </nav>
 
             <!-- Controles da Sidebar (Config, Tema) - REORGANIZED -->
@@ -647,7 +678,8 @@
         </aside>
 
         <!-- Conteúdo Principal (à direita da Sidebar) -->
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64"> <!-- ml-64 para compensar a sidebar no desktop -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64 pt-16 lg:pt-8">
+            <!-- pt-16 para o header mobile, ml-64 para compensar a sidebar no desktop -->
 
             <!-- ===== PÁGINA 1: PAINEL PRINCIPAL ===== -->
             <div id="page-dashboard">
@@ -684,31 +716,59 @@
                 </section>
 
                 <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Progresso do Orçamento - Card Compacto com Gráfico Circular -->
+                    <!-- Card de Saúde Financeira -->
                     <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Orçamento do Mês</h3>
-                        <!-- Gráfico Circular D3 -->
-                        <div id="budgetDonutChart" class="flex justify-center mb-4">
-                            <!-- D3 donut chart será renderizado aqui -->
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Saúde Financeira
+                        </h3>
+                        <!-- Score de Saúde -->
+                        <div id="healthScoreContainer" class="flex flex-col items-center mb-4">
+                            <div id="healthScoreCircle" class="relative w-24 h-24 mb-2">
+                                <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                                    <path class="text-gray-700" stroke="currentColor" stroke-width="3" fill="none"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path id="healthScoreArc" class="text-green-500" stroke="currentColor"
+                                        stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="75, 100"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <span id="healthScoreText"
+                                    class="absolute inset-0 flex items-center justify-center text-xl font-bold text-green-500">Bom</span>
+                            </div>
                         </div>
-                        <!-- Resumo Compacto -->
-                        <div id="budgetSummary" class="text-center space-y-2">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Orçamento Total:</span>
-                                <span id="budgetTotalValue" class="font-semibold text-gray-800 dark:text-gray-200">R$
-                                    0,00</span>
+                        <!-- Indicadores -->
+                        <div id="healthIndicators" class="space-y-3 text-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                                    <span id="savingsIcon" class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                                    Taxa de Poupança
+                                </span>
+                                <span id="savingsRateValue" class="font-semibold text-green-500">0%</span>
                             </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Gasto:</span>
-                                <span id="budgetSpentValue" class="font-semibold text-red-500">R$ 0,00</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                                    <span id="overdueIcon" class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                                    Contas em Dia
+                                </span>
+                                <span id="onTimeRateValue" class="font-semibold text-green-500">100%</span>
                             </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500 dark:text-gray-400">Disponível:</span>
-                                <span id="budgetRemainingValue" class="font-semibold text-green-500">R$ 0,00</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                                    <span id="budgetIcon" class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
+                                    Orçamento
+                                </span>
+                                <span id="budgetStatusValue" class="font-semibold text-yellow-500">Não definido</span>
                             </div>
                         </div>
-                        <!-- Container antigo para manter compatibilidade -->
-                        <div id="budgetProgressContainer" class="hidden"></div>
+                        <!-- Link para Consultor IA -->
+                        <a href="#" id="goToAiConsultantBtn"
+                            class="mt-4 block w-full text-center py-2 px-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all">
+                            🤖 Ver Recomendações IA
+                        </a>
                     </div>
 
                     <!-- CARD: CONTAS ATRASADAS - Expandido -->
@@ -1230,6 +1290,123 @@
                 </section>
             </div>
 
+            <!-- ===== PÁGINA: CONSULTOR IA ===== -->
+            <div id="page-ai-consultant" class="hidden">
+                <section>
+                    <div
+                        class="bg-gradient-to-br from-purple-900/50 to-blue-900/50 dark:from-purple-900/30 dark:to-blue-900/30 p-6 rounded-lg shadow-lg mb-6 border border-purple-500/30">
+                        <div class="flex items-center mb-4">
+                            <div
+                                class="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Consultor Financeiro IA</h2>
+                                <p class="text-purple-200 text-sm">Análise inteligente das suas finanças</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-sm">Baseado nos seus dados financeiros, preparei algumas
+                            recomendações personalizadas para melhorar sua saúde financeira.</p>
+                    </div>
+
+                    <!-- Score Geral -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Score Financeiro</h4>
+                            <p id="aiScoreValue" class="text-3xl font-bold text-green-500">75</p>
+                            <p id="aiScoreLabel" class="text-xs text-gray-400">de 100 pontos</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Taxa de Poupança</h4>
+                            <p id="aiSavingsRate" class="text-3xl font-bold text-blue-500">8%</p>
+                            <p class="text-xs text-gray-400">das receitas</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Contas Atrasadas</h4>
+                            <p id="aiOverdueCount" class="text-3xl font-bold text-red-500">3</p>
+                            <p id="aiOverdueTotal" class="text-xs text-gray-400">R$ 0,00</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Maior Gasto</h4>
+                            <p id="aiTopCategory" class="text-xl font-bold text-amber-500 truncate">-</p>
+                            <p id="aiTopCategoryValue" class="text-xs text-gray-400">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <!-- Recomendações -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                            Recomendações Personalizadas
+                        </h3>
+                        <div id="aiRecommendationsList" class="space-y-4">
+                            <!-- Recomendações serão inseridas pelo JS -->
+                            <div class="animate-pulse flex space-x-4">
+                                <div class="flex-1 space-y-4 py-1">
+                                    <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                                    <div class="h-4 bg-gray-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plano de Ação -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Plano de Ação - Próximos 30 Dias
+                        </h3>
+                        <div id="aiActionPlanList" class="space-y-3">
+                            <!-- Ações serão inseridas pelo JS -->
+                        </div>
+                    </div>
+
+                    <!-- Metas Sugeridas -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                                Metas Sugeridas
+                            </h3>
+                            <div id="aiGoalsList" class="space-y-4">
+                                <!-- Metas serão inseridas pelo JS -->
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Alertas Importantes
+                            </h3>
+                            <div id="aiAlertsList" class="space-y-3">
+                                <!-- Alertas serão inseridos pelo JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+
 
         </main> <!-- Fim do Conteúdo Principal -->
     </div>
@@ -1251,7 +1428,7 @@
     </div>
 
     <!-- App Module -->
-    <script type="module" src="./js/app.js?v=13"></script>
+    <script type="module" src="./js/app.js?v=15"></script>
 </body>
 
 </html>

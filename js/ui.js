@@ -35,7 +35,13 @@ export function initializeElements() {
         navBtnPlanning: document.getElementById('navBtnPlanning'),
         navBtnReports: document.getElementById('navBtnReports'),
         navBtnBi: document.getElementById('navBtnBi'),
+        navBtnAiConsultant: document.getElementById('navBtnAiConsultant'),
+        goToAiConsultantBtn: document.getElementById('goToAiConsultantBtn'),
 
+        // Mobile elements
+        mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+        sidebarOverlay: document.getElementById('sidebarOverlay'),
+        sidebar: document.getElementById('sidebar'),
 
         // Pages
         pageDashboard: document.getElementById('page-dashboard'),
@@ -528,3 +534,35 @@ export function populateMonthFilters() {
     }
 }
 
+/**
+ * Mobile sidebar control functions
+ */
+export function openMobileSidebar() {
+    if (elements.sidebar) {
+        elements.sidebar.classList.remove('-translate-x-full');
+        elements.sidebar.classList.add('translate-x-0');
+    }
+    if (elements.sidebarOverlay) {
+        elements.sidebarOverlay.classList.remove('hidden');
+    }
+    document.body.classList.add('overflow-hidden');
+}
+
+export function closeMobileSidebar() {
+    if (elements.sidebar) {
+        elements.sidebar.classList.remove('translate-x-0');
+        elements.sidebar.classList.add('-translate-x-full');
+    }
+    if (elements.sidebarOverlay) {
+        elements.sidebarOverlay.classList.add('hidden');
+    }
+    document.body.classList.remove('overflow-hidden');
+}
+
+export function toggleMobileSidebar() {
+    if (elements.sidebar && elements.sidebar.classList.contains('-translate-x-full')) {
+        openMobileSidebar();
+    } else {
+        closeMobileSidebar();
+    }
+}

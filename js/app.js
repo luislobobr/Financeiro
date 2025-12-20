@@ -27,7 +27,9 @@ import {
     closePaymentMethodsModal,
     openConfirmPaymentModal,
     closeConfirmPaymentModal,
-    populateMonthFilters
+    populateMonthFilters,
+    toggleMobileSidebar,
+    closeMobileSidebar
 } from './ui.js';
 import {
     formatCurrency,
@@ -48,6 +50,7 @@ import { renderDREReport, renderAllReports, populateReportFilters } from './repo
 import { handleFileSelect, processImport } from './import.js';
 import { setupPaymentMethodsListener, handleAddPaymentMethod, updatePaymentMethodDropdowns } from './paymentMethods.js';
 import { state } from './state.js'; // Import state from dedicated module
+import { renderAiConsultant } from './aiConsultant.js';
 
 /**
  * Handle payment confirmation from modal
@@ -148,7 +151,9 @@ const logic = {
         // 5. Reports & Charts
         renderAllReports(data);
         renderBIReport(data);
-        // Credit cards page removed
+
+        // 6. AI Consultant
+        renderAiConsultant(data);
     },
 
     /**
@@ -617,8 +622,22 @@ const startInitialization = async () => {
         if (elements.navBtnIncome) elements.navBtnIncome.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-income'); });
         if (elements.navBtnPlanning) elements.navBtnPlanning.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-planning'); });
         if (elements.navBtnReports) elements.navBtnReports.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-reports'); });
-        if (elements.navBtnBi) elements.navBtnBi.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-bi'); });
-        // Credit cards nav removed
+        if (elements.navBtnBi) elements.navBtnBi.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-bi'); });
+        if (elements.navBtnAiConsultant) elements.navBtnAiConsultant.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-ai-consultant'); });
+        if (elements.goToAiConsultantBtn) elements.goToAiConsultantBtn.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-ai-consultant'); });
+
+        // Mobile menu controls
+        if (elements.mobileMenuBtn) elements.mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        if (elements.sidebarOverlay) elements.sidebarOverlay.addEventListener('click', closeMobileSidebar);
+
+        // Close mobile sidebar when navigating
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    closeMobileSidebar();
+                }
+            });
+        });
 
         // Transaction Form
         if (elements.statusSelect) elements.statusSelect.addEventListener('change', togglePaymentDateVisibility);
