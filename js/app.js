@@ -53,10 +53,13 @@ import { renderBIReport, populateBIMonthSelect } from './charts.js';
 import { renderDREReport, renderAllReports, populateReportFilters } from './reports.js';
 import { handleFileSelect, processImport } from './import.js';
 import { setupPaymentMethodsListener, handleAddPaymentMethod, updatePaymentMethodDropdowns } from './paymentMethods.js';
-import { setupCreditCardsListener, handleAddCreditCard, handleDeleteCreditCard, updateCreditCardDropdown } from './creditCards.js';
+import { setupCreditCardsListener, handleAddCreditCard, handleDeleteCreditCard, updateCreditCardDropdown, isEditingCard, handleUpdateCreditCard } from './creditCards.js';
 import { renderCreditCardsPage } from './creditCardInvoices.js';
 import { state } from './state.js'; // Import state from dedicated module
-import { renderAiConsultant } from './aiConsultant.js';
+import { renderAiConsultant, generateAIRecommendations } from './aiConsultant.js';
+import { renderSubscriptionsPage } from './subscriptions.js';
+import { setupGoalsListener, renderGoalsPage } from './goals.js';
+import { getApiKey, setApiKey, hasApiKey } from './geminiApi.js';
 
 /**
  * Handle payment confirmation from modal
@@ -193,8 +196,8 @@ const logic = {
                 totalExpense += t.amount;
             }
 
-            // Pending (Current month)
-            if (t.type === 'Despesa' && t.status === 'A Pagar' && t.dueDate >= firstDay && t.dueDate <= lastDay) {
+            // Pending (Current month - exclude credit card items, they're paid via invoice)
+            if (t.type === 'Despesa' && t.status === 'A Pagar' && t.dueDate >= firstDay && t.dueDate <= lastDay && t.paymentMethod !== 'credito') {
                 totalPendingCurrentMonth += t.amount;
             }
         });
@@ -244,7 +247,7 @@ const logic = {
             const selectedMonth = elements.pendingFilterMonth.value;
             const category = elements.pendingFilterCategory.value;
 
-            let pendingTransactions = allTransactions.filter(t => t.status === 'A Pagar');
+            let pendingTransactions = allTransactions.filter(t => t.status === 'A Pagar' && t.paymentMethod !== 'credito');
 
             // Filter by custom date range (if provided)
             if (startDate) {
@@ -639,6 +642,7 @@ const startInitialization = async () => {
         if (elements.navBtnReports) elements.navBtnReports.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-reports'); renderAllReports(state.allTransactions); });
         if (elements.navBtnBi) elements.navBtnBi.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-bi'); renderBIReport(state.allTransactions); });
         if (elements.navBtnAiConsultant) elements.navBtnAiConsultant.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-ai-consultant'); });
+        if (elements.navBtnSubscriptions) elements.navBtnSubscriptions.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-subscriptions'); renderSubscriptionsPage(); });
         if (elements.goToAiConsultantBtn) elements.goToAiConsultantBtn.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-ai-consultant'); });
 
         // Mobile menu controls
@@ -719,7 +723,16 @@ const startInitialization = async () => {
         // Credit Cards Modal Listeners
         if (elements.openCreditCardsBtn) elements.openCreditCardsBtn.addEventListener('click', openCreditCardsModal);
         if (elements.closeCreditCardsModalBtn) elements.closeCreditCardsModalBtn.addEventListener('click', closeCreditCardsModal);
-        if (elements.addCreditCardForm) elements.addCreditCardForm.addEventListener('submit', handleAddCreditCard);
+        if (elements.addCreditCardForm) {
+            elements.addCreditCardForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (isEditingCard()) {
+                    handleUpdateCreditCard(e);
+                } else {
+                    handleAddCreditCard(e);
+                }
+            });
+        }
 
         if (elements.cancelPaymentBtn) elements.cancelPaymentBtn.addEventListener('click', closeConfirmPaymentModal);
         if (elements.confirmPaymentBtn) elements.confirmPaymentBtn.addEventListener('click', handleConfirmPayment);
@@ -873,7 +886,43 @@ const startInitialization = async () => {
             });
         }
 
-        // Filters - Income
+        // Filters - Income (Quick Filters)
+        if (elements.incomeCurrentMonthBtn) {
+            elements.incomeCurrentMonthBtn.addEventListener('click', () => {
+                const dates = getCurrentMonthDates();
+                elements.incomeFilterStartDate.value = dates.start;
+                elements.incomeFilterEndDate.value = dates.end;
+                activateIncomeQuickFilterButton(elements.incomeCurrentMonthBtn);
+                logic.updateAllUI(state.allTransactions);
+            });
+        }
+        if (elements.incomeLastMonthBtn) {
+            elements.incomeLastMonthBtn.addEventListener('click', () => {
+                const dates = getLastMonthDates();
+                elements.incomeFilterStartDate.value = dates.start;
+                elements.incomeFilterEndDate.value = dates.end;
+                activateIncomeQuickFilterButton(elements.incomeLastMonthBtn);
+                logic.updateAllUI(state.allTransactions);
+            });
+        }
+        if (elements.incomeLast3MonthsBtn) {
+            elements.incomeLast3MonthsBtn.addEventListener('click', () => {
+                const dates = getLast3MonthsDates();
+                elements.incomeFilterStartDate.value = dates.start;
+                elements.incomeFilterEndDate.value = dates.end;
+                activateIncomeQuickFilterButton(elements.incomeLast3MonthsBtn);
+                logic.updateAllUI(state.allTransactions);
+            });
+        }
+        if (elements.incomeAllBtn) {
+            elements.incomeAllBtn.addEventListener('click', () => {
+                elements.incomeFilterForm.reset();
+                activateIncomeQuickFilterButton(elements.incomeAllBtn);
+                logic.updateAllUI(state.allTransactions);
+            });
+        }
+
+        // Filters - Income (Form)
         if (elements.incomeFilterForm) {
             elements.incomeFilterForm.addEventListener('submit', (e) => {
                 e.preventDefault();

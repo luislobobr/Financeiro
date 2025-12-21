@@ -11,7 +11,7 @@ import { state } from './state.js'; // FIX: proper state import
 let parsedCsvData = [];
 
 /**
- * Handle file selection (Excel or CSV)
+ * Handle file selection (Excel, CSV, or OFX)
  */
 export function handleFileSelect(event) {
     const file = event.target.files[0];
@@ -20,6 +20,16 @@ export function handleFileSelect(event) {
     const elements = getElements();
     elements.csvFileInput.value = null;
 
+    const fileName = file.name.toLowerCase();
+    const isOFX = fileName.endsWith('.ofx');
+
+    if (isOFX) {
+        // Handle OFX file
+        handleOFXFile(file);
+        return;
+    }
+
+    // Handle Excel/CSV file (existing logic)
     const requiredCols = ['Descrição', 'Valor', 'Tipo', 'Vencimento', 'Categoria'];
 
     const reader = new FileReader();
@@ -60,6 +70,126 @@ export function handleFileSelect(event) {
     };
     reader.onerror = (error) => showToast("Não foi possível ler o arquivo.", true);
     reader.readAsBinaryString(file);
+}
+
+/**
+ * Handle OFX file parsing
+ * @param {File} file - The OFX file to parse
+ */
+function handleOFXFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const ofxContent = e.target.result;
+            const transactions = parseOFX(ofxContent);
+
+            if (transactions.length === 0) {
+                showToast("Nenhuma transação encontrada no arquivo OFX.", true);
+                return;
+            }
+
+            parsedCsvData = transactions;
+            showReviewModal(parsedCsvData);
+
+        } catch (error) {
+            console.error("Erro ao processar arquivo OFX:", error);
+            showToast("Erro ao processar arquivo OFX. Verifique o formato.", true);
+        }
+    };
+    reader.onerror = () => showToast("Não foi possível ler o arquivo OFX.", true);
+    reader.readAsText(file);
+}
+
+/**
+ * Parse OFX file content
+ * @param {string} ofxContent - Raw OFX file content
+ * @returns {Array} Array of transaction objects
+ */
+function parseOFX(ofxContent) {
+    const transactions = [];
+
+    // Extract transactions from OFX (both SGML and XML formats)
+    // Match STMTTRN blocks
+    const transactionRegex = /<STMTTRN>([\s\S]*?)<\/STMTTRN>/gi;
+    const matches = ofxContent.matchAll(transactionRegex);
+
+    for (const match of matches) {
+        const transactionBlock = match[1];
+
+        // Extract individual fields
+        const trnAmt = extractOFXTag(transactionBlock, 'TRNAMT');
+        const dtPosted = extractOFXTag(transactionBlock, 'DTPOSTED');
+        const name = extractOFXTag(transactionBlock, 'NAME') || extractOFXTag(transactionBlock, 'MEMO') || 'Transação importada';
+        const trnType = extractOFXTag(transactionBlock, 'TRNTYPE');
+
+        if (!trnAmt || !dtPosted) continue;
+
+        const amount = parseFloat(trnAmt);
+        const date = parseOFXDate(dtPosted);
+
+        if (isNaN(amount) || !date) continue;
+
+        // Determine transaction type based on amount sign
+        const type = amount < 0 ? 'Despesa' : 'Receita';
+        const absAmount = Math.abs(amount);
+
+        // Map to our data structure
+        transactions.push({
+            'Descrição': name,
+            'Valor': absAmount,
+            'Tipo': type,
+            'Vencimento': date,
+            'Categoria': 'Outros', // User can change in preview
+            'Status': 'Pago', // Bank statement = already processed
+            'Data Pagamento': date, // Same as due date for bank extracts
+            'Tipo de Despesa': 'Variável',
+            'Recorrente': false
+        });
+    }
+
+    return transactions;
+}
+
+/**
+ * Extract a tag value from OFX content
+ * @param {string} content - OFX content block
+ * @param {string} tagName - Tag name to extract
+ * @returns {string|null} Tag value or null
+ */
+function extractOFXTag(content, tagName) {
+    // Try XML format first (with closing tag)
+    const xmlRegex = new RegExp(`<${tagName}>([^<]+)</${tagName}>`, 'i');
+    const xmlMatch = content.match(xmlRegex);
+    if (xmlMatch) return xmlMatch[1].trim();
+
+    // Try SGML format (no closing tag, value until next tag or newline)
+    const sgmlRegex = new RegExp(`<${tagName}>([^\\n<]+)`, 'i');
+    const sgmlMatch = content.match(sgmlRegex);
+    if (sgmlMatch) return sgmlMatch[1].trim();
+
+    return null;
+}
+
+/**
+ * Parse OFX date format (YYYYMMDD or YYYYMMDDHHMMSS)
+ * @param {string} ofxDate - OFX format date string
+ * @returns {string|null} ISO date string (YYYY-MM-DD) or null
+ */
+function parseOFXDate(ofxDate) {
+    if (!ofxDate || ofxDate.length < 8) return null;
+
+    // Extract YYYYMMDD (first 8 characters)
+    const dateStr = ofxDate.substring(0, 8);
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+
+    // Validate
+    if (!/^\d{4}$/.test(year) || !/^\d{2}$/.test(month) || !/^\d{2}$/.test(day)) {
+        return null;
+    }
+
+    return `${year}-${month}-${day}`;
 }
 
 /**

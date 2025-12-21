@@ -86,6 +86,38 @@ export async function createFutureRecurringTransactions(baseTransaction) {
 import { calculateInvoiceMonth } from './utils.js';
 
 /**
+ * Save transaction data directly (used by Quick Add and form submit)
+ * @param {Object} transactionData - Transaction data object
+ * @returns {Promise<void>}
+ */
+export async function saveTransaction(transactionData) {
+    try {
+        // Validate amount
+        if (!transactionData.amount || isNaN(transactionData.amount) || transactionData.amount <= 0) {
+            showToast("Valor inválido.", true);
+            return;
+        }
+
+        // Add timestamp
+        transactionData.createdAt = new Date().toISOString();
+
+        // Save to Firebase
+        await addDoc(getTransactionsCollectionRef(), transactionData);
+        showToast("Transação adicionada!");
+
+        // Handle recurring transactions
+        if (transactionData.isRecurring && transactionData.paymentMethod !== 'credito') {
+            await createFutureRecurringTransactions(transactionData);
+        }
+
+    } catch (error) {
+        console.error("Erro ao salvar transação:", error);
+        showToast("Erro ao salvar transação.", true);
+        throw error; // Re-throw para permitir tratamento externo
+    }
+}
+
+/**
  * Handle transaction form submit
  */
 export async function handleTransactionSubmit(e) {

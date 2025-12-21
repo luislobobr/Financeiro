@@ -16,6 +16,7 @@ import {
     collection,
     addDoc,
     deleteDoc,
+    getDocs,
     onSnapshot,
     query,
     where,
@@ -25,6 +26,7 @@ import {
     collectionGroup,
     getDoc
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -153,6 +155,7 @@ export {
     collection,
     addDoc,
     deleteDoc,
+    getDocs,
     onSnapshot,
     query,
     where,
@@ -161,3 +164,4 @@ export {
     updateDoc,
     getDoc
 };
+

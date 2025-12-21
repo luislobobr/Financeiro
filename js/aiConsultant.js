@@ -47,12 +47,15 @@ export function analyzeFinances(transactions) {
         .filter(t => t.type === 'Despesa' && t.status === 'Pago')
         .reduce((sum, t) => sum + t.amount, 0);
 
-    // Overdue accounts
+    // Overdue accounts (exclude credit card transactions - they're paid via invoice)
     const overdueTransactions = transactions.filter(t =>
-        t.status === 'A Pagar' && t.dueDate < today
+        t.status === 'A Pagar' &&
+        t.dueDate < today &&
+        t.paymentMethod !== 'credito' // Exclude credit card purchases (paid via invoice)
     );
     analysis.overdueCount = overdueTransactions.length;
     analysis.overdueTotal = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
+
 
     // Savings rate
     if (totalIncome > 0) {
@@ -316,6 +319,119 @@ function generateAlerts(analysis, overdueTransactions, income, expenses) {
     }
 
     return alerts;
+}
+
+/**
+ * Generate AI-powered recommendations using Gemini
+ */
+export async function generateAIRecommendations(transactions) {
+    const { analyzeFinancesWithAI, hasApiKey } = await import('./geminiApi.js');
+
+    const loadingEl = document.getElementById('aiAnalysisLoading');
+    const contentEl = document.getElementById('aiAnalysisContent');
+    const textEl = document.getElementById('aiAnalysisText');
+    const noKeyEl = document.getElementById('aiNoApiKeyWarning');
+
+    // Hide all states
+    if (loadingEl) loadingEl.classList.add('hidden');
+    if (contentEl) contentEl.classList.add('hidden');
+    if (noKeyEl) noKeyEl.classList.add('hidden');
+
+    // Check if API key is configured
+    if (!hasApiKey()) {
+        if (noKeyEl) noKeyEl.classList.remove('hidden');
+        return;
+    }
+
+    // Show loading
+    if (loadingEl) loadingEl.classList.remove('hidden');
+
+    try {
+        const aiResponse = await analyzeFinancesWithAI(transactions);
+
+        // Format response as markdown/HTML
+        const formattedResponse = formatAIResponse(aiResponse);
+
+        if (textEl) {
+            textEl.innerHTML = formattedResponse;
+        }
+
+        // Show content
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (contentEl) contentEl.classList.remove('hidden');
+
+    } catch (error) {
+        console.error('Error generating AI recommendations:', error);
+
+        // Show error
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (textEl) {
+            textEl.innerHTML = `
+                <div class="bg-red-500 bg-opacity-20 border border-red-400 rounded-lg p-4 text-red-100">
+                    <p class="font-semibold">❌ Erro ao gerar análise</p>
+                    <p class="text-sm mt-1">${error.message}</p>
+                    <p class="text-xs mt-2">Verifique sua API key em Configurações.</p>
+                </div>
+            `;
+        }
+        if (contentEl) contentEl.classList.remove('hidden');
+    }
+}
+
+/**
+ * Format AI response for display
+ */
+function formatAIResponse(response) {
+    let html = '<div class="space-y-4">';
+
+    // If we have structured response
+    if (response.summary) {
+        html += `
+            <div>
+                <h4 class="font-bold text-lg mb-2">📊 Resumo da Situação</h4>
+                <p class="text-sm leading-relaxed">${response.summary}</p>
+            </div>
+        `;
+    }
+
+    if (response.concerns) {
+        html += `
+            <div>
+                <h4 class="font-bold text-lg mb-2">⚠️ Pontos de Atenção</h4>
+                <div class="text-sm leading-relaxed">${formatMarkdownList(response.concerns)}</div>
+            </div>
+        `;
+    }
+
+    if (response.recommendations) {
+        html += `
+            <div>
+                <h4 class="font-bold text-lg mb-2">💡 Recomendações Práticas</h4>
+                <div class="text-sm leading-relaxed">${formatMarkdownList(response.recommendations)}</div>
+            </div>
+        `;
+    }
+
+    // If we only have raw response, show it formatted
+    if (!response.summary && !response.concerns && !response.recommendations && response.rawResponse) {
+        html += `<div class="text-sm leading-relaxed whitespace-pre-wrap">${response.rawResponse}</div>`;
+    }
+
+    html += '</div>';
+    return html;
+}
+
+/**
+ * Format markdown-style lists
+ */
+function formatMarkdownList(text) {
+    // Convert numbered lists
+    text = text.replace(/(\d+)\.\s+/g, '<br><strong>$1.</strong> ');
+    // Convert bullet points
+    text = text.replace(/[-*]\s+/g, '<br>• ');
+    // Convert **bold**
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return text;
 }
 
 /**

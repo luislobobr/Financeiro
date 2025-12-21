@@ -36,6 +36,8 @@ export function initializeElements() {
         navBtnCreditCards: document.getElementById('navBtnCreditCards'),
         navBtnReports: document.getElementById('navBtnReports'),
         navBtnBi: document.getElementById('navBtnBi'),
+        navBtnSubscriptions: document.getElementById('navBtnSubscriptions'),
+        navBtnGoals: document.getElementById('navBtnGoals'),
         navBtnAiConsultant: document.getElementById('navBtnAiConsultant'),
         goToAiConsultantBtn: document.getElementById('goToAiConsultantBtn'),
 
@@ -167,6 +169,10 @@ export function initializeElements() {
         incomeFilterStartDate: document.getElementById('incomeFilterStartDate'),
         incomeFilterEndDate: document.getElementById('incomeFilterEndDate'),
         incomeFilterCategory: document.getElementById('incomeFilterCategory'),
+        incomeCurrentMonthBtn: document.getElementById('incomeCurrentMonthBtn'),
+        incomeLastMonthBtn: document.getElementById('incomeLastMonthBtn'),
+        incomeLast3MonthsBtn: document.getElementById('incomeLast3MonthsBtn'),
+        incomeAllBtn: document.getElementById('incomeAllBtn'),
         incomeClearFilterBtn: document.getElementById('incomeClearFilterBtn'),
         reportMonthSelect: document.getElementById('reportMonth'),
         reportYearInput: document.getElementById('reportYear'),
@@ -313,7 +319,10 @@ export function switchPage(targetPageId) {
         'page-planning': 'navBtnPlanning',
         'page-credit-cards': 'navBtnCreditCards',
         'page-reports': 'navBtnReports',
-        'page-bi': 'navBtnBi'
+        'page-bi': 'navBtnBi',
+        'page-subscriptions': 'navBtnSubscriptions',
+        'page-goals': 'navBtnGoals',
+        'page-ai-consultant': 'navBtnAiConsultant'
     };
 
     const btnToActivate = document.getElementById(btnIdMap[targetPageId]);
