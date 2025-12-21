@@ -83,63 +83,152 @@ export async function createFutureRecurringTransactions(baseTransaction) {
     }
 }
 
+import { calculateInvoiceMonth } from './utils.js';
+
 /**
- * Handle transaction form submit (add or update)
+ * Handle transaction form submit
  */
 export async function handleTransactionSubmit(e) {
-    e.preventDefault();
-
+    if (e) e.preventDefault();
     const elements = getElements();
     const formData = new FormData(elements.transactionForm);
-    const amount = parseFloat(formData.get('amount'));
 
-    if (isNaN(amount) || amount <= 0) {
-        showToast("Por favor, insira um valor válido.", true);
+    let amount = parseFloat(formData.get('amount'));
+    if (isNaN(amount)) {
+        showToast("Valor inválido.", true);
         return;
     }
 
-    const transactionData = {
-        description: formData.get('description'),
-        amount: amount,
+    const paymentMethod = formData.get('paymentMethod') || '';
+    const isCredit = paymentMethod === 'credito';
+    const cardId = isCredit ? elements.cardSelect.value : null;
+    let installments = isCredit ? parseInt(elements.installments.value) : 1;
+    if (isNaN(installments) || installments < 1) installments = 1;
+
+    // Validate Credit Card
+    if (isCredit && !cardId) {
+        showToast("Selecione um cartão de crédito.", true);
+        return;
+    }
+
+    // Base transaction data
+    const baseTransactionData = {
         type: formData.get('type'),
         category: formData.get('category'),
         paidBy: formData.get('paidBy'),
-        status: formData.get('status'),
-        dueDate: formData.get('dueDate'),
-        paymentDate: formData.get('paymentDate') || '',
-        paymentMethod: formData.get('paymentMethod') || '',
+        status: isCredit ? 'A Pagar' : formData.get('status'), // Credit is always pending payment
+        paymentMethod: paymentMethod,
         expenseType: formData.get('type') === 'Despesa' ? formData.get('expenseType') : '',
         isRecurring: formData.get('isRecurring') === 'on'
     };
 
-    if (transactionData.status === 'Pago' && !transactionData.paymentDate) {
-        transactionData.paymentDate = today;
-    } else if (transactionData.status === 'A Pagar') {
-        transactionData.paymentDate = '';
+    // Invoice Payment Handling
+    const isInvoicePayment = formData.get('isInvoicePayment') === 'true';
+    if (isInvoicePayment) {
+        baseTransactionData.isInvoicePayment = true;
+        baseTransactionData.cardId = formData.get('invoiceCardId');
+        baseTransactionData.invoiceMonth = formData.get('invoiceMonthDate');
+        // Type is usually Despesa
     }
 
-    if (transactionData.type === 'Receita') {
-        // Allow Receita to be A Pagar/Pago based on form
-        // Only clear expense specific fields
-        transactionData.expenseType = '';
+    if (baseTransactionData.type === 'Receita') {
+        baseTransactionData.expenseType = '';
     }
 
     try {
+        // Edit Mode
         if (state.currentEditId) {
+            const transactionData = {
+                ...baseTransactionData,
+                description: formData.get('description'),
+                amount: amount,
+                dueDate: formData.get('dueDate'),
+                paymentDate: (baseTransactionData.status === 'Pago' && !formData.get('paymentDate')) ? today : (formData.get('paymentDate') || ''),
+            };
+
+            // Should we update card info on edit? 
+            // For simplicity, yes, but no installment splitting on edit
+            if (isCredit) {
+                const card = state.creditCards.find(c => c.id === cardId);
+                if (card) {
+                    transactionData.cardId = cardId;
+                    transactionData.invoiceMonth = calculateInvoiceMonth(transactionData.dueDate, card.closingDay);
+                    transactionData.paymentDate = ''; // Reset payment date for credit
+                }
+            }
+
             const docRef = doc(getTransactionsCollectionRef(), state.currentEditId);
             await updateDoc(docRef, transactionData);
             showToast("Transação atualizada!");
-        } else {
-            transactionData.createdAt = new Date().toISOString();
-            await addDoc(getTransactionsCollectionRef(), transactionData);
-            showToast("Transação adicionada!");
 
-            if (transactionData.isRecurring) {
-                await createFutureRecurringTransactions(transactionData);
+        } else {
+            // New Transaction Mode
+
+            // Credit Card Installments
+            if (isCredit && installments > 1) {
+                const card = state.creditCards.find(c => c.id === cardId);
+                const installmentAmount = parseFloat((amount / installments).toFixed(2));
+                // Add remainder to first installment
+                const totalCalculated = installmentAmount * installments;
+                const remainder = amount - totalCalculated;
+
+                const baseDate = new Date(formData.get('dueDate') + 'T12:00:00');
+                const description = formData.get('description');
+
+                // Create N transactions
+                for (let i = 0; i < installments; i++) {
+                    const currentAmount = i === 0 ? installmentAmount + remainder : installmentAmount;
+
+                    // Increment month for each installment
+                    const currentDate = new Date(baseDate);
+                    currentDate.setMonth(baseDate.getMonth() + i);
+                    const formattedDate = currentDate.toISOString().split('T')[0];
+
+                    const transactionData = {
+                        ...baseTransactionData,
+                        description: `${description} (${i + 1}/${installments})`,
+                        amount: currentAmount,
+                        dueDate: formattedDate,
+                        paymentDate: '',
+                        cardId: cardId,
+                        invoiceMonth: card ? calculateInvoiceMonth(formattedDate, card.closingDay) : '',
+                        createdAt: new Date().toISOString()
+                    };
+
+                    await addDoc(getTransactionsCollectionRef(), transactionData);
+                }
+                showToast(`${installments} parcelas adicionadas!`);
+
+            } else {
+                // Single Transaction (Credit or Normal)
+                const transactionData = {
+                    ...baseTransactionData,
+                    description: formData.get('description'),
+                    amount: amount,
+                    dueDate: formData.get('dueDate'),
+                    paymentDate: (baseTransactionData.status === 'Pago' && !formData.get('paymentDate')) ? today : (formData.get('paymentDate') || ''),
+                    createdAt: new Date().toISOString()
+                };
+
+                if (isCredit) {
+                    const card = state.creditCards.find(c => c.id === cardId);
+                    if (card) {
+                        transactionData.cardId = cardId;
+                        transactionData.invoiceMonth = calculateInvoiceMonth(transactionData.dueDate, card.closingDay);
+                        transactionData.paymentDate = '';
+                    }
+                }
+
+                await addDoc(getTransactionsCollectionRef(), transactionData);
+                showToast("Transação adicionada!");
+
+                if (transactionData.isRecurring && !isCredit) {
+                    await createFutureRecurringTransactions(transactionData);
+                }
             }
         }
 
-        // Close modal - import dynamically to avoid circular dependency
+        // Close modal
         const { closeTransactionModal } = await import('./ui.js');
         closeTransactionModal();
     } catch (error) {

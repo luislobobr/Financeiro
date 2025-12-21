@@ -33,6 +33,7 @@ export function initializeElements() {
         navBtnHistory: document.getElementById('navBtnHistory'),
         navBtnIncome: document.getElementById('navBtnIncome'),
         navBtnPlanning: document.getElementById('navBtnPlanning'),
+        navBtnCreditCards: document.getElementById('navBtnCreditCards'),
         navBtnReports: document.getElementById('navBtnReports'),
         navBtnBi: document.getElementById('navBtnBi'),
         navBtnAiConsultant: document.getElementById('navBtnAiConsultant'),
@@ -49,14 +50,24 @@ export function initializeElements() {
         pageHistory: document.getElementById('page-history'),
         pageIncome: document.getElementById('page-income'),
         pagePlanning: document.getElementById('page-planning'),
+        pageCreditCards: document.getElementById('page-credit-cards'),
         pageReports: document.getElementById('page-reports'),
         pageBi: document.getElementById('page-bi'),
+        pageAiConsultant: document.getElementById('page-ai-consultant'),
 
 
         // Main containers
         loadingIndicator: document.getElementById('loadingIndicator'),
         appContainer: document.getElementById('appContainer'),
         currentFamilyIdEl: document.getElementById('currentFamilyId'),
+
+        // Page content containers
+        dashboardContent: document.getElementById('dashboardContent'),
+        pendingList: document.getElementById('pendingList'),
+        historyList: document.getElementById('historyList'),
+        incomeList: document.getElementById('incomeList'),
+        reportResults: document.getElementById('reportResults'), // Keep for legacy if needed
+        creditCardsPageContent: document.getElementById('creditCardsPageContent'),
 
         // Buttons
         createFamilyBtn: document.getElementById('createFamilyBtn'),
@@ -72,6 +83,13 @@ export function initializeElements() {
         closeCategoriesModalBtn: document.getElementById('closeCategoriesModalBtn'),
         openPaymentMethodsBtn: document.getElementById('openPaymentMethodsBtn'),
         closePaymentMethodsModalBtn: document.getElementById('closePaymentMethodsModalBtn'),
+        openCreditCardsBtn: document.getElementById('openCreditCardsBtn'),
+
+        // Credit Card Modal
+        creditCardsModal: document.getElementById('creditCardsModal'),
+        closeCreditCardsModalBtn: document.getElementById('closeCreditCardsModalBtn'),
+        addCreditCardForm: document.getElementById('addCreditCardForm'),
+        creditCardsList: document.getElementById('creditCardsList'),
         cancelPaymentBtn: document.getElementById('cancelPaymentBtn'),
         confirmPaymentBtn: document.getElementById('confirmPaymentBtn'),
         disconnectFamilyBtn: document.getElementById('disconnectFamilyBtn'),
@@ -113,9 +131,23 @@ export function initializeElements() {
 
         csvFileInput: document.getElementById('csvFileInput'),
         newCategoryNameInput: document.getElementById('newCategoryName'),
-        newCardNameInput: document.getElementById('newCardName'),
-        newCardDueDayInput: document.getElementById('newCardDueDay'),
-        newCardLimitInput: document.getElementById('newCardLimit'),
+
+        // Cerdit Card Inputs
+        newCardName: document.getElementById('newCardName'),
+        newCardHolder: document.getElementById('newCardHolder'),
+        newCardClosingDay: document.getElementById('newCardClosingDay'),
+        newCardDueDay: document.getElementById('newCardDueDay'),
+
+        // Transaction form card fields
+        creditCardSection: document.getElementById('creditCardSection'),
+        cardSelect: document.getElementById('cardSelect'),
+        installments: document.getElementById('installments'),
+        invoicePreview: document.getElementById('invoicePreview'),
+        creditCardMonthFilter: document.getElementById('creditCardMonthFilter'),
+
+        // Transaction form inputs (additional references)
+        descriptionInput: document.getElementById('description'),
+        amountInput: document.getElementById('amount'),
 
         // Transaction modal elements
         transactionModalTitle: document.getElementById('transactionModalTitle'),
@@ -212,8 +244,8 @@ export function initializeElements() {
 
         // Payment methods
         newPaymentMethodName: document.getElementById('newPaymentMethodName'),
-        newPaymentMethodIcon: document.getElementById('newPaymentMethodIcon'),
-        paymentMethodSelect: document.getElementById('paymentMethodSelect'),
+        paymentDateContainer: document.getElementById('paymentDateContainer'),
+        aiAnalysisButton: document.getElementById('aiAnalysisButton'),
         confirmPaymentMethodSelect: document.getElementById('confirmPaymentMethodSelect'),
         confirmPaymentTransactionId: document.getElementById('confirmPaymentTransactionId'),
 
@@ -241,6 +273,7 @@ export function getAllPages() {
         elements.pageHistory,
         elements.pageIncome,
         elements.pagePlanning,
+        elements.pageCreditCards,
         elements.pageReports,
         elements.pageBi
     ];
@@ -256,6 +289,7 @@ export function getAllNavBtns() {
         elements.navBtnHistory,
         elements.navBtnIncome,
         elements.navBtnPlanning,
+        elements.navBtnCreditCards,
         elements.navBtnReports,
         elements.navBtnBi
     ];
@@ -277,6 +311,7 @@ export function switchPage(targetPageId) {
         'page-history': 'navBtnHistory',
         'page-income': 'navBtnIncome',
         'page-planning': 'navBtnPlanning',
+        'page-credit-cards': 'navBtnCreditCards',
         'page-reports': 'navBtnReports',
         'page-bi': 'navBtnBi'
     };
@@ -329,8 +364,10 @@ export function initializeTheme() {
 
 /**
  * Open transaction modal
+ * @param {boolean} isEdit - Whether this is an edit operation
+ * @param {object} overrides - Optional data to pre-fill the form fields
  */
-export function openTransactionModal(isEdit = false) {
+export function openTransactionModal(isEdit = false, overrides = {}) {
     if (isEdit) {
         elements.transactionModalTitle.textContent = "Editar Transação";
         elements.transactionSubmitBtn.innerHTML = `
@@ -353,6 +390,40 @@ export function openTransactionModal(isEdit = false) {
         elements.transactionSubmitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
         elements.transactionSubmitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
     }
+
+    // Apply overrides to form fields if provided
+    if (overrides && Object.keys(overrides).length > 0) {
+        if (overrides.description) elements.descriptionInput.value = overrides.description;
+        if (overrides.amount) elements.amountInput.value = overrides.amount;
+        if (overrides.category) elements.categorySelect.value = overrides.category;
+        if (overrides.paidBy) elements.paidBySelect.value = overrides.paidBy;
+        if (overrides.type) {
+            const typeRadio = document.querySelector(`input[name="type"][value="${overrides.type}"]`);
+            if (typeRadio) typeRadio.checked = true;
+            toggleExpenseTypeVisibility();
+        }
+        if (overrides.expenseType) elements.expenseTypeSelect.value = overrides.expenseType;
+        if (overrides.status) elements.statusSelect.value = overrides.status;
+        if (overrides.paymentMethod) elements.paymentMethodSelect.value = overrides.paymentMethod;
+
+        // Handle hidden fields for invoice payment
+        if (overrides.isInvoicePayment !== undefined) {
+            const isInvoicePaymentField = document.getElementById('isInvoicePayment');
+            if (isInvoicePaymentField) isInvoicePaymentField.value = overrides.isInvoicePayment ? 'true' : 'false';
+        }
+        if (overrides.invoiceCardId) {
+            const invoiceCardIdField = document.getElementById('invoiceCardId');
+            if (invoiceCardIdField) invoiceCardIdField.value = overrides.invoiceCardId;
+        }
+        if (overrides.invoiceMonthDate) {
+            const invoiceMonthDateField = document.getElementById('invoiceMonthDate');
+            if (invoiceMonthDateField) invoiceMonthDateField.value = overrides.invoiceMonthDate;
+        }
+
+        // Trigger visibility toggles after setting values
+        togglePaymentDateVisibility();
+    }
+
     showElement(elements.transactionModal);
 }
 
@@ -414,7 +485,84 @@ export function toggleExpenseTypeVisibility() {
 /**
  * Toggle credit card visibility
  */
-// toggleCreditCardVisibility function removed
+export function toggleCreditCardVisibility() {
+    if (!elements.paymentMethodSelect) {
+        console.warn('[toggleCreditCardVisibility] paymentMethodSelect not found');
+        return;
+    }
+
+    // Check if selected method is credit card
+    const selectedValue = elements.paymentMethodSelect.value;
+    console.log('[toggleCreditCardVisibility] Payment method selected:', selectedValue);
+
+    // Check both value and text for credit card (case-insensitive)
+    const isCredit = selectedValue === 'credito' || selectedValue.toLowerCase() === 'crédito';
+    console.log('[toggleCreditCardVisibility] isCredit:', isCredit);
+
+    if (isCredit) {
+        console.log('[toggleCreditCardVisibility] Showing credit card section');
+        showElement(elements.creditCardSection);
+        // Ocultar Data Pagamento e Status (sempre será A Pagar/Faturado)
+        if (elements.paymentDateInput && elements.paymentDateInput.parentElement) {
+            hideElement(elements.paymentDateInput.parentElement);
+        }
+        if (elements.statusSelect && elements.statusSelect.parentElement) {
+            hideElement(elements.statusSelect.parentElement);
+            elements.statusSelect.value = 'A Pagar';
+        }
+        if (elements.cardSelect) {
+            elements.cardSelect.required = true;
+        }
+    } else {
+        console.log('[toggleCreditCardVisibility] Hiding credit card section');
+        hideElement(elements.creditCardSection);
+        if (elements.statusSelect && elements.statusSelect.parentElement) {
+            showElement(elements.statusSelect.parentElement);
+        }
+        if (elements.cardSelect) {
+            elements.cardSelect.required = false;
+        }
+
+        // Restore payment date logic
+        togglePaymentDateVisibility();
+    }
+}
+
+/**
+ * Update credit card invoice preview
+ * Calculates the invoice month based on purchase date and closing day
+ */
+export function updateCardInvoicePreview(creditCards) {
+    if (!elements.creditCardSection || elements.creditCardSection.classList.contains('hidden')) return;
+
+    const cardId = elements.cardSelect.value;
+    const dateStr = elements.dueDateInput.value; // Using DueDate as Purchase Date for expense
+
+    if (!cardId || !dateStr) {
+        elements.invoicePreview.textContent = '';
+        return;
+    }
+
+    const card = creditCards.find(c => c.id === cardId);
+    if (!card) return;
+
+    const purchaseDate = new Date(dateStr + 'T12:00:00');
+    const day = purchaseDate.getDate();
+    const month = purchaseDate.getMonth();
+    const year = purchaseDate.getFullYear();
+
+    let invoiceMonth = new Date(year, month, 1);
+
+    // Se dia da compra >= dia fechamento, vai para próximo mês
+    if (day >= card.closingDay) {
+        invoiceMonth.setMonth(invoiceMonth.getMonth() + 1);
+    }
+
+    const monthName = invoiceMonth.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+    const capitalized = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+    elements.invoicePreview.textContent = `📅 Fatura prevista: ${capitalized} (Fecha dia ${card.closingDay})`;
+}
 
 /**
  * Update paid by dropdown
@@ -486,6 +634,14 @@ export function openPaymentMethodsModal() {
 }
 export function closePaymentMethodsModal() {
     hideElement(elements.paymentMethodsModal);
+}
+
+export function openCreditCardsModal() {
+    showElement(elements.creditCardsModal);
+}
+
+export function closeCreditCardsModal() {
+    hideElement(elements.creditCardsModal);
 }
 
 // Confirm payment modal functions

@@ -29,7 +29,11 @@ import {
     closeConfirmPaymentModal,
     populateMonthFilters,
     toggleMobileSidebar,
-    closeMobileSidebar
+    closeMobileSidebar,
+    openCreditCardsModal,
+    closeCreditCardsModal,
+    toggleCreditCardVisibility,
+    updateCardInvoicePreview
 } from './ui.js';
 import {
     formatCurrency,
@@ -49,6 +53,8 @@ import { renderBIReport, populateBIMonthSelect } from './charts.js';
 import { renderDREReport, renderAllReports, populateReportFilters } from './reports.js';
 import { handleFileSelect, processImport } from './import.js';
 import { setupPaymentMethodsListener, handleAddPaymentMethod, updatePaymentMethodDropdowns } from './paymentMethods.js';
+import { setupCreditCardsListener, handleAddCreditCard, handleDeleteCreditCard, updateCreditCardDropdown } from './creditCards.js';
+import { renderCreditCardsPage } from './creditCardInvoices.js';
 import { state } from './state.js'; // Import state from dedicated module
 import { renderAiConsultant } from './aiConsultant.js';
 
@@ -129,9 +135,11 @@ const logic = {
                 return false;
             }
         });
-
-        // Overdue Transactions
-        const overdueTransactions = data.filter(t => t.status === 'A Pagar' && t.dueDate < today);
+        const overdueTransactions = data.filter(t =>
+            t.status === 'A Pagar' &&
+            t.dueDate < today &&
+            t.paymentMethod !== 'credito'
+        );
         const totalOverdue = overdueTransactions.reduce((sum, t) => sum + t.amount, 0);
 
         // 1. Dashboard
@@ -139,8 +147,8 @@ const logic = {
         renderBudgetProgress(monthTransactions);
         logic.renderOverdueList(overdueTransactions, totalOverdue);
 
-        // 2. Pending List
-        logic.renderPendingList(data);
+        // 2. Pending List (Exclude credit card items)
+        logic.renderPendingList(data.filter(t => t.paymentMethod !== 'credito'));
 
         // 3. History List
         logic.renderHistoryList(data);
@@ -152,7 +160,13 @@ const logic = {
         renderAllReports(data);
         renderBIReport(data);
 
-        // 6. AI Consultant
+        // 6. Credit Cards Page
+        if (elements.pageCreditCards && !elements.pageCreditCards.classList.contains('hidden')) {
+            renderCreditCardsPage();
+        }
+
+        // 7. AI Consultant
+        renderAiConsultant();
         renderAiConsultant(data);
     },
 
@@ -513,7 +527,7 @@ const logic = {
         setupBudgetListener();
         setupCategoriesListener();
         setupPaymentMethodsListener();
-        // Credit cards listener removed
+        setupCreditCardsListener(); // Initialize Credit Cards Listener
 
         // Load settings from firestore
         getDoc(getFamilyDocRef()).then(docSnap => {
@@ -621,8 +635,9 @@ const startInitialization = async () => {
         if (elements.navBtnHistory) elements.navBtnHistory.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-history'); });
         if (elements.navBtnIncome) elements.navBtnIncome.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-income'); });
         if (elements.navBtnPlanning) elements.navBtnPlanning.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-planning'); });
-        if (elements.navBtnReports) elements.navBtnReports.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-reports'); });
-        if (elements.navBtnBi) elements.navBtnBi.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-bi'); });
+        if (elements.navBtnCreditCards) elements.navBtnCreditCards.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-credit-cards'); renderCreditCardsPage(); });
+        if (elements.navBtnReports) elements.navBtnReports.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-reports'); renderAllReports(state.allTransactions); });
+        if (elements.navBtnBi) elements.navBtnBi.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-bi'); renderBIReport(state.allTransactions); });
         if (elements.navBtnAiConsultant) elements.navBtnAiConsultant.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-ai-consultant'); });
         if (elements.goToAiConsultantBtn) elements.goToAiConsultantBtn.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-ai-consultant'); });
 
@@ -641,16 +656,32 @@ const startInitialization = async () => {
 
         // Transaction Form
         if (elements.statusSelect) elements.statusSelect.addEventListener('change', togglePaymentDateVisibility);
+        if (elements.paymentMethodSelect) elements.paymentMethodSelect.addEventListener('change', toggleCreditCardVisibility);
+
+        // Credit Card Interaction
+        if (elements.cardSelect) elements.cardSelect.addEventListener('change', () => updateCardInvoicePreview(state.creditCards));
+        if (elements.dueDateInput) elements.dueDateInput.addEventListener('change', () => updateCardInvoicePreview(state.creditCards));
+
+        // Credit Card Month Filter
+        if (elements.creditCardMonthFilter) {
+            elements.creditCardMonthFilter.addEventListener('change', () => {
+                const selectedMonth = elements.creditCardMonthFilter.value;
+                renderCreditCardsPage(selectedMonth);
+            });
+        }
+
         if (elements.transactionForm) {
             elements.transactionForm.querySelectorAll('input[name="type"]').forEach(radio =>
                 radio.addEventListener('change', () => {
                     toggleExpenseTypeVisibility();
-                    // toggleCreditCardVisibility removed
                 })
             );
             elements.transactionForm.addEventListener('submit', handleTransactionSubmit);
         }
-        if (elements.addTransactionBtn) elements.addTransactionBtn.addEventListener('click', () => openTransactionModal(false));
+        if (elements.addTransactionBtn) elements.addTransactionBtn.addEventListener('click', () => {
+            updateCreditCardDropdown();
+            openTransactionModal(false);
+        });
         if (elements.closeTransactionModalBtn) elements.closeTransactionModalBtn.addEventListener('click', closeTransactionModal);
 
         // Family Management
@@ -684,7 +715,12 @@ const startInitialization = async () => {
         // Payment Methods
         if (elements.openPaymentMethodsBtn) elements.openPaymentMethodsBtn.addEventListener('click', openPaymentMethodsModal);
         if (elements.closePaymentMethodsModalBtn) elements.closePaymentMethodsModalBtn.addEventListener('click', closePaymentMethodsModal);
-        if (elements.addPaymentMethodForm) elements.addPaymentMethodForm.addEventListener('submit', handleAddPaymentMethod);
+
+        // Credit Cards Modal Listeners
+        if (elements.openCreditCardsBtn) elements.openCreditCardsBtn.addEventListener('click', openCreditCardsModal);
+        if (elements.closeCreditCardsModalBtn) elements.closeCreditCardsModalBtn.addEventListener('click', closeCreditCardsModal);
+        if (elements.addCreditCardForm) elements.addCreditCardForm.addEventListener('submit', handleAddCreditCard);
+
         if (elements.cancelPaymentBtn) elements.cancelPaymentBtn.addEventListener('click', closeConfirmPaymentModal);
         if (elements.confirmPaymentBtn) elements.confirmPaymentBtn.addEventListener('click', handleConfirmPayment);
         if (elements.disconnectFamilyBtn) elements.disconnectFamilyBtn.addEventListener('click', handleDisconnectFamily);

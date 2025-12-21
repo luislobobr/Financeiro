@@ -367,6 +367,34 @@
                     </select>
                 </div>
 
+                <!-- Seção de Cartão de Crédito (Visível apenas se forma de pagamento == Crédito) -->
+                <div id="creditCardSection"
+                    class="hidden md:col-span-2 grid grid-cols-2 gap-4 border-l-4 border-orange-500 pl-4 bg-orange-50 dark:bg-orange-900/20 py-2 rounded-r-md">
+                    <div>
+                        <label for="cardSelect"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cartão de Crédito</label>
+                        <select id="cardSelect" name="cardSelect"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Selecione o Cartão...</option>
+                            <!-- Preenchido pelo JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="installments"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Parcelas</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">x</span>
+                            </div>
+                            <input type="number" id="installments" name="installments" min="1" max="99" value="1"
+                                class="focus:ring-orange-500 focus:border-orange-500 block w-full pl-7 px-3 py-2 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md">
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                        <p id="invoicePreview" class="text-xs text-orange-600 dark:text-orange-400 font-semibold"></p>
+                    </div>
+                </div>
+
                 <!-- Tipo de Despesa (Req 4) -->
                 <div id="expenseTypeContainer">
                     <label for="expenseType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de
@@ -377,6 +405,11 @@
                         <option>Fixa</option>
                     </select>
                 </div>
+
+                <!-- Hidden Fields for Invoice Payment -->
+                <input type="hidden" id="isInvoicePayment" name="isInvoicePayment" value="false">
+                <input type="hidden" id="invoiceCardId" name="invoiceCardId" value="">
+                <input type="hidden" id="invoiceMonthDate" name="invoiceMonthDate" value="">
 
                 <!-- Recorrente (Req 5) -->
                 <div class="flex items-end pb-2">
@@ -472,6 +505,72 @@
 
             <!-- Lista -->
             <div id="paymentMethodsList" class="space-y-2 max-h-64 overflow-y-auto">
+                <!-- Preenchido pelo JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CARTÕES DE CRÉDITO -->
+    <div id="creditCardsModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-lg p-6 sm:p-8 rounded-lg shadow-xl relative">
+            <button id="closeCreditCardsModalBtn"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center">
+                <span class="mr-2">💳</span> Gerenciar Cartões
+            </h2>
+
+            <!-- Formulário para adicionar -->
+            <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Novo Cartão</h3>
+                <form id="addCreditCardForm" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="col-span-2 sm:col-span-1">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nome do
+                                Cartão</label>
+                            <input type="text" id="newCardName" placeholder="Ex: Nubank" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label
+                                class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Titular</label>
+                            <select id="newCardHolder"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm">
+                                <option value="Titular">Titular</option>
+                                <option value="Adicional">Adicional</option>
+                                <option value="Conjunto">Conjunto</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Dia
+                                Fechamento</label>
+                            <input type="number" id="newCardClosingDay" min="1" max="31" placeholder="Ex: 5" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Dia
+                                Vencimento</label>
+                            <input type="number" id="newCardDueDay" min="1" max="31" placeholder="Ex: 12" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm">
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 text-sm">
+                        Adicionar Cartão
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lista -->
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Cartões Cadastrados</h3>
+            <div id="creditCardsList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
                 <!-- Preenchido pelo JS -->
             </div>
         </div>
@@ -588,6 +687,16 @@
                     </svg>
                     Planejamento
                 </a>
+                <!-- NOVO: Link para Faturas/Cartões -->
+                <a href="#" id="navBtnCreditCards"
+                    class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    Cartões
+                </a>
                 <!-- NOVO: Link para Relatórios -->
                 <a href="#" id="navBtnReports"
                     class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -656,6 +765,14 @@
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </button>
+                        <button id="openCreditCardsBtn" title="Cartões de Crédito"
+                            class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900 hover:text-orange-600 dark:hover:text-orange-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                             </svg>
                         </button>
                     </div>
@@ -1110,6 +1227,43 @@
                 </section>
             </div>
 
+            <!-- ===== PÁGINA CARTÕES: FATURAS ===== -->
+            <div id="page-credit-cards" class="hidden">
+                <section>
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-4">
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Faturas de Cartão</h2>
+
+                                <!-- Filtro de Mês -->
+                                <div class="flex items-center gap-2">
+                                    <label for="creditCardMonthFilter"
+                                        class="text-sm text-gray-600 dark:text-gray-400">Período:</label>
+                                    <select id="creditCardMonthFilter"
+                                        class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="all">Todos os Meses</option>
+                                        <!-- Options populated by JS -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button id="openCreditCardsBtn"
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                Gerenciar Cartões
+                            </button>
+                        </div>
+                        <div id="creditCardsPageContent" class="space-y-6">
+                            <!-- Preenchido pelo JS -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
             <!-- ===== PÁGINA 6: RELATÓRIOS (REDESIGNED) ===== -->
             <div id="page-reports" class="hidden">
                 <section class="space-y-6">
@@ -1428,7 +1582,7 @@
     </div>
 
     <!-- App Module -->
-    <script type="module" src="./js/app.js?v=15"></script>
+    <script type="module" src="./js/app.js?v=21"></script>
 </body>
 
 </html>

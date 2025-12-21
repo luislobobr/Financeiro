@@ -197,3 +197,28 @@ export function getLast3MonthsDates() {
         end: lastDay.toISOString().split('T')[0]
     };
 }
+
+/**
+ * Calculate Invoice Month based on Purchase Date and Closing Day
+ * @param {Date|string} purchaseDate 
+ * @param {number} closingDay 
+ * @returns {string} YYYY-MM
+ */
+export function calculateInvoiceMonth(purchaseDate, closingDay) {
+    const date = new Date(purchaseDate instanceof Date ? purchaseDate : purchaseDate + 'T12:00:00');
+    const day = date.getDate();
+
+    // Create new date for invoice month (start as current month)
+    const invoiceDate = new Date(date.getFullYear(), date.getMonth(), 1);
+
+    // If purchase day >= closing day, move to next month
+    if (day >= closingDay) {
+        invoiceDate.setMonth(invoiceDate.getMonth() + 1);
+    }
+
+    // Format YYYY-MM
+    const year = invoiceDate.getFullYear();
+    const month = String(invoiceDate.getMonth() + 1).padStart(2, '0');
+
+    return `${year}-${month}`;
+}

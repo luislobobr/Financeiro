@@ -57,7 +57,7 @@ export function renderDREReport(allTransactions) {
 
     // Filter transactions for selected month/year (paid only)
     const filteredTransactions = allTransactions.filter(t => {
-        if (t.status !== 'Pago' || !t.paymentDate) return false;
+        if (t.status !== 'Pago' || !t.paymentDate || t.isInvoicePayment) return false;
         const paymentDate = new Date(t.paymentDate + 'T00:00:00');
         return paymentDate.getFullYear() === year && (paymentDate.getMonth() + 1) === month;
     });
@@ -146,7 +146,7 @@ export function renderComparativoMensal(allTransactions) {
     // Calculate data for each month
     const monthlyData = months.map((m, index) => {
         const monthTransactions = allTransactions.filter(t => {
-            if (t.status !== 'Pago' || !t.paymentDate) return false;
+            if (t.status !== 'Pago' || !t.paymentDate || t.isInvoicePayment) return false;
             const paymentDate = new Date(t.paymentDate + 'T00:00:00');
             return paymentDate.getFullYear() === m.year && (paymentDate.getMonth() + 1) === m.month;
         });
@@ -317,7 +317,7 @@ export function renderDespesasPorFormaPagamento(allTransactions) {
 
     // Filter paid expenses for selected month
     const paidExpenses = allTransactions.filter(t => {
-        if (t.status !== 'Pago' || t.type !== 'Despesa' || !t.paymentDate) return false;
+        if (t.status !== 'Pago' || t.type !== 'Despesa' || !t.paymentDate || t.isInvoicePayment) return false;
         const paymentDate = new Date(t.paymentDate + 'T00:00:00');
         return paymentDate.getFullYear() === year && (paymentDate.getMonth() + 1) === month;
     });
