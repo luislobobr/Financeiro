@@ -164,12 +164,18 @@ export function updateNotificationUI() {
     }
 
     const isEnabled = Notification.permission === 'granted';
-    notifBtn.innerHTML = isEnabled
-        ? '🔔 Notificações Ativadas'
-        : '🔕 Ativar Notificações';
-    notifBtn.classList.toggle('bg-green-600', isEnabled);
-    notifBtn.classList.toggle('bg-gray-600', !isEnabled);
+    // Apenas muda a cor do botão, sem adicionar texto
+    if (isEnabled) {
+        notifBtn.classList.remove('text-amber-600', 'dark:text-amber-400');
+        notifBtn.classList.add('text-green-600', 'dark:text-green-400', 'bg-green-100', 'dark:bg-green-900/30');
+        notifBtn.title = 'Notificações Ativadas';
+    } else {
+        notifBtn.classList.remove('text-green-600', 'dark:text-green-400', 'bg-green-100', 'dark:bg-green-900/30');
+        notifBtn.classList.add('text-amber-600', 'dark:text-amber-400');
+        notifBtn.title = 'Ativar Notificações';
+    }
 }
+
 
 // Listener para mensagens do Service Worker
 export function setupServiceWorkerMessageListener() {
