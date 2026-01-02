@@ -55,6 +55,8 @@ export function initializeElements() {
         pageCreditCards: document.getElementById('page-credit-cards'),
         pageReports: document.getElementById('page-reports'),
         pageBi: document.getElementById('page-bi'),
+        pageSubscriptions: document.getElementById('page-subscriptions'),
+        pageGoals: document.getElementById('page-goals'),
         pageAiConsultant: document.getElementById('page-ai-consultant'),
 
 
@@ -257,7 +259,38 @@ export function initializeElements() {
 
         // Toast
         toastNotification: document.getElementById('toastNotification'),
+
+        // Goals Modal elements
+        goalModal: document.getElementById('goalModal'),
+        goalForm: document.getElementById('goalForm'),
+        goalFormTitle: document.getElementById('goalFormTitle'),
+        goalNameInput: document.getElementById('goalNameInput'),
+        goalTargetInput: document.getElementById('goalTargetInput'),
+        goalCurrentInput: document.getElementById('goalCurrentInput'),
+        goalDeadlineInput: document.getElementById('goalDeadlineInput'),
+        goalIconInput: document.getElementById('goalIconInput'),
+        goalCategorySelect: document.getElementById('goalCategorySelect'),
+        closeGoalModalBtn: document.getElementById('closeGoalModalBtn'),
+        goalsPageContent: document.getElementById('goalsPageContent'),
+
+        // Contribution Modal elements
+        contributionModal: document.getElementById('contributionModal'),
+        closeContributionModalBtn: document.getElementById('closeContributionModalBtn'),
+        contributionGoalName: document.getElementById('contributionGoalName'),
+        contributionGoalId: document.getElementById('contributionGoalId'),
+        contributionAmountInput: document.getElementById('contributionAmountInput'),
+        confirmContributionBtn: document.getElementById('confirmContributionBtn'),
+
+        // Confirm Delete Modal elements
+        confirmDeleteModal: document.getElementById('confirmDeleteModal'),
+        confirmDeleteMessage: document.getElementById('confirmDeleteMessage'),
+        confirmDeleteItemId: document.getElementById('confirmDeleteItemId'),
+        confirmDeleteItemType: document.getElementById('confirmDeleteItemType'),
+        cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
+        confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
     };
+
+
 
     return elements;
 }
@@ -281,9 +314,13 @@ export function getAllPages() {
         elements.pagePlanning,
         elements.pageCreditCards,
         elements.pageReports,
-        elements.pageBi
+        elements.pageBi,
+        elements.pageSubscriptions,
+        elements.pageGoals,
+        elements.pageAiConsultant
     ];
 }
+
 
 /**
  * Get all nav buttons array

@@ -99,10 +99,6 @@ export async function updateGoal(goalId, updates) {
  * Delete goal
  */
 export async function deleteGoal(goalId) {
-    if (!confirm('Tem certeza que deseja deletar esta meta?')) {
-        return false;
-    }
-
     try {
         const goalRef = doc(getGoalsCollectionRef(), goalId);
         await deleteDoc(goalRef);
@@ -300,6 +296,17 @@ function renderGoalCard(goal) {
     const daysRemaining = getDaysRemaining(goal.deadline);
     const isCompleted = goal.status === 'completed';
 
+    // Get progress badges
+    const getBadges = (p) => {
+        let badges = '';
+        if (p >= 25) badges += '<span title="25% alcançado!" class="text-lg">🥉</span>';
+        if (p >= 50) badges += '<span title="50% alcançado!" class="text-lg">🥈</span>';
+        if (p >= 75) badges += '<span title="75% alcançado!" class="text-lg">🥇</span>';
+        if (p >= 100) badges += '<span title="Meta concluída!" class="text-lg">🏆</span>';
+        return badges;
+    };
+    const badges = getBadges(progress);
+
     return `
         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition ${isCompleted ? 'opacity-75' : ''}">
             <div class="flex items-start justify-between mb-4">
@@ -307,7 +314,10 @@ function renderGoalCard(goal) {
                     <span class="text-4xl">${goal.icon}</span>
                     <div>
                         <h4 class="font-bold text-gray-900 dark:text-white">${goal.name}</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">${goal.category}</p>
+                        <div class="flex items-center gap-2">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${goal.category}</p>
+                            ${badges ? `<div class="flex gap-1">${badges}</div>` : ''}
+                        </div>
                     </div>
                 </div>
                 ${!isCompleted ? `
@@ -331,6 +341,7 @@ function renderGoalCard(goal) {
                     <div class="${progressColor} h-full rounded-full transition-all duration-500" style="width: ${progress}%"></div>
                 </div>
             </div>
+
 
             <!-- Amounts -->
             <div class="mb-4">
@@ -385,11 +396,12 @@ function setupGoalsPageListeners() {
         addBtn.addEventListener('click', () => openGoalModal());
     }
 
-    // Delete buttons
+    // Delete buttons - now using confirmation modal
     document.querySelectorAll('.delete-goal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const goalId = btn.dataset.goalId;
-            deleteGoal(goalId);
+            const goal = state.goals.find(g => g.id === goalId);
+            if (goal) showConfirmDeleteGoal(goalId, goal.name);
         });
     });
 
@@ -468,12 +480,87 @@ function openGoalModal(goal = null) {
  * Open contribution modal
  */
 function openContributionModal(goalId) {
+    const elements = getElements();
     const goal = state.goals.find(g => g.id === goalId);
     if (!goal) return;
 
-    const amount = prompt(`Quanto deseja adicionar à meta "${goal.name}"?`);
-    if (amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0) {
-        addContribution(goalId, parseFloat(amount));
+    elements.contributionGoalId.value = goalId;
+    elements.contributionGoalName.textContent = `Meta: ${goal.icon} ${goal.name}`;
+    elements.contributionAmountInput.value = '';
+    showElement(elements.contributionModal);
+}
+
+/**
+ * Close contribution modal
+ */
+function closeContributionModal() {
+    const elements = getElements();
+    hideElement(elements.contributionModal);
+}
+
+/**
+ * Show confirm delete modal for goals
+ */
+export function showConfirmDeleteGoal(goalId, goalName) {
+    const elements = getElements();
+    elements.confirmDeleteMessage.textContent = `Tem certeza que deseja excluir a meta "${goalName}"?`;
+    elements.confirmDeleteItemId.value = goalId;
+    elements.confirmDeleteItemType.value = 'goal';
+    showElement(elements.confirmDeleteModal);
+}
+
+/**
+ * Setup goal modal listeners (called from app.js)
+ */
+export function setupGoalModalListeners() {
+    const elements = getElements();
+
+    // Close goal modal
+    if (elements.closeGoalModalBtn) {
+        elements.closeGoalModalBtn.addEventListener('click', () => {
+            hideElement(elements.goalModal);
+        });
+    }
+
+    // Close contribution modal
+    if (elements.closeContributionModalBtn) {
+        elements.closeContributionModalBtn.addEventListener('click', closeContributionModal);
+    }
+
+    // Confirm contribution
+    if (elements.confirmContributionBtn) {
+        elements.confirmContributionBtn.addEventListener('click', async () => {
+            const goalId = elements.contributionGoalId.value;
+            const amount = parseFloat(elements.contributionAmountInput.value);
+
+            if (goalId && amount > 0) {
+                await addContribution(goalId, amount);
+                closeContributionModal();
+            } else {
+                showToast('Digite um valor válido.', true);
+            }
+        });
+    }
+
+    // Cancel delete
+    if (elements.cancelDeleteBtn) {
+        elements.cancelDeleteBtn.addEventListener('click', () => {
+            hideElement(elements.confirmDeleteModal);
+        });
+    }
+
+    // Confirm delete
+    if (elements.confirmDeleteBtn) {
+        elements.confirmDeleteBtn.addEventListener('click', async () => {
+            const itemId = elements.confirmDeleteItemId.value;
+            const itemType = elements.confirmDeleteItemType.value;
+
+            if (itemType === 'goal' && itemId) {
+                await deleteGoal(itemId);
+            }
+
+            hideElement(elements.confirmDeleteModal);
+        });
     }
 }
 

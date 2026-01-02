@@ -58,8 +58,11 @@ import { renderCreditCardsPage } from './creditCardInvoices.js';
 import { state } from './state.js'; // Import state from dedicated module
 import { renderAiConsultant, generateAIRecommendations } from './aiConsultant.js';
 import { renderSubscriptionsPage } from './subscriptions.js';
-import { setupGoalsListener, renderGoalsPage } from './goals.js';
+import { setupGoalsListener, renderGoalsPage, setupGoalModalListeners } from './goals.js';
 import { getApiKey, setApiKey, hasApiKey } from './geminiApi.js';
+import { initNotifications, requestNotificationPermission, updateNotificationUI } from './notifications.js';
+import { initFormValidations } from './validation.js';
+
 
 /**
  * Handle payment confirmation from modal
@@ -531,6 +534,10 @@ const logic = {
         setupCategoriesListener();
         setupPaymentMethodsListener();
         setupCreditCardsListener(); // Initialize Credit Cards Listener
+        setupGoalsListener(); // Initialize Goals Listener
+        setupGoalModalListeners(); // Setup goal modal event listeners
+        initNotifications(); // Initialize PWA notifications
+        initFormValidations(); // Initialize form validations
 
         // Load settings from firestore
         getDoc(getFamilyDocRef()).then(docSnap => {
@@ -643,6 +650,7 @@ const startInitialization = async () => {
         if (elements.navBtnBi) elements.navBtnBi.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-bi'); renderBIReport(state.allTransactions); });
         if (elements.navBtnAiConsultant) elements.navBtnAiConsultant.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-ai-consultant'); });
         if (elements.navBtnSubscriptions) elements.navBtnSubscriptions.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-subscriptions'); renderSubscriptionsPage(); });
+        if (elements.navBtnGoals) elements.navBtnGoals.addEventListener('click', (e) => { e.preventDefault(); closeMobileSidebar(); switchPage('page-goals'); renderGoalsPage(); });
         if (elements.goToAiConsultantBtn) elements.goToAiConsultantBtn.addEventListener('click', (e) => { e.preventDefault(); switchPage('page-ai-consultant'); });
 
         // Mobile menu controls
@@ -673,6 +681,97 @@ const startInitialization = async () => {
                 renderCreditCardsPage(selectedMonth);
             });
         }
+
+        // Search Transactions Filter (with debounce for performance)
+        const searchInput = document.getElementById('searchTransactionsInput');
+        if (searchInput) {
+            let searchTimeout = null;
+            searchInput.addEventListener('input', (e) => {
+                // Debounce: wait 300ms before filtering
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    const transactionList = document.getElementById('transactionList');
+                    if (!transactionList) return;
+
+                    // Items use data-id attribute (li elements)
+                    const transactionItems = transactionList.querySelectorAll('li[data-id]');
+                    transactionItems.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        if (searchTerm === '' || text.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }, 300);
+            });
+
+        }
+
+
+        // Export Report to Excel
+        const exportBtn = document.getElementById('exportReportBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                try {
+                    console.log('Export button clicked');
+                    console.log('state.allTransactions:', state.allTransactions);
+
+                    // Check if transactions exist
+                    if (!state.allTransactions || state.allTransactions.length === 0) {
+                        showToast('Nenhuma transação disponível para exportar.', true);
+                        return;
+                    }
+
+                    // Get current month/year from filters (optional)
+                    const monthSelect = document.getElementById('reportMonth');
+                    const yearInput = document.getElementById('reportYear');
+                    const month = parseInt(monthSelect?.value || new Date().getMonth() + 1);
+                    const year = parseInt(yearInput?.value || new Date().getFullYear());
+
+                    // Try to filter by period first
+                    let transactions = state.allTransactions.filter(t => {
+                        const dateStr = t.paymentDate || t.dueDate;
+                        if (!dateStr) return false;
+                        const date = new Date(dateStr);
+                        return date.getMonth() + 1 === month && date.getFullYear() === year;
+                    });
+
+                    // If no transactions in period, export all
+                    if (transactions.length === 0) {
+                        transactions = state.allTransactions;
+                        showToast(`Exportando todas as ${transactions.length} transações...`);
+                    }
+
+                    // Prepare data for Excel
+                    const data = transactions.map(t => ({
+                        'Data': formatDate(t.paymentDate || t.dueDate),
+                        'Descrição': t.description || '',
+                        'Categoria': t.category || '',
+                        'Tipo': t.type || '',
+                        'Valor': parseFloat(t.amount) || 0,
+                        'Status': t.status || '',
+                        'Forma Pagamento': t.paymentMethod || ''
+                    }));
+
+                    // Create workbook and worksheet
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Transações');
+
+                    // Download file
+                    const today = new Date();
+                    const fileName = `Financeiro_${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}.xlsx`;
+                    XLSX.writeFile(wb, fileName);
+                    showToast('📊 Relatório exportado com sucesso!');
+                } catch (error) {
+                    console.error('Error exporting report:', error);
+                    showToast('Erro ao exportar: ' + error.message, true);
+                }
+            });
+        }
+
 
         if (elements.transactionForm) {
             elements.transactionForm.querySelectorAll('input[name="type"]').forEach(radio =>
@@ -708,6 +807,18 @@ const startInitialization = async () => {
         if (elements.themeToggleBtn) elements.themeToggleBtn.addEventListener('click', () => {
             import('./ui.js').then(ui => ui.toggleTheme());
         });
+
+        // Notifications Toggle Button
+        const notifBtn = document.getElementById('toggleNotificationsBtn');
+        if (notifBtn) {
+            notifBtn.addEventListener('click', async () => {
+                const granted = await requestNotificationPermission();
+                updateNotificationUI();
+                if (granted) {
+                    showToast('🔔 Notificações ativadas! Você receberá lembretes de contas a vencer.');
+                }
+            });
+        }
 
         // Categories
         if (elements.openCategoriesBtn) elements.openCategoriesBtn.addEventListener('click', openCategoriesModal);

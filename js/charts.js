@@ -70,6 +70,7 @@ export function renderBIReport(allTransactions) {
     renderDonutChart(monthTransactions);
     renderPartnerBarChart(monthTransactions);
     renderEvolutionChart(allTransactions);
+    renderPatrimonialChart(allTransactions);
 }
 
 /**
@@ -457,5 +458,117 @@ function renderEvolutionChart(allTransactions) {
         .duration(600)
         .attr("y", d => y(d.despesas))
         .attr("height", d => height - y(d.despesas));
+}
+
+/**
+ * Render Patrimonial Evolution Chart (line chart showing accumulated balance)
+ * Uses Chart.js for line chart
+ */
+export function renderPatrimonialChart(allTransactions) {
+    const canvas = document.getElementById('patrimonialChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    // Destroy existing chart if any
+    if (window.patrimonialChartInstance) {
+        window.patrimonialChartInstance.destroy();
+    }
+
+    // Get last 12 months
+    const months = [];
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({
+            month: date.getMonth() + 1,
+            year: date.getFullYear(),
+            label: date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
+        });
+    }
+
+    // Calculate accumulated balance for each month
+    let accumulatedBalance = 0;
+    const chartData = months.map(m => {
+        const monthTx = allTransactions.filter(t => {
+            if (t.status !== 'Pago' || !t.paymentDate) return false;
+            const paymentDate = new Date(t.paymentDate + 'T00:00:00');
+            return paymentDate.getFullYear() === m.year && (paymentDate.getMonth() + 1) === m.month;
+        });
+
+        const receitas = monthTx.filter(t => t.type === 'Receita').reduce((sum, t) => sum + t.amount, 0);
+        const despesas = monthTx.filter(t => t.type === 'Despesa').reduce((sum, t) => sum + t.amount, 0);
+        accumulatedBalance += (receitas - despesas);
+
+        return {
+            ...m,
+            balance: accumulatedBalance
+        };
+    });
+
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not loaded, skipping patrimonial chart');
+        return;
+    }
+
+    // Create chart
+    window.patrimonialChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(d => d.label),
+            datasets: [{
+                label: 'Patrimônio Acumulado',
+                data: chartData.map(d => d.balance),
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: chartData.map(d => d.balance >= 0 ? '#22c55e' : '#ef4444'),
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return formatCurrency(context.raw);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(107, 114, 128, 0.2)'
+                    },
+                    ticks: {
+                        color: '#9ca3af'
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(107, 114, 128, 0.2)'
+                    },
+                    ticks: {
+                        color: '#9ca3af',
+                        callback: function (value) {
+                            return 'R$ ' + value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
