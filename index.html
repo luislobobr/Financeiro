@@ -1,4 +1,4 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR" class="">
 
 <head>
@@ -8,11 +8,11 @@
 
     <!-- PWA Meta Tags -->
     <meta name="description"
-        content="Gerenciador completo de finan√ßas familiares com controle de contas, cart√µes de cr√©dito, or√ßamentos e relat√≥rios">
+        content="Gerenciador completo de finanÁas familiares com controle de contas, cartıes de crÈdito, orÁamentos e relatÛrios">
     <meta name="theme-color" content="#1e40af">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Finan√ßas">
+    <meta name="apple-mobile-web-app-title" content="FinanÁas">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon-192.png">
     <!-- Carrega o Tailwind CSS a partir de um CDN -->
@@ -24,12 +24,12 @@
     </script>
     <!-- Carrega SheetJS (xlsx.js) para ler Excel e CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- NOVO: Carrega D3.js para visualiza√ß√£o de dados no BI -->
+    <!-- NOVO: Carrega D3.js para visualizaÁ„o de dados no BI -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <!-- NOVO: Carrega Chart.js para gr√°ficos de linha -->
+    <!-- NOVO: Carrega Chart.js para gr·ficos de linha -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
-        /* Estilo base para garantir altura correta da p√°gina */
+        /* Estilo base para garantir altura correta da p·gina */
         html,
         body {
             height: 100%;
@@ -75,7 +75,7 @@
             /* indigo-100 */
         }
 
-        /* √çcones de Sol/Lua para o toggle de tema */
+        /* Õcones de Sol/Lua para o toggle de tema */
         #theme-toggle-sun,
         #theme-toggle-moon {
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -96,7 +96,7 @@
             transform: rotate(-90deg);
         }
 
-        /* Estilo base para o gr√°fico D3 para garantir que o texto seja leg√≠vel nos temas */
+        /* Estilo base para o gr·fico D3 para garantir que o texto seja legÌvel nos temas */
         #bi-chart svg {
             font-family: inherit;
         }
@@ -117,33 +117,33 @@
 
 <body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-300">
 
-    <!-- ===== 1. MODAL DE SELE√á√ÉO DE FAM√çLIA ===== -->
+    <!-- ===== 1. MODAL DE SELE«√O DE FAMÕLIA ===== -->
     <div id="familyModal"
         class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 sm:p-8 rounded-lg shadow-xl text-center">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Bem-vindo!</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">Como voc√™ gostaria de come√ßar?</p>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Como vocÍ gostaria de comeÁar?</p>
 
             <div class="space-y-4">
                 <button id="createFamilyBtn"
                     class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
-                    Criar Nova Fam√≠lia
+                    Criar Nova FamÌlia
                 </button>
                 <div class="relative flex items-center justify-center">
                     <span class="absolute bg-white dark:bg-gray-800 px-2 text-gray-500 text-sm">ou</span>
                     <div class="h-px bg-gray-300 dark:bg-gray-600 w-full"></div>
                 </div>
                 <div class="space-y-3">
-                    <input type="text" id="familyIdInput" placeholder="Cole o ID da Fam√≠lia aqui"
+                    <input type="text" id="familyIdInput" placeholder="Cole o ID da FamÌlia aqui"
                         class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button id="joinFamilyBtn"
                         class="w-full bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-gray-800 transition duration-300">
-                        Juntar-se a uma Fam√≠lia
+                        Juntar-se a uma FamÌlia
                     </button>
                 </div>
             </div>
 
-            <!-- Mostra o ID da nova fam√≠lia ap√≥s a cria√ß√£o -->
+            <!-- Mostra o ID da nova famÌlia apÛs a criaÁ„o -->
             <div id="newFamilyIdSection" class="mt-6 hidden">
                 <p class="text-gray-700 dark:text-gray-300">Compartilhe este ID com seu parceiro:</p>
                 <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-mono text-lg p-3 my-2 rounded-lg break-words"
@@ -154,7 +154,7 @@
                 </button>
                 <button id="startAppBtn"
                     class="mt-4 w-full text-blue-600 dark:text-blue-400 font-semibold py-2 px-4 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-700 transition duration-300">
-                    Come√ßar a Usar
+                    ComeÁar a Usar
                 </button>
             </div>
         </div>
@@ -164,11 +164,11 @@
     <div id="loadingIndicator"
         class="fixed inset-0 bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center z-40">
         <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full"></div>
-        <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Carregando finan√ßas...</p>
-        <!-- Mensagem de erro de inicializa√ß√£o ser√° injetada aqui -->
+        <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Carregando finanÁas...</p>
+        <!-- Mensagem de erro de inicializaÁ„o ser· injetada aqui -->
     </div>
 
-    <!-- ===== 2.5 MODAL DE CONFIGURA√á√ïES ===== -->
+    <!-- ===== 2.5 MODAL DE CONFIGURA«’ES ===== -->
     <div id="settingsModal"
         class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
         <div
@@ -190,14 +190,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </span>
-                Configura√ß√µes da Fam√≠lia
+                ConfiguraÁıes da FamÌlia
             </h2>
 
             <form id="settingsForm" class="space-y-4">
                 <div>
                     <label for="partner1NameInput"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome (Parceiro 1)</label>
-                    <input type="text" id="partner1NameInput" placeholder="Ex: Jo√£o"
+                    <input type="text" id="partner1NameInput" placeholder="Ex: Jo„o"
                         class="mt-1 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
@@ -212,7 +212,7 @@
                 </button>
             </form>
 
-            <!-- Bot√£o Sair da Fam√≠lia -->
+            <!-- Bot„o Sair da FamÌlia -->
             <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button id="disconnectFamilyBtn"
                     class="w-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 font-semibold py-3 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition duration-300 flex items-center justify-center">
@@ -221,13 +221,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
-                    Trocar / Sair da Fam√≠lia
+                    Trocar / Sair da FamÌlia
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ===== 2.6 MODAL DE IMPORTA√á√ÉO ===== -->
+    <!-- ===== 2.6 MODAL DE IMPORTA«√O ===== -->
     <div id="importModal"
         class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white dark:bg-gray-800 w-full max-w-2xl p-6 sm:p-8 rounded-lg shadow-xl relative">
@@ -238,29 +238,29 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Importar Transa√ß√µes (Planilha/OFX)</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Importar TransaÁıes (Planilha/OFX)</h2>
 
-            <!-- Passo de Revis√£o -->
+            <!-- Passo de Revis„o -->
             <div id="importReviewStep">
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Por favor, revise os dados e defina um pagador padr√£o
-                    para todas as transa√ß√µes importadas.</p>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Por favor, revise os dados e defina um pagador padr„o
+                    para todas as transaÁıes importadas.</p>
 
                 <div class="mb-4">
                     <label for="importPaidBy" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Pagador
-                        Padr√£o (para todos os itens)</label>
+                        Padr„o (para todos os itens)</label>
                     <select id="importPaidBy"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <!-- Op√ß√µes preenchidas pelo JS -->
+                        <!-- OpÁıes preenchidas pelo JS -->
                     </select>
                 </div>
 
                 <div class="mb-6 overflow-x-auto">
-                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pr√©via (primeiras 5 linhas):
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">PrÈvia (primeiras 5 linhas):
                     </p>
                     <table
                         class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-300 dark:border-gray-700">
                         <thead id="csvPreviewHead" class="bg-gray-50 dark:bg-gray-700">
-                            <!-- Cabe√ßalho preenchido pelo JS -->
+                            <!-- CabeÁalho preenchido pelo JS -->
                         </thead>
                         <tbody id="csvPreviewBody"
                             class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -284,14 +284,14 @@
             <!-- Passo de Carregamento -->
             <div id="importLoadingStep" class="text-center py-10 hidden">
                 <div class="spinner w-12 h-12 border-4 border-gray-300 dark:border-gray-600 rounded-full mx-auto"></div>
-                <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Importando transa√ß√µes... Por favor, aguarde.
+                <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Importando transaÁıes... Por favor, aguarde.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- NOVO: MODAL DE TRANSA√á√ÉO (Req 3) -->
-    <!-- Este modal agora centraliza o formul√°rio de Adicionar e Editar -->
+    <!-- NOVO: MODAL DE TRANSA«√O (Req 3) -->
+    <!-- Este modal agora centraliza o formul·rio de Adicionar e Editar -->
     <div id="transactionModal"
         class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
         <div
@@ -312,16 +312,16 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                 </span>
-                Adicionar Transa√ß√£o
+                Adicionar TransaÁ„o
             </h2>
 
 
-            <!-- Formul√°rio de Transa√ß√£o (Movido para c√°) -->
+            <!-- Formul·rio de TransaÁ„o (Movido para c·) -->
             <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Descri√ß√£o -->
+                <!-- DescriÁ„o -->
                 <div class="md:col-span-2 lg:col-span-3">
                     <label for="description"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descri√ß√£o</label>
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">DescriÁ„o</label>
                     <input type="text" id="description" name="description" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400">
                 </div>
@@ -355,7 +355,7 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
                     <select id="category" name="category"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <!-- Op√ß√µes preenchidas pelo JS -->
+                        <!-- OpÁıes preenchidas pelo JS -->
                     </select>
                 </div>
                 <!-- Pago Por -->
@@ -364,7 +364,7 @@
                         Por</label>
                     <select id="paidBy" name="paidBy"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <!-- Op√ß√µes preenchidas pelo JS -->
+                        <!-- OpÁıes preenchidas pelo JS -->
                     </select>
                 </div>
 
@@ -399,19 +399,19 @@
                         de Pagamento</label>
                     <select id="paymentMethod" name="paymentMethod"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <!-- Op√ß√µes preenchidas pelo JS -->
+                        <!-- OpÁıes preenchidas pelo JS -->
                     </select>
                 </div>
 
-                <!-- Se√ß√£o de Cart√£o de Cr√©dito (Vis√≠vel apenas se forma de pagamento == Cr√©dito) -->
+                <!-- SeÁ„o de Cart„o de CrÈdito (VisÌvel apenas se forma de pagamento == CrÈdito) -->
                 <div id="creditCardSection"
                     class="hidden md:col-span-2 grid grid-cols-2 gap-4 border-l-4 border-orange-500 pl-4 bg-orange-50 dark:bg-orange-900/20 py-2 rounded-r-md">
                     <div>
                         <label for="cardSelect"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cart√£o de Cr√©dito</label>
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cart„o de CrÈdito</label>
                         <select id="cardSelect" name="cardSelect"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500">
-                            <option value="">Selecione o Cart√£o...</option>
+                            <option value="">Selecione o Cart„o...</option>
                             <!-- Preenchido pelo JS -->
                         </select>
                     </div>
@@ -437,7 +437,7 @@
                         Despesa</label>
                     <select id="expenseType" name="expenseType"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <option>Vari√°vel</option>
+                        <option>Vari·vel</option>
                         <option>Fixa</option>
                     </select>
                 </div>
@@ -457,11 +457,11 @@
                 </div>
 
 
-                <!-- Bot√£o Adicionar / Atualizar -->
+                <!-- Bot„o Adicionar / Atualizar -->
                 <div class="md:col-span-2 lg:col-span-3">
                     <button id="transactionSubmitBtn" type="submit"
                         class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
-                        <!-- O texto ser√° "Adicionar" ou "Atualizar" via JS -->
+                        <!-- O texto ser· "Adicionar" ou "Atualizar" via JS -->
                     </button>
                 </div>
             </form>
@@ -493,7 +493,7 @@
             </h2>
 
 
-            <!-- Formul√°rio para adicionar nova categoria -->
+            <!-- Formul·rio para adicionar nova categoria -->
             <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Adicionar Nova Categoria</h3>
                 <form id="addCategoryForm" class="flex gap-4">
@@ -503,7 +503,7 @@
                             Categoria</label>
                         <input type="text" id="newCategoryName" required
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Ex: Educa√ß√£o">
+                            placeholder="Ex: EducaÁ„o">
                     </div>
                     <div class="flex items-end">
                         <button type="submit"
@@ -518,7 +518,7 @@
             <div>
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Categorias Existentes</h3>
                 <div id="categoriesList" class="space-y-2 max-h-80 overflow-y-auto">
-                    <!-- As categorias ser√£o preenchidas aqui pelo JavaScript -->
+                    <!-- As categorias ser„o preenchidas aqui pelo JavaScript -->
                 </div>
             </div>
         </div>
@@ -549,10 +549,10 @@
             </h2>
 
 
-            <!-- Formul√°rio para adicionar -->
+            <!-- Formul·rio para adicionar -->
             <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <form id="addPaymentMethodForm" class="flex gap-2">
-                    <input type="text" id="newPaymentMethodIcon" placeholder="√çcone (emoji)"
+                    <input type="text" id="newPaymentMethodIcon" placeholder="Õcone (emoji)"
                         class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-center text-xl">
                     <input type="text" id="newPaymentMethodName" placeholder="Nome (ex: PIX)" required
                         class="flex-grow px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md">
@@ -570,7 +570,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CART√ïES DE CR√âDITO -->
+    <!-- MODAL DE CART’ES DE CR…DITO -->
     <div id="creditCardsModal"
         class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
         <div
@@ -591,18 +591,18 @@
                             d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                 </span>
-                Gerenciar Cart√µes
+                Gerenciar Cartıes
             </h2>
 
 
-            <!-- Formul√°rio para adicionar -->
+            <!-- Formul·rio para adicionar -->
             <div class="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Novo Cart√£o</h3>
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Novo Cart„o</h3>
                 <form id="addCreditCardForm" class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                         <div class="col-span-2 sm:col-span-1">
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nome do
-                                Cart√£o</label>
+                                Cart„o</label>
                             <input type="text" id="newCardName" placeholder="Ex: Nubank" required
                                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm">
                         </div>
@@ -633,20 +633,20 @@
                     </div>
                     <button type="submit"
                         class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 text-sm">
-                        Adicionar Cart√£o
+                        Adicionar Cart„o
                     </button>
                 </form>
             </div>
 
             <!-- Lista -->
-            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Cart√µes Cadastrados</h3>
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Cartıes Cadastrados</h3>
             <div id="creditCardsList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
                 <!-- Preenchido pelo JS -->
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMA√á√ÉO DE PAGAMENTO -->
+    <!-- MODAL DE CONFIRMA«√O DE PAGAMENTO -->
     <div id="confirmPaymentModal"
         class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white dark:bg-gray-800 w-full max-w-sm p-6 rounded-lg shadow-xl">
@@ -698,11 +698,11 @@
             </h2>
 
             <form id="goalForm" class="space-y-4">
-                <!-- √çcone e Nome -->
+                <!-- Õcone e Nome -->
                 <div class="grid grid-cols-4 gap-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">√çcone</label>
-                        <input type="text" id="goalIconInput" value="üéØ" maxlength="2"
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Õcone</label>
+                        <input type="text" id="goalIconInput" value="??" maxlength="2"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-center text-2xl">
                     </div>
                     <div class="col-span-3">
@@ -741,25 +741,25 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
                         <select id="goalCategorySelect"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
-                            <option value="viagem">üèñÔ∏è Viagem</option>
-                            <option value="compra">üõçÔ∏è Compra</option>
-                            <option value="reserva">üí∞ Reserva</option>
-                            <option value="investimento">üìà Investimento</option>
-                            <option value="outro">üì¶ Outro</option>
+                            <option value="viagem">??? Viagem</option>
+                            <option value="compra">??? Compra</option>
+                            <option value="reserva">?? Reserva</option>
+                            <option value="investimento">?? Investimento</option>
+                            <option value="outro">?? Outro</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Bot√£o Submit -->
+                <!-- Bot„o Submit -->
                 <button type="submit"
                     class="w-full bg-gradient-to-r from-lime-500 to-green-600 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl hover:from-lime-600 hover:to-green-700 transition-all duration-300">
-                    üíæ Salvar Meta
+                    ?? Salvar Meta
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL DE CONTRIBUI√á√ÉO PARA METAS -->
+    <!-- MODAL DE CONTRIBUI«√O PARA METAS -->
     <div id="contributionModal"
         class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
         <div
@@ -774,9 +774,9 @@
             <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
                 <span
                     class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white mr-3 shadow-lg">
-                    üí∞
+                    ??
                 </span>
-                Adicionar Contribui√ß√£o
+                Adicionar ContribuiÁ„o
             </h2>
             <p id="contributionGoalName" class="text-gray-600 dark:text-gray-400 text-sm mb-4">Meta: </p>
 
@@ -790,12 +790,12 @@
 
             <button id="confirmContributionBtn"
                 class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300">
-                ‚úÖ Confirmar Contribui√ß√£o
+                ? Confirmar ContribuiÁ„o
             </button>
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMA√á√ÉO DE EXCLUS√ÉO -->
+    <!-- MODAL DE CONFIRMA«√O DE EXCLUS√O -->
     <div id="confirmDeleteModal"
         class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
         <div
@@ -809,7 +809,7 @@
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Confirmar Exclus√£o</h2>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Confirmar Exclus„o</h2>
                 <p id="confirmDeleteMessage" class="text-gray-600 dark:text-gray-400 mb-6">Tem certeza que deseja
                     excluir este item?</p>
 
@@ -823,14 +823,14 @@
                     </button>
                     <button id="confirmDeleteBtn"
                         class="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium transition">
-                        üóëÔ∏è Excluir
+                        ??? Excluir
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== 3. CONTE√öDO PRINCIPAL DA APLICA√á√ÉO ===== -->
+    <!-- ===== 3. CONTE⁄DO PRINCIPAL DA APLICA«√O ===== -->
 
 
     <!-- Layout com Sidebar (Req 2) -->
@@ -847,7 +847,7 @@
                 </svg>
             </button>
             <h1 class="text-lg font-bold text-gray-900 dark:text-gray-100">Meu Painel</h1>
-            <div class="w-10"></div> <!-- Spacer para centralizar t√≠tulo -->
+            <div class="w-10"></div> <!-- Spacer para centralizar tÌtulo -->
         </header>
 
         <!-- Overlay mobile -->
@@ -856,19 +856,19 @@
         <!-- Sidebar (Req 2) -->
         <aside id="sidebar"
             class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out lg:flex lg:flex-col overflow-y-auto">
-            <!-- Cabe√ßalho da Sidebar -->
+            <!-- CabeÁalho da Sidebar -->
             <header class="p-6 border-b dark:border-gray-700">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Meu Painel</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
                     ID: <span id="currentFamilyId" class="font-mono"></span>
                 </p>
-                <button id="copyIdBtn" title="Copiar ID da Fam√≠lia"
+                <button id="copyIdBtn" title="Copiar ID da FamÌlia"
                     class="mt-2 w-full text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                    Copiar ID da Fam√≠lia
+                    Copiar ID da FamÌlia
                 </button>
             </header>
 
-            <!-- Menu de Navega√ß√£o -->
+            <!-- Menu de NavegaÁ„o -->
             <nav class="flex-1 p-4 space-y-2">
                 <!-- Dashboard -->
                 <a href="#" id="navBtnDashboard"
@@ -940,7 +940,7 @@
                     <span class="font-medium">Planejamento</span>
                 </a>
 
-                <!-- Cart√µes -->
+                <!-- Cartıes -->
                 <a href="#" id="navBtnCreditCards"
                     class="sidebar-link flex items-center p-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 group">
                     <div
@@ -951,10 +951,10 @@
                                 d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
                     </div>
-                    <span class="font-medium">Cart√µes</span>
+                    <span class="font-medium">Cartıes</span>
                 </a>
 
-                <!-- Relat√≥rios -->
+                <!-- RelatÛrios -->
                 <a href="#" id="navBtnReports"
                     class="sidebar-link flex items-center p-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 group">
                     <div
@@ -965,7 +965,7 @@
                                 d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     </div>
-                    <span class="font-medium">Relat√≥rios</span>
+                    <span class="font-medium">RelatÛrios</span>
                 </a>
 
                 <!-- BI / Insights -->
@@ -999,7 +999,7 @@
                         class="font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Consultor
                         IA</span>
                     <span
-                        class="ml-auto text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full shadow-md">‚ú®
+                        class="ml-auto text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full shadow-md">?
                         IA</span>
                 </a>
 
@@ -1033,65 +1033,65 @@
             </nav>
 
 
-            <!-- Controles da Sidebar (Config, Tema) - PREMIUM DESIGN -->
-            <div
-                class="p-4 border-t dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-                <!-- Settings Row -->
-                <div class="flex items-center justify-between">
-                    <!-- Action Buttons -->
-                    <div class="flex items-center gap-2">
-                        <button id="openSettingsBtn" title="Configura√ß√µes"
-                            class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-slate-500 to-slate-700 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </button>
-                        <button id="toggleNotificationsBtn" title="Ativar/Desativar Notifica√ß√µes"
-                            class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                        </button>
-                        <button id="openCategoriesBtn" title="Categorias"
-                            class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                            </svg>
-                        </button>
-                        <button id="openPaymentMethodsBtn" title="Formas de Pagamento"
-                            class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </button>
-                        <button id="openCreditCardsBtn" title="Cart√µes de Cr√©dito"
-                            class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
-                        </button>
-                    </div>
-                    <!-- Theme Toggle -->
+            <!-- Controles da Sidebar - CLEAN DESIGN -->
+            <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <!-- Flexbox com espaÁamento adequado -->
+                <div class="flex items-center justify-center gap-2 flex-wrap">
+                    <!-- ConfiguraÁıes -->
+                    <button id="openSettingsBtn" title="ConfiguraÁıes"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                    <!-- Categorias -->
+                    <button id="openCategoriesBtn" title="Categorias"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                    </button>
+                    <!-- Formas de Pagamento -->
+                    <button id="openPaymentMethodsBtn" title="Formas de Pagamento"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </button>
+                    <!-- Cartıes de CrÈdito -->
+                    <button id="openCreditCardsBtn" title="Cartıes de CrÈdito"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </button>
+                    <!-- NotificaÁıes -->
+                    <button id="toggleNotificationsBtn" title="NotificaÁıes"
+                        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                    </button>
+                    <!-- Tema -->
                     <button id="themeToggleBtn" title="Alternar Tema"
-                        class="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 dark:from-indigo-500 dark:to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 relative overflow-hidden">
-                        <svg id="theme-toggle-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 text-indigo-600 dark:text-yellow-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all">
+                        <svg id="theme-toggle-sun" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
-                        <svg id="theme-toggle-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute"
+                        <svg id="theme-toggle-moon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
@@ -1099,976 +1099,973 @@
                     </button>
                 </div>
             </div>
-        </aside>
+    </div>
+    </aside>
 
 
-        <!-- Conte√∫do Principal (√† direita da Sidebar) -->
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64 pt-16 lg:pt-8">
-            <!-- pt-16 para o header mobile, ml-64 para compensar a sidebar no desktop -->
+    <!-- Conte˙do Principal (‡ direita da Sidebar) -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64 pt-16 lg:pt-8">
+        <!-- pt-16 para o header mobile, ml-64 para compensar a sidebar no desktop -->
 
-            <!-- ===== P√ÅGINA 1: PAINEL PRINCIPAL ===== -->
-            <div id="page-dashboard">
-                <!-- Balancete Geral do M√™s (PREMIUM DESIGN COM √çCONES) -->
-                <section class="mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                        <span
-                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </span>
-                        Balancete do M√™s
-                    </h2>
-                    <!-- Cards com √≠cones e gradientes -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <!-- Card Entradas -->
-                        <div
-                            class="bg-gradient-to-br from-emerald-500 to-green-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Total de
-                                        Entradas</h3>
-                                    <p id="totalIncome" class="text-3xl font-bold text-white mt-2">R$ 0,00</p>
-                                </div>
-                                <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card Sa√≠das -->
-                        <div
-                            class="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Total de
-                                        Sa√≠das</h3>
-                                    <p id="totalExpense" class="text-3xl font-bold text-white mt-2">R$ 0,00</p>
-                                </div>
-                                <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card Contas a Pagar -->
-                        <div
-                            class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Contas a
-                                        Pagar
-                                    </h3>
-                                    <p id="totalPendingCurrentMonth" class="text-3xl font-bold text-white mt-2">R$
-                                        0,00
-                                    </p>
-                                </div>
-                                <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card Saldo -->
-                        <div
-                            class="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Saldo do
-                                        M√™s
-                                    </h3>
-                                    <p id="totalBalance" class="text-3xl font-bold text-white mt-2">R$ 0,00</p>
-                                </div>
-                                <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-
-                <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Card de Sa√∫de Financeira -->
-                    <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Sa√∫de Financeira
-                        </h3>
-                        <!-- Score de Sa√∫de -->
-                        <div id="healthScoreContainer" class="flex flex-col items-center mb-4">
-                            <div id="healthScoreCircle" class="relative w-24 h-24 mb-2">
-                                <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
-                                    <path class="text-gray-700" stroke="currentColor" stroke-width="3" fill="none"
-                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    <path id="healthScoreArc" class="text-green-500" stroke="currentColor"
-                                        stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="75, 100"
-                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                </svg>
-                                <span id="healthScoreText"
-                                    class="absolute inset-0 flex items-center justify-center text-xl font-bold text-green-500">Bom</span>
-                            </div>
-                        </div>
-                        <!-- Indicadores -->
-                        <div id="healthIndicators" class="space-y-3 text-sm">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-500 dark:text-gray-400 flex items-center">
-                                    <span id="savingsIcon" class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                                    Taxa de Poupan√ßa
-                                </span>
-                                <span id="savingsRateValue" class="font-semibold text-green-500">0%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-500 dark:text-gray-400 flex items-center">
-                                    <span id="overdueIcon" class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                                    Contas em Dia
-                                </span>
-                                <span id="onTimeRateValue" class="font-semibold text-green-500">100%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-500 dark:text-gray-400 flex items-center">
-                                    <span id="budgetIcon" class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
-                                    Or√ßamento
-                                </span>
-                                <span id="budgetStatusValue" class="font-semibold text-yellow-500">N√£o
-                                    definido</span>
-                            </div>
-                        </div>
-                        <!-- Link para Consultor IA -->
-                        <a href="#" id="goToAiConsultantBtn"
-                            class="mt-4 block w-full text-center py-2 px-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all">
-                            ü§ñ Ver Recomenda√ß√µes IA
-                        </a>
-                    </div>
-
-                    <!-- CARD: CONTAS ATRASADAS - Expandido -->
+        <!-- ===== P¡GINA 1: PAINEL PRINCIPAL ===== -->
+        <div id="page-dashboard">
+            <!-- Balancete Geral do MÍs (PREMIUM DESIGN COM ÕCONES) -->
+            <section class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                    <span
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </span>
+                    Balancete do MÍs
+                </h2>
+                <!-- Cards com Ìcones e gradientes -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Card Entradas -->
                     <div
-                        class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
-                        <h3 class="text-lg font-semibold text-red-700 dark:text-red-500 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Contas Atrasadas
-                        </h3>
-                        <!-- Estado Vazio -->
-                        <div id="emptyStateOverdue" class="text-center text-gray-500 dark:text-gray-400 py-6 hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-green-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <h4 class="mt-2 text-md font-semibold text-gray-700 dark:text-gray-300">Nenhuma conta
-                                atrasada!</h4>
-                        </div>
-                        <!-- Lista de Contas Atrasadas -->
-                        <ul id="overdueList"
-                            class="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
-                            <!-- Itens da lista ser√£o inseridos pelo JS -->
-                        </ul>
-                        <!-- Total Atrasado -->
-                        <p id="totalOverdueAmount"
-                            class="text-right font-semibold text-red-600 dark:text-red-500 mt-4 pr-4"></p>
-                    </div>
-                </section>
-            </div>
-
-            <!-- ===== P√ÅGINA 2: CONTAS A PAGAR ===== -->
-            <div id="page-pending" class="hidden">
-                <section>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-
-                        <!-- Header com t√≠tulo -->
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Contas a Pagar</h2>
-                        </div>
-
-                        <!-- Cards de Resumo (primeiro, bem destacados) -->
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-400 mb-2">Total a Pagar</h4>
-                                <p id="pendingTotalAmount" class="text-2xl font-bold text-amber-500">R$ 0,00</p>
+                        class="bg-gradient-to-br from-emerald-500 to-green-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Total de
+                                    Entradas</h3>
+                                <p id="totalIncome" class="text-3xl font-bold text-white mt-2">R$ 0,00</p>
                             </div>
-                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-400 mb-2">Despesas Fixas</h4>
-                                <p id="pendingTotalFixedAmount" class="text-2xl font-bold text-purple-500">R$ 0,00
+                            <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card SaÌdas -->
+                    <div
+                        class="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Total de
+                                    SaÌdas</h3>
+                                <p id="totalExpense" class="text-3xl font-bold text-white mt-2">R$ 0,00</p>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card Contas a Pagar -->
+                    <div
+                        class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Contas a
+                                    Pagar
+                                </h3>
+                                <p id="totalPendingCurrentMonth" class="text-3xl font-bold text-white mt-2">R$
+                                    0,00
                                 </p>
                             </div>
-                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-400 mb-2">Quantidade</h4>
-                                <p id="pendingItemsCount" class="text-2xl font-bold text-gray-100">0</p>
-                            </div>
-                            <div class="bg-green-900/50 dark:bg-green-900/30 p-5 rounded-xl border border-green-700">
-                                <h4 class="text-sm font-medium text-green-400 mb-2">Total Selecionado (<span
-                                        id="pendingSelectedCount">0</span>)</h4>
-                                <p id="pendingSelectedAmount" class="text-2xl font-bold text-green-400">R$ 0,00</p>
-                            </div>
-                        </div>
-
-                        <!-- Filtros -->
-                        <form id="pendingFilterForm" class="mb-6">
-                            <!-- Bot√µes de Filtro R√°pido -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <button type="button" id="pendingCurrentMonthBtn"
-                                    class="quick-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300">
-                                    Este M√™s
-                                </button>
-                                <button type="button" id="pendingNextMonthBtn"
-                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    Pr√≥ximo M√™s
-                                </button>
-                                <button type="button" id="pendingNext3MonthsBtn"
-                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    Pr√≥ximos 3 Meses
-                                </button>
-                                <button type="button" id="pendingAllBtn"
-                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    Todos
-                                </button>
-                            </div>
-
-                            <!-- Filtros Dropdown em linha -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
-                                    <label for="pendingFilterMonth"
-                                        class="block text-sm font-medium text-gray-400 mb-1">M√™s</label>
-                                    <select id="pendingFilterMonth" name="pendingFilterMonth"
-                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Todos os meses</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="pendingFilterCategory"
-                                        class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
-                                    <select id="pendingFilterCategory" name="pendingFilterCategory"
-                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Todas</option>
-                                        <!-- Preenchido por JS -->
-                                    </select>
-                                </div>
-                                <div class="hidden">
-                                    <input type="date" id="pendingFilterStartDate" name="pendingFilterStartDate"
-                                        aria-label="Data in√≠cio">
-                                    <input type="date" id="pendingFilterEndDate" name="pendingFilterEndDate"
-                                        aria-label="Data fim">
-                                </div>
-                                <div class="flex items-end">
-                                    <button type="reset" id="pendingClearFilterBtn"
-                                        class="w-full px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                        Limpar Filtros
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                        <!-- Sele√ß√£o Geral -->
-                        <div class="flex items-center mb-4 p-3 bg-gray-700/50 rounded-lg">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" id="selectAllPendingCheckbox"
-                                    class="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
-                                <span class="ml-3 text-sm font-medium text-gray-300">Selecionar Todos</span>
-                            </label>
-                        </div>
-
-                        <!-- Estado Vazio -->
-                        <div id="emptyStatePending" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta a pagar</h4>
-                            <p class="mt-1 text-sm">Voc√™ est√° em dia ou os filtros n√£o retornaram resultados!</p>
-                        </div>
-                        <!-- Lista de Contas a Pagar -->
-                        <ul id="pendingList" class="divide-y divide-gray-700">
-                            <!-- Itens da lista ser√£o inseridos pelo JS -->
-                        </ul>
-                    </div>
-                </section>
-            </div>
-
-            <!-- P√ÅGINA 3: HIST√ìRICO DE CONTAS PAGAS -->
-            <div id="page-history" class="hidden">
-                <section>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-
-                        <!-- Header com t√≠tulo e bot√£o de importar -->
-                        <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Hist√≥rico de Contas
-                                Pagas
-                            </h2>
-                            <div class="flex items-center gap-3">
-                                <!-- Campo de Busca -->
-                                <div class="relative">
-                                    <input type="text" id="searchTransactionsInput"
-                                        placeholder="üîç Buscar transa√ß√µes..."
-                                        class="w-64 px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </div>
-                                <button id="importCsvBtn"
-                                    class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                    Importar
-                                </button>
-                            </div>
-                            <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
-                        </div>
-
-
-                        <!-- Cards de Resumo -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-400 mb-2">Total Pago</h4>
-                                <p id="historyTotalAmount" class="text-2xl font-bold text-red-500">R$ 0,00</p>
-                            </div>
-                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-400 mb-2">M√©dia por Item</h4>
-                                <p id="historyAverageAmount" class="text-2xl font-bold text-purple-500">R$ 0,00</p>
-                            </div>
-                            <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
-                                <h4 class="text-sm font-medium text-gray-400 mb-2">Quantidade</h4>
-                                <p id="historyItemsCount" class="text-2xl font-bold text-gray-100">0</p>
-                            </div>
-                        </div>
-
-                        <!-- Filtros -->
-                        <form id="filterForm" class="mb-6">
-                            <!-- Bot√µes de Filtro R√°pido -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <button type="button" id="historyCurrentMonthBtn"
-                                    class="quick-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300">
-                                    Este M√™s
-                                </button>
-                                <button type="button" id="historyLastMonthBtn"
-                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    M√™s Anterior
-                                </button>
-                                <button type="button" id="historyLast3MonthsBtn"
-                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    √öltimos 3 Meses
-                                </button>
-                                <button type="button" id="historyAllBtn"
-                                    class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    Todos
-                                </button>
-                            </div>
-
-                            <!-- Filtros Dropdown em linha -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
-                                    <label for="historyFilterMonth"
-                                        class="block text-sm font-medium text-gray-400 mb-1">M√™s</label>
-                                    <select id="historyFilterMonth" name="historyFilterMonth"
-                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Todos os meses</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="filterCategory"
-                                        class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
-                                    <select id="filterCategory" name="filterCategory"
-                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Todas</option>
-                                        <!-- Preenchido por JS -->
-                                    </select>
-                                </div>
-                                <div class="hidden">
-                                    <input type="date" id="filterStartDate" name="filterStartDate">
-                                    <input type="date" id="filterEndDate" name="filterEndDate">
-                                </div>
-                                <div class="flex items-end">
-                                    <button type="reset" id="clearFilterBtn"
-                                        class="w-full px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                        Limpar Filtros
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                        <!-- Estado Vazio -->
-                        <div id="emptyState" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta paga encontrada
-                            </h4>
-                            <p class="mt-1 text-sm">Ajuste seus filtros ou marque uma conta como paga.</p>
-                        </div>
-                        <!-- Lista -->
-                        <ul id="transactionList" class="divide-y divide-gray-700">
-                            <!-- Itens da lista ser√£o inseridos pelo JS -->
-                        </ul>
-                    </div>
-                </section>
-            </div>
-
-            <!-- P√ÅGINA 4: ENTRADAS -->
-            <div id="page-income" class="hidden">
-                <section>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Hist√≥rico de Entradas
-                            (Receitas)</h2>
-
-                        <!-- Filtros de Receitas -->
-                        <form id="incomeFilterForm" class="mb-6">
-                            <!-- Bot√µes de Filtro R√°pido -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <button type="button" id="incomeCurrentMonthBtn"
-                                    class="income-quick-filter-btn bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-green-700 transition duration-300 shadow-md">
-                                    üìÖ Este M√™s
-                                </button>
-                                <button type="button" id="incomeLastMonthBtn"
-                                    class="income-quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    üìÜ M√™s Anterior
-                                </button>
-                                <button type="button" id="incomeLast3MonthsBtn"
-                                    class="income-quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    üìä √öltimos 3 Meses
-                                </button>
-                                <button type="button" id="incomeAllBtn"
-                                    class="income-quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                    üóÇÔ∏è Todos
-                                </button>
-                            </div>
-
-                            <!-- Filtros Detalhados -->
-                            <div
-                                class="bg-gradient-to-r from-green-900/20 to-emerald-900/20 p-4 rounded-lg border border-green-700/30">
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <label for="incomeFilterStartDate"
-                                            class="block text-sm font-medium text-gray-400 mb-1">Data In√≠cio</label>
-                                        <input type="date" id="incomeFilterStartDate" name="incomeFilterStartDate"
-                                            class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 [color-scheme:dark]">
-                                    </div>
-                                    <div>
-                                        <label for="incomeFilterEndDate"
-                                            class="block text-sm font-medium text-gray-400 mb-1">Data Fim</label>
-                                        <input type="date" id="incomeFilterEndDate" name="incomeFilterEndDate"
-                                            class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 [color-scheme:dark]">
-                                    </div>
-                                    <div>
-                                        <label for="incomeFilterCategory"
-                                            class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
-                                        <select id="incomeFilterCategory" name="incomeFilterCategory"
-                                            class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                                            <option value="">Todas</option>
-                                            <!-- Preenchido por JS -->
-                                        </select>
-                                    </div>
-                                    <div class="flex items-end gap-2">
-                                        <button type="submit"
-                                            class="flex-1 px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                            Filtrar
-                                        </button>
-                                        <button type="button" id="incomeClearFilterBtn"
-                                            class="px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
-                                            Limpar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-
-
-                        <!-- Total Recebido (Filtrado) -->
-                        <div class="mb-4">
-                            <p id="incomeTotalAmount"
-                                class="text-right text-xl font-bold text-green-600 dark:text-green-500 pr-4"></p>
-                        </div>
-
-                        <!-- Estado Vazio -->
-                        <div id="emptyStateIncome" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma entrada encontrada
-                            </h4>
-                            <p class="mt-1 text-sm">Adicione uma receita ou ajuste seus filtros.</p>
-                        </div>
-                        <!-- Lista -->
-                        <ul id="incomeList" class="divide-y divide-gray-200 dark:divide-gray-700">
-                            <!-- Itens da lista ser√£o inseridos pelo JS -->
-                        </ul>
-                    </div>
-                </section>
-            </div>
-
-            <!-- ===== P√ÅGINA 5: PLANEJAMENTO ===== -->
-            <div id="page-planning" class="hidden">
-                <section>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Definir Or√ßamento
-                            Mensal
-                        </h2>
-                        <p class="text-gray-600 dark:text-gray-400 mb-6">Defina seus limites de gastos mensais por
-                            categoria. As altera√ß√µes s√£o salvas automaticamente.</p>
-                        <form id="budgetForm" class="space-y-4">
-                            <!-- Inputs do or√ßamento ser√£o inseridos pelo JS -->
-                        </form>
-                    </div>
-                </section>
-            </div>
-
-            <!-- ===== P√ÅGINA CART√ïES: FATURAS ===== -->
-            <div id="page-credit-cards" class="hidden">
-                <section>
-                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="flex items-center gap-4">
-                                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Faturas de Cart√£o
-                                </h2>
-
-                                <!-- Filtro de M√™s -->
-                                <div class="flex items-center gap-2">
-                                    <label for="creditCardMonthFilter"
-                                        class="text-sm text-gray-600 dark:text-gray-400">Per√≠odo:</label>
-                                    <select id="creditCardMonthFilter"
-                                        class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                        <option value="all">Todos os Meses</option>
-                                        <!-- Options populated by JS -->
-                                    </select>
-                                </div>
-                            </div>
-
-                            <button id="openCreditCardsBtn"
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
+                            <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Gerenciar Cart√µes
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card Saldo -->
+                    <div
+                        class="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-sm font-medium text-white/80 uppercase tracking-wide">Saldo do
+                                    MÍs
+                                </h3>
+                                <p id="totalBalance" class="text-3xl font-bold text-white mt-2">R$ 0,00</p>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Card de Sa˙de Financeira -->
+                <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Sa˙de Financeira
+                    </h3>
+                    <!-- Score de Sa˙de -->
+                    <div id="healthScoreContainer" class="flex flex-col items-center mb-4">
+                        <div id="healthScoreCircle" class="relative w-24 h-24 mb-2">
+                            <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-gray-700" stroke="currentColor" stroke-width="3" fill="none"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="healthScoreArc" class="text-green-500" stroke="currentColor" stroke-width="3"
+                                    stroke-linecap="round" fill="none" stroke-dasharray="75, 100"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <span id="healthScoreText"
+                                class="absolute inset-0 flex items-center justify-center text-xl font-bold text-green-500">Bom</span>
+                        </div>
+                    </div>
+                    <!-- Indicadores -->
+                    <div id="healthIndicators" class="space-y-3 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                                <span id="savingsIcon" class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                                Taxa de PoupanÁa
+                            </span>
+                            <span id="savingsRateValue" class="font-semibold text-green-500">0%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                                <span id="overdueIcon" class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                                Contas em Dia
+                            </span>
+                            <span id="onTimeRateValue" class="font-semibold text-green-500">100%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-500 dark:text-gray-400 flex items-center">
+                                <span id="budgetIcon" class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
+                                OrÁamento
+                            </span>
+                            <span id="budgetStatusValue" class="font-semibold text-yellow-500">N„o
+                                definido</span>
+                        </div>
+                    </div>
+                    <!-- Link para Consultor IA -->
+                    <a href="#" id="goToAiConsultantBtn"
+                        class="mt-4 block w-full text-center py-2 px-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all">
+                        ?? Ver RecomendaÁıes IA
+                    </a>
+                </div>
+
+                <!-- CARD: CONTAS ATRASADAS - Expandido -->
+                <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 border-red-500">
+                    <h3 class="text-lg font-semibold text-red-700 dark:text-red-500 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Contas Atrasadas
+                    </h3>
+                    <!-- Estado Vazio -->
+                    <div id="emptyStateOverdue" class="text-center text-gray-500 dark:text-gray-400 py-6 hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-green-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h4 class="mt-2 text-md font-semibold text-gray-700 dark:text-gray-300">Nenhuma conta
+                            atrasada!</h4>
+                    </div>
+                    <!-- Lista de Contas Atrasadas -->
+                    <ul id="overdueList" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-80 overflow-y-auto">
+                        <!-- Itens da lista ser„o inseridos pelo JS -->
+                    </ul>
+                    <!-- Total Atrasado -->
+                    <p id="totalOverdueAmount"
+                        class="text-right font-semibold text-red-600 dark:text-red-500 mt-4 pr-4"></p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ===== P¡GINA 2: CONTAS A PAGAR ===== -->
+        <div id="page-pending" class="hidden">
+            <section>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+
+                    <!-- Header com tÌtulo -->
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Contas a Pagar</h2>
+                    </div>
+
+                    <!-- Cards de Resumo (primeiro, bem destacados) -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Total a Pagar</h4>
+                            <p id="pendingTotalAmount" class="text-2xl font-bold text-amber-500">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Despesas Fixas</h4>
+                            <p id="pendingTotalFixedAmount" class="text-2xl font-bold text-purple-500">R$ 0,00
+                            </p>
+                        </div>
+                        <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Quantidade</h4>
+                            <p id="pendingItemsCount" class="text-2xl font-bold text-gray-100">0</p>
+                        </div>
+                        <div class="bg-green-900/50 dark:bg-green-900/30 p-5 rounded-xl border border-green-700">
+                            <h4 class="text-sm font-medium text-green-400 mb-2">Total Selecionado (<span
+                                    id="pendingSelectedCount">0</span>)</h4>
+                            <p id="pendingSelectedAmount" class="text-2xl font-bold text-green-400">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <form id="pendingFilterForm" class="mb-6">
+                        <!-- Botıes de Filtro R·pido -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button type="button" id="pendingCurrentMonthBtn"
+                                class="quick-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300">
+                                Este MÍs
+                            </button>
+                            <button type="button" id="pendingNextMonthBtn"
+                                class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                PrÛximo MÍs
+                            </button>
+                            <button type="button" id="pendingNext3MonthsBtn"
+                                class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                PrÛximos 3 Meses
+                            </button>
+                            <button type="button" id="pendingAllBtn"
+                                class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                Todos
                             </button>
                         </div>
-                        <div id="creditCardsPageContent" class="space-y-6">
-                            <!-- Preenchido pelo JS -->
+
+                        <!-- Filtros Dropdown em linha -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="pendingFilterMonth"
+                                    class="block text-sm font-medium text-gray-400 mb-1">MÍs</label>
+                                <select id="pendingFilterMonth" name="pendingFilterMonth"
+                                    class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todos os meses</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="pendingFilterCategory"
+                                    class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
+                                <select id="pendingFilterCategory" name="pendingFilterCategory"
+                                    class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todas</option>
+                                    <!-- Preenchido por JS -->
+                                </select>
+                            </div>
+                            <div class="hidden">
+                                <input type="date" id="pendingFilterStartDate" name="pendingFilterStartDate"
+                                    aria-label="Data inÌcio">
+                                <input type="date" id="pendingFilterEndDate" name="pendingFilterEndDate"
+                                    aria-label="Data fim">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="reset" id="pendingClearFilterBtn"
+                                    class="w-full px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Limpar Filtros
+                                </button>
+                            </div>
                         </div>
+                    </form>
+
+                    <!-- SeleÁ„o Geral -->
+                    <div class="flex items-center mb-4 p-3 bg-gray-700/50 rounded-lg">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="selectAllPendingCheckbox"
+                                class="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                            <span class="ml-3 text-sm font-medium text-gray-300">Selecionar Todos</span>
+                        </label>
                     </div>
-                </section>
-            </div>
 
-            <!-- ===== P√ÅGINA 6: RELAT√ìRIOS (REDESIGNED) ===== -->
-            <div id="page-reports" class="hidden">
-                <section class="space-y-6">
+                    <!-- Estado Vazio -->
+                    <div id="emptyStatePending" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta a pagar</h4>
+                        <p class="mt-1 text-sm">VocÍ est· em dia ou os filtros n„o retornaram resultados!</p>
+                    </div>
+                    <!-- Lista de Contas a Pagar -->
+                    <ul id="pendingList" class="divide-y divide-gray-700">
+                        <!-- Itens da lista ser„o inseridos pelo JS -->
+                    </ul>
+                </div>
+            </section>
+        </div>
 
-                    <!-- ===== SE√á√ÉO 1: DRE ===== -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Demonstra√ß√£o do
-                                Resultado
-                                (DRE)</h2>
-                            <button id="exportReportBtn"
+        <!-- P¡GINA 3: HIST”RICO DE CONTAS PAGAS -->
+        <div id="page-history" class="hidden">
+            <section>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+
+                    <!-- Header com tÌtulo e bot„o de importar -->
+                    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">HistÛrico de Contas
+                            Pagas
+                        </h2>
+                        <div class="flex items-center gap-3">
+                            <!-- Campo de Busca -->
+                            <div class="relative">
+                                <input type="text" id="searchTransactionsInput" placeholder="?? Buscar transaÁıes..."
+                                    class="w-64 px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <button id="importCsvBtn"
                                 class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
-                                üìä Exportar Excel
+                                Importar
+                            </button>
+                        </div>
+                        <input type="file" id="csvFileInput" class="hidden" accept=".xlsx, .xls, .csv">
+                    </div>
+
+
+                    <!-- Cards de Resumo -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Total Pago</h4>
+                            <p id="historyTotalAmount" class="text-2xl font-bold text-red-500">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">MÈdia por Item</h4>
+                            <p id="historyAverageAmount" class="text-2xl font-bold text-purple-500">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gray-800 dark:bg-gray-900 p-5 rounded-xl border border-gray-700">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Quantidade</h4>
+                            <p id="historyItemsCount" class="text-2xl font-bold text-gray-100">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <form id="filterForm" class="mb-6">
+                        <!-- Botıes de Filtro R·pido -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button type="button" id="historyCurrentMonthBtn"
+                                class="quick-filter-btn bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition duration-300">
+                                Este MÍs
+                            </button>
+                            <button type="button" id="historyLastMonthBtn"
+                                class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                MÍs Anterior
+                            </button>
+                            <button type="button" id="historyLast3MonthsBtn"
+                                class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                ⁄ltimos 3 Meses
+                            </button>
+                            <button type="button" id="historyAllBtn"
+                                class="quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                Todos
                             </button>
                         </div>
 
-                        <!-- Filtros DRE -->
-                        <div class="flex flex-wrap gap-4 mb-6">
+                        <!-- Filtros Dropdown em linha -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <label for="reportMonth"
-                                    class="block text-sm font-medium text-gray-400 mb-1">M√™s</label>
-                                <select id="reportMonth"
-                                    class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="1">Janeiro</option>
-                                    <option value="2">Fevereiro</option>
-                                    <option value="3">Mar√ßo</option>
-                                    <option value="4">Abril</option>
-                                    <option value="5">Maio</option>
-                                    <option value="6">Junho</option>
-                                    <option value="7">Julho</option>
-                                    <option value="8">Agosto</option>
-                                    <option value="9">Setembro</option>
-                                    <option value="10">Outubro</option>
-                                    <option value="11">Novembro</option>
-                                    <option value="12">Dezembro</option>
+                                <label for="historyFilterMonth"
+                                    class="block text-sm font-medium text-gray-400 mb-1">MÍs</label>
+                                <select id="historyFilterMonth" name="historyFilterMonth"
+                                    class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todos os meses</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="reportYear" class="block text-sm font-medium text-gray-400 mb-1">Ano</label>
-                                <input type="number" id="reportYear" min="2020" max="2100"
-                                    class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-24">
-                            </div>
-                        </div>
-
-                        <!-- Cont√™iner do DRE -->
-                        <div id="dreReportContainer" class="overflow-x-auto">
-                            <!-- A tabela do DRE ser√° renderizada aqui -->
-                        </div>
-                        <div id="dreReportEmpty" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
-                            <h4 class="text-lg font-semibold dark:text-gray-300">Selecione um m√™s para gerar o DRE.
-                            </h4>
-                        </div>
-                    </div>
-
-                    <!-- ===== SE√á√ÉO 2: COMPARATIVO MENSAL ===== -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Comparativo Mensal
-                            (√∫ltimos
-                            6 meses)</h2>
-
-                        <div id="comparativoMensalContainer" class="overflow-x-auto">
-                            <!-- Tabela do comparativo ser√° renderizada aqui -->
-                        </div>
-                    </div>
-
-                    <!-- ===== SE√á√ÉO 2.5: EVOLU√á√ÉO DO PATRIM√îNIO ===== -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">üìà Evolu√ß√£o do Patrim√¥nio
-                        </h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Saldo acumulado ao longo dos meses
-                            (Receitas - Despesas)</p>
-                        <div id="patrimonialChartContainer" class="h-64">
-                            <canvas id="patrimonialChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- ===== SE√á√ÉO 3: DESPESAS POR PARCEIRO ===== -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Despesas por Parceiro
-                        </h2>
-
-                        <div id="despesasPorParceiroContainer">
-                            <!-- Cards de parceiros ser√£o renderizados aqui -->
-                        </div>
-                    </div>
-
-                    <!-- ===== SE√á√ÉO 4: DESPESAS POR FORMA DE PAGAMENTO ===== -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Despesas por Forma de
-                            Pagamento</h2>
-
-                        <div id="despesasPorFormaPagamentoContainer">
-                            <!-- Cards de formas de pagamento ser√£o renderizados aqui -->
-                        </div>
-                    </div>
-
-                </section>
-            </div>
-
-            <!-- ===== P√ÅGINA 7: BI / BUSINESS INTELLIGENCE (REDESIGNED) ===== -->
-            <div id="page-bi" class="hidden">
-                <section class="space-y-6">
-
-                    <!-- Header with Month Selector -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Business Intelligence
-                            </h2>
-                            <div>
-                                <select id="biMonthSelect"
-                                    class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <!-- Populated by JS with Month/Year options -->
+                                <label for="filterCategory"
+                                    class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
+                                <select id="filterCategory" name="filterCategory"
+                                    class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todas</option>
+                                    <!-- Preenchido por JS -->
                                 </select>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Summary Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
-                            <h4 class="text-sm font-medium text-gray-400 mb-2">Receitas do M√™s</h4>
-                            <p id="biReceitasMes" class="text-2xl font-bold text-green-500">R$ 0,00</p>
-                        </div>
-                        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
-                            <h4 class="text-sm font-medium text-gray-400 mb-2">Despesas do M√™s</h4>
-                            <p id="biDespesasMes" class="text-2xl font-bold text-red-500">R$ 0,00</p>
-                        </div>
-                        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
-                            <h4 class="text-sm font-medium text-gray-400 mb-2">Saldo do M√™s</h4>
-                            <p id="biSaldoMes" class="text-2xl font-bold text-white">R$ 0,00</p>
-                        </div>
-                    </div>
-
-                    <!-- Charts Row: Despesas por Categoria + Distribui√ß√£o por Categoria -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Despesas por Categoria (Horizontal Bar Chart) -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Despesas por
-                                Categoria</h3>
-                            <div id="biCategoryBarChart" class="overflow-x-auto min-h-[200px]">
-                                <!-- D3 bar chart rendered here -->
+                            <div class="hidden">
+                                <input type="date" id="filterStartDate" name="filterStartDate">
+                                <input type="date" id="filterEndDate" name="filterEndDate">
                             </div>
-                            <div id="biCategoryBarChartEmpty" class="text-center text-gray-500 py-8 hidden">
-                                <p>Sem dados para o per√≠odo</p>
+                            <div class="flex items-end">
+                                <button type="reset" id="clearFilterBtn"
+                                    class="w-full px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                    Limpar Filtros
+                                </button>
                             </div>
                         </div>
+                    </form>
 
-                        <!-- Distribui√ß√£o por Categoria (Donut Chart) -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Distribui√ß√£o por
-                                Categoria</h3>
-                            <div class="flex items-center gap-4">
-                                <div id="biDonutChart" class="flex-shrink-0">
-                                    <!-- D3 donut chart rendered here -->
+                    <!-- Estado Vazio -->
+                    <div id="emptyState" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma conta paga encontrada
+                        </h4>
+                        <p class="mt-1 text-sm">Ajuste seus filtros ou marque uma conta como paga.</p>
+                    </div>
+                    <!-- Lista -->
+                    <ul id="transactionList" class="divide-y divide-gray-700">
+                        <!-- Itens da lista ser„o inseridos pelo JS -->
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- P¡GINA 4: ENTRADAS -->
+        <div id="page-income" class="hidden">
+            <section>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">HistÛrico de Entradas
+                        (Receitas)</h2>
+
+                    <!-- Filtros de Receitas -->
+                    <form id="incomeFilterForm" class="mb-6">
+                        <!-- Botıes de Filtro R·pido -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button type="button" id="incomeCurrentMonthBtn"
+                                class="income-quick-filter-btn bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-green-700 transition duration-300 shadow-md">
+                                ?? Este MÍs
+                            </button>
+                            <button type="button" id="incomeLastMonthBtn"
+                                class="income-quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                ?? MÍs Anterior
+                            </button>
+                            <button type="button" id="incomeLast3MonthsBtn"
+                                class="income-quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                ?? ⁄ltimos 3 Meses
+                            </button>
+                            <button type="button" id="incomeAllBtn"
+                                class="income-quick-filter-btn bg-gray-700 text-gray-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                ??? Todos
+                            </button>
+                        </div>
+
+                        <!-- Filtros Detalhados -->
+                        <div
+                            class="bg-gradient-to-r from-green-900/20 to-emerald-900/20 p-4 rounded-lg border border-green-700/30">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label for="incomeFilterStartDate"
+                                        class="block text-sm font-medium text-gray-400 mb-1">Data InÌcio</label>
+                                    <input type="date" id="incomeFilterStartDate" name="incomeFilterStartDate"
+                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 [color-scheme:dark]">
                                 </div>
-                                <div id="biDonutLegend" class="flex-1 space-y-2">
-                                    <!-- Legend items rendered here -->
+                                <div>
+                                    <label for="incomeFilterEndDate"
+                                        class="block text-sm font-medium text-gray-400 mb-1">Data Fim</label>
+                                    <input type="date" id="incomeFilterEndDate" name="incomeFilterEndDate"
+                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 [color-scheme:dark]">
                                 </div>
-                            </div>
-                            <div id="biDonutChartEmpty" class="text-center text-gray-500 py-8 hidden">
-                                <p>Sem dados para o per√≠odo</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Charts Row: Despesas por Parceiro + Evolu√ß√£o Mensal -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Despesas por Parceiro (Horizontal Bar Chart) -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Despesas por
-                                Parceiro</h3>
-                            <div id="biPartnerBarChart" class="overflow-x-auto min-h-[150px]">
-                                <!-- D3 bar chart rendered here -->
-                            </div>
-                            <div id="biPartnerBarChartEmpty" class="text-center text-gray-500 py-8 hidden">
-                                <p>Sem dados para o per√≠odo</p>
-                            </div>
-                        </div>
-
-                        <!-- Evolu√ß√£o Mensal (Grouped Bar Chart) -->
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Evolu√ß√£o Mensal
-                                (6
-                                meses)</h3>
-                            <div id="biEvolutionChart" class="overflow-x-auto min-h-[250px]">
-                                <!-- D3 grouped bar chart rendered here -->
-                            </div>
-                            <div id="biEvolutionLegend" class="flex justify-center gap-6 mt-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-4 h-4 bg-green-500 rounded"></div>
-                                    <span class="text-sm text-gray-400">Receitas</span>
+                                <div>
+                                    <label for="incomeFilterCategory"
+                                        class="block text-sm font-medium text-gray-400 mb-1">Categoria</label>
+                                    <select id="incomeFilterCategory" name="incomeFilterCategory"
+                                        class="w-full px-4 py-3 bg-gray-800 dark:bg-gray-900 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                                        <option value="">Todas</option>
+                                        <!-- Preenchido por JS -->
+                                    </select>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <div class="w-4 h-4 bg-red-500 rounded"></div>
-                                    <span class="text-sm text-gray-400">Despesas</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </section>
-            </div>
-
-            <!-- ===== P√ÅGINA: CONSULTOR IA ===== -->
-            <div id="page-ai-consultant" class="hidden">
-                <section>
-                    <div
-                        class="bg-gradient-to-br from-purple-900/50 to-blue-900/50 dark:from-purple-900/30 dark:to-blue-900/30 p-6 rounded-lg shadow-lg mb-6 border border-purple-500/30">
-                        <div class="flex items-center mb-4">
-                            <div
-                                class="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h2 class="text-2xl font-bold text-white">Consultor Financeiro IA</h2>
-                                <p class="text-purple-200 text-sm">An√°lise inteligente das suas finan√ßas</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-300 text-sm">Baseado nos seus dados financeiros, preparei algumas
-                            recomenda√ß√µes personalizadas para melhorar sua sa√∫de financeira.</p>
-                    </div>
-
-                    <!-- Score Geral -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
-                            <h4 class="text-sm font-medium text-gray-400 mb-2">Score Financeiro</h4>
-                            <p id="aiScoreValue" class="text-3xl font-bold text-green-500">75</p>
-                            <p id="aiScoreLabel" class="text-xs text-gray-400">de 100 pontos</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
-                            <h4 class="text-sm font-medium text-gray-400 mb-2">Taxa de Poupan√ßa</h4>
-                            <p id="aiSavingsRate" class="text-3xl font-bold text-blue-500">8%</p>
-                            <p class="text-xs text-gray-400">das receitas</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
-                            <h4 class="text-sm font-medium text-gray-400 mb-2">Contas Atrasadas</h4>
-                            <p id="aiOverdueCount" class="text-3xl font-bold text-red-500">3</p>
-                            <p id="aiOverdueTotal" class="text-xs text-gray-400">R$ 0,00</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
-                            <h4 class="text-sm font-medium text-gray-400 mb-2">Maior Gasto</h4>
-                            <p id="aiTopCategory" class="text-xl font-bold text-amber-500 truncate">-</p>
-                            <p id="aiTopCategoryValue" class="text-xs text-gray-400">R$ 0,00</p>
-                        </div>
-                    </div>
-
-                    <!-- Recomenda√ß√µes -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                            Recomenda√ß√µes Personalizadas
-                        </h3>
-                        <div id="aiRecommendationsList" class="space-y-4">
-                            <!-- Recomenda√ß√µes ser√£o inseridas pelo JS -->
-                            <div class="animate-pulse flex space-x-4">
-                                <div class="flex-1 space-y-4 py-1">
-                                    <div class="h-4 bg-gray-700 rounded w-3/4"></div>
-                                    <div class="h-4 bg-gray-700 rounded w-1/2"></div>
+                                <div class="flex items-end gap-2">
+                                    <button type="submit"
+                                        class="flex-1 px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                        Filtrar
+                                    </button>
+                                    <button type="button" id="incomeClearFilterBtn"
+                                        class="px-4 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition duration-300 border border-gray-600">
+                                        Limpar
+                                    </button>
                                 </div>
                             </div>
                         </div>
+                    </form>
+
+
+                    <!-- Total Recebido (Filtrado) -->
+                    <div class="mb-4">
+                        <p id="incomeTotalAmount"
+                            class="text-right text-xl font-bold text-green-600 dark:text-green-500 pr-4"></p>
                     </div>
 
-                    <!-- Plano de A√ß√£o -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Plano de A√ß√£o - Pr√≥ximos 30 Dias
-                        </h3>
-                        <div id="aiActionPlanList" class="space-y-3">
-                            <!-- A√ß√µes ser√£o inseridas pelo JS -->
-                        </div>
+                    <!-- Estado Vazio -->
+                    <div id="emptyStateIncome" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h4 class="mt-2 text-lg font-semibold dark:text-gray-300">Nenhuma entrada encontrada
+                        </h4>
+                        <p class="mt-1 text-sm">Adicione uma receita ou ajuste seus filtros.</p>
                     </div>
+                    <!-- Lista -->
+                    <ul id="incomeList" class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Itens da lista ser„o inseridos pelo JS -->
+                    </ul>
+                </div>
+            </section>
+        </div>
 
-                    <!-- Metas Sugeridas -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                </svg>
-                                Metas Sugeridas
-                            </h3>
-                            <div id="aiGoalsList" class="space-y-4">
-                                <!-- Metas ser√£o inseridas pelo JS -->
-                            </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                Alertas Importantes
-                            </h3>
-                            <div id="aiAlertsList" class="space-y-3">
-                                <!-- Alertas ser√£o inseridos pelo JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                </section>
-            </div>
-
-            <!-- ===== P√ÅGINA: ASSINATURAS E RECORR√äNCIAS ===== -->
-            <div id="page-subscriptions" class="hidden">
-                <div class="mb-6">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">üí≥ Assinaturas e Recorr√™ncias
+        <!-- ===== P¡GINA 5: PLANEJAMENTO ===== -->
+        <div id="page-planning" class="hidden">
+            <section>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Definir OrÁamento
+                        Mensal
                     </h2>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">Gerencie suas despesas recorrentes e
-                        assinaturas
-                    </p>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">Defina seus limites de gastos mensais por
+                        categoria. As alteraÁıes s„o salvas automaticamente.</p>
+                    <form id="budgetForm" class="space-y-4">
+                        <!-- Inputs do orÁamento ser„o inseridos pelo JS -->
+                    </form>
                 </div>
+            </section>
+        </div>
 
-                <div id="subscriptionsPageContent">
-                    <!-- Conte√∫do ser√° renderizado pelo subscriptions.js -->
-                    <div class="text-center py-8">
-                        <div
-                            class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent">
+        <!-- ===== P¡GINA CART’ES: FATURAS ===== -->
+        <div id="page-credit-cards" class="hidden">
+            <section>
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-4">
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Faturas de Cart„o
+                            </h2>
+
+                            <!-- Filtro de MÍs -->
+                            <div class="flex items-center gap-2">
+                                <label for="creditCardMonthFilter"
+                                    class="text-sm text-gray-600 dark:text-gray-400">PerÌodo:</label>
+                                <select id="creditCardMonthFilter"
+                                    class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="all">Todos os Meses</option>
+                                    <!-- Options populated by JS -->
+                                </select>
+                            </div>
                         </div>
-                        <p class="mt-4 text-gray-500 dark:text-gray-400">Carregando assinaturas...</p>
+
+                        <button id="openCreditCardsBtn"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Gerenciar Cartıes
+                        </button>
+                    </div>
+                    <div id="creditCardsPageContent" class="space-y-6">
+                        <!-- Preenchido pelo JS -->
                     </div>
                 </div>
-            </div>
+            </section>
+        </div>
 
-            <!-- ===== P√ÅGINA: METAS E COFRES ===== -->
-            <div id="page-goals" class="hidden">
-                <div class="mb-6">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">üéØ Metas e Cofres</h2>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">Defina objetivos e acompanhe seu progresso</p>
-                </div>
+        <!-- ===== P¡GINA 6: RELAT”RIOS (REDESIGNED) ===== -->
+        <div id="page-reports" class="hidden">
+            <section class="space-y-6">
 
-                <div id="goalsPageContent">
-                    <!-- Conte√∫do ser√° renderizado pelo goals.js -->
-                    <div class="text-center py-8">
-                        <div
-                            class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent">
+                <!-- ===== SE«√O 1: DRE ===== -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">DemonstraÁ„o do
+                            Resultado
+                            (DRE)</h2>
+                        <button id="exportReportBtn"
+                            class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 flex items-center text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            ?? Exportar Excel
+                        </button>
+                    </div>
+
+                    <!-- Filtros DRE -->
+                    <div class="flex flex-wrap gap-4 mb-6">
+                        <div>
+                            <label for="reportMonth" class="block text-sm font-medium text-gray-400 mb-1">MÍs</label>
+                            <select id="reportMonth"
+                                class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1">Janeiro</option>
+                                <option value="2">Fevereiro</option>
+                                <option value="3">MarÁo</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Maio</option>
+                                <option value="6">Junho</option>
+                                <option value="7">Julho</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
                         </div>
-                        <p class="mt-4 text-gray-500 dark:text-gray-400">Carregando metas...</p>
+                        <div>
+                            <label for="reportYear" class="block text-sm font-medium text-gray-400 mb-1">Ano</label>
+                            <input type="number" id="reportYear" min="2020" max="2100"
+                                class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-24">
+                        </div>
+                    </div>
+
+                    <!-- ContÍiner do DRE -->
+                    <div id="dreReportContainer" class="overflow-x-auto">
+                        <!-- A tabela do DRE ser· renderizada aqui -->
+                    </div>
+                    <div id="dreReportEmpty" class="text-center text-gray-500 dark:text-gray-400 py-10 hidden">
+                        <h4 class="text-lg font-semibold dark:text-gray-300">Selecione um mÍs para gerar o DRE.
+                        </h4>
                     </div>
                 </div>
+
+                <!-- ===== SE«√O 2: COMPARATIVO MENSAL ===== -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Comparativo Mensal
+                        (˙ltimos
+                        6 meses)</h2>
+
+                    <div id="comparativoMensalContainer" class="overflow-x-auto">
+                        <!-- Tabela do comparativo ser· renderizada aqui -->
+                    </div>
+                </div>
+
+                <!-- ===== SE«√O 2.5: EVOLU«√O DO PATRIM‘NIO ===== -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">?? EvoluÁ„o do PatrimÙnio
+                    </h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Saldo acumulado ao longo dos meses
+                        (Receitas - Despesas)</p>
+                    <div id="patrimonialChartContainer" class="h-64">
+                        <canvas id="patrimonialChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- ===== SE«√O 3: DESPESAS POR PARCEIRO ===== -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Despesas por Parceiro
+                    </h2>
+
+                    <div id="despesasPorParceiroContainer">
+                        <!-- Cards de parceiros ser„o renderizados aqui -->
+                    </div>
+                </div>
+
+                <!-- ===== SE«√O 4: DESPESAS POR FORMA DE PAGAMENTO ===== -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Despesas por Forma de
+                        Pagamento</h2>
+
+                    <div id="despesasPorFormaPagamentoContainer">
+                        <!-- Cards de formas de pagamento ser„o renderizados aqui -->
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- ===== P¡GINA 7: BI / BUSINESS INTELLIGENCE (REDESIGNED) ===== -->
+        <div id="page-bi" class="hidden">
+            <section class="space-y-6">
+
+                <!-- Header with Month Selector -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Business Intelligence
+                        </h2>
+                        <div>
+                            <select id="biMonthSelect"
+                                class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Populated by JS with Month/Year options -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Receitas do MÍs</h4>
+                        <p id="biReceitasMes" class="text-2xl font-bold text-green-500">R$ 0,00</p>
+                    </div>
+                    <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Despesas do MÍs</h4>
+                        <p id="biDespesasMes" class="text-2xl font-bold text-red-500">R$ 0,00</p>
+                    </div>
+                    <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Saldo do MÍs</h4>
+                        <p id="biSaldoMes" class="text-2xl font-bold text-white">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <!-- Charts Row: Despesas por Categoria + DistribuiÁ„o por Categoria -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Despesas por Categoria (Horizontal Bar Chart) -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Despesas por
+                            Categoria</h3>
+                        <div id="biCategoryBarChart" class="overflow-x-auto min-h-[200px]">
+                            <!-- D3 bar chart rendered here -->
+                        </div>
+                        <div id="biCategoryBarChartEmpty" class="text-center text-gray-500 py-8 hidden">
+                            <p>Sem dados para o perÌodo</p>
+                        </div>
+                    </div>
+
+                    <!-- DistribuiÁ„o por Categoria (Donut Chart) -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">DistribuiÁ„o por
+                            Categoria</h3>
+                        <div class="flex items-center gap-4">
+                            <div id="biDonutChart" class="flex-shrink-0">
+                                <!-- D3 donut chart rendered here -->
+                            </div>
+                            <div id="biDonutLegend" class="flex-1 space-y-2">
+                                <!-- Legend items rendered here -->
+                            </div>
+                        </div>
+                        <div id="biDonutChartEmpty" class="text-center text-gray-500 py-8 hidden">
+                            <p>Sem dados para o perÌodo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row: Despesas por Parceiro + EvoluÁ„o Mensal -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Despesas por Parceiro (Horizontal Bar Chart) -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Despesas por
+                            Parceiro</h3>
+                        <div id="biPartnerBarChart" class="overflow-x-auto min-h-[150px]">
+                            <!-- D3 bar chart rendered here -->
+                        </div>
+                        <div id="biPartnerBarChartEmpty" class="text-center text-gray-500 py-8 hidden">
+                            <p>Sem dados para o perÌodo</p>
+                        </div>
+                    </div>
+
+                    <!-- EvoluÁ„o Mensal (Grouped Bar Chart) -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">EvoluÁ„o Mensal
+                            (6
+                            meses)</h3>
+                        <div id="biEvolutionChart" class="overflow-x-auto min-h-[250px]">
+                            <!-- D3 grouped bar chart rendered here -->
+                        </div>
+                        <div id="biEvolutionLegend" class="flex justify-center gap-6 mt-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-green-500 rounded"></div>
+                                <span class="text-sm text-gray-400">Receitas</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-red-500 rounded"></div>
+                                <span class="text-sm text-gray-400">Despesas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- ===== P¡GINA: CONSULTOR IA ===== -->
+        <div id="page-ai-consultant" class="hidden">
+            <section>
+                <div
+                    class="bg-gradient-to-br from-purple-900/50 to-blue-900/50 dark:from-purple-900/30 dark:to-blue-900/30 p-6 rounded-lg shadow-lg mb-6 border border-purple-500/30">
+                    <div class="flex items-center mb-4">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Consultor Financeiro IA</h2>
+                            <p class="text-purple-200 text-sm">An·lise inteligente das suas finanÁas</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 text-sm">Baseado nos seus dados financeiros, preparei algumas
+                        recomendaÁıes personalizadas para melhorar sua sa˙de financeira.</p>
+                </div>
+
+                <!-- Score Geral -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Score Financeiro</h4>
+                        <p id="aiScoreValue" class="text-3xl font-bold text-green-500">75</p>
+                        <p id="aiScoreLabel" class="text-xs text-gray-400">de 100 pontos</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Taxa de PoupanÁa</h4>
+                        <p id="aiSavingsRate" class="text-3xl font-bold text-blue-500">8%</p>
+                        <p class="text-xs text-gray-400">das receitas</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Contas Atrasadas</h4>
+                        <p id="aiOverdueCount" class="text-3xl font-bold text-red-500">3</p>
+                        <p id="aiOverdueTotal" class="text-xs text-gray-400">R$ 0,00</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-700 text-center">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Maior Gasto</h4>
+                        <p id="aiTopCategory" class="text-xl font-bold text-amber-500 truncate">-</p>
+                        <p id="aiTopCategoryValue" class="text-xs text-gray-400">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <!-- RecomendaÁıes -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        RecomendaÁıes Personalizadas
+                    </h3>
+                    <div id="aiRecommendationsList" class="space-y-4">
+                        <!-- RecomendaÁıes ser„o inseridas pelo JS -->
+                        <div class="animate-pulse flex space-x-4">
+                            <div class="flex-1 space-y-4 py-1">
+                                <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                                <div class="h-4 bg-gray-700 rounded w-1/2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plano de AÁ„o -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Plano de AÁ„o - PrÛximos 30 Dias
+                    </h3>
+                    <div id="aiActionPlanList" class="space-y-3">
+                        <!-- AÁıes ser„o inseridas pelo JS -->
+                    </div>
+                </div>
+
+                <!-- Metas Sugeridas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            Metas Sugeridas
+                        </h3>
+                        <div id="aiGoalsList" class="space-y-4">
+                            <!-- Metas ser„o inseridas pelo JS -->
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Alertas Importantes
+                        </h3>
+                        <div id="aiAlertsList" class="space-y-3">
+                            <!-- Alertas ser„o inseridos pelo JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- ===== P¡GINA: ASSINATURAS E RECORR NCIAS ===== -->
+        <div id="page-subscriptions" class="hidden">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">?? Assinaturas e RecorrÍncias
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Gerencie suas despesas recorrentes e
+                    assinaturas
+                </p>
             </div>
 
+            <div id="subscriptionsPageContent">
+                <!-- Conte˙do ser· renderizado pelo subscriptions.js -->
+                <div class="text-center py-8">
+                    <div
+                        class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent">
+                    </div>
+                    <p class="mt-4 text-gray-500 dark:text-gray-400">Carregando assinaturas...</p>
+                </div>
+            </div>
+        </div>
 
-        </main> <!-- Fim do Conte√∫do Principal -->
+        <!-- ===== P¡GINA: METAS E COFRES ===== -->
+        <div id="page-goals" class="hidden">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">?? Metas e Cofres</h2>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Defina objetivos e acompanhe seu progresso</p>
+            </div>
+
+            <div id="goalsPageContent">
+                <!-- Conte˙do ser· renderizado pelo goals.js -->
+                <div class="text-center py-8">
+                    <div
+                        class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent">
+                    </div>
+                    <p class="mt-4 text-gray-500 dark:text-gray-400">Carregando metas...</p>
+                </div>
+            </div>
+        </div>
+
+
+    </main> <!-- Fim do Conte˙do Principal -->
     </div>
 
-    <!-- Bot√£o Flutuante (FAB) para Adicionar Transa√ß√£o -->
+    <!-- Bot„o Flutuante (FAB) para Adicionar TransaÁ„o -->
     <button id="addTransactionBtn"
         class="fixed bottom-6 right-6 lg:bottom-8 lg:right-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white w-14 h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center shadow-2xl z-30 transition-all duration-300 hover:scale-110"
-        title="Adicionar transa√ß√£o">
+        title="Adicionar transaÁ„o">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 lg:h-8 lg:w-8" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
         </svg>
     </button>
 
-    <!-- ===== 3.5 ELEMENTO TOAST/NOTIFICA√á√ÉO ===== -->
+    <!-- ===== 3.5 ELEMENTO TOAST/NOTIFICA«√O ===== -->
     <div id="toastNotification"
         class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white transition-all duration-300 translate-x-[200%] hidden z-50">
-        <!-- O conte√∫do e a cor (bg-green-500 ou bg-red-500) ser√£o definidos pelo JS -->
+        <!-- O conte˙do e a cor (bg-green-500 ou bg-red-500) ser„o definidos pelo JS -->
     </div>
 
     <!-- Service Worker Registration -->
